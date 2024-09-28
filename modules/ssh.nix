@@ -1,9 +1,10 @@
-# note ssh is not automatically started but the systemctl service is created
-{lib, ...}:
+# adds ssh and forcibly creates the systemd service if ssh was not already
+# enabled, then it does nothing
+{lib, config, ...}:
 
-{
-  services.openssh.enable = true;
+{  
+  systemd.services.sshd.wantedBy = lib.mkIf config.services.openssh.enable (lib.mkForce []);
   
-  # create systemd service for SSH but do not start it automatically
-  systemd.services.sshd.wantedBy = lib.mkForce [];
+  # in case it was not enabled already enable it
+  services.openssh.enable = true;
 }

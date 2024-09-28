@@ -7,5 +7,6 @@
     ./audio.nix
     ./printing.nix
     ./ssh.nix
+    ./shell.nix
   ];
 }
