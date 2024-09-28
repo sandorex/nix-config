@@ -3,8 +3,9 @@
 {
   programs.firefox.enable = true;
 
-  environment.systemPackages = [
+  environment.systemPackages = with stable; [
     unstable.neovim
-    stable.git
+    git
+    curl
   ];
 }
