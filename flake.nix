@@ -11,7 +11,7 @@
     };
   };
 
-  outputs = { nixpkgs, nixpkgsUnstable, ... } @ inputs:
+  outputs = { self, nixpkgs, nixpkgsUnstable, ... } @ inputs:
   let
     system = "x86_64-linux";
     stable = import nixpkgs { inherit system; config.allowUnfree = true; };
@@ -19,8 +19,15 @@
   in {
     # note nixos is the hostname in this case
     nixosConfigurations.nixos = nixpkgs.lib.nixosSystem {
-      specialArgs = { inherit stable unstable system inputs; };
-      modules = [ ./configuration.nix ];
+      specialArgs = {
+        inherit stable unstable system;
+        flake = self;
+        hostname = "nixos";
+      };
+      modules = [
+        ./kvm/configuration.nix
+        ./modules/bundle.nix
+      ];
     };
   };
 }
