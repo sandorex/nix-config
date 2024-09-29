@@ -9,5 +9,9 @@
     # apps
     kitty
     mpv-unwrapped
+    vivaldi
   ];
+
+  # add some fonts
+  fonts.packages = with stable; [ fira-code-nerdfont ];
 }

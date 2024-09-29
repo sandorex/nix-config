@@ -25,6 +25,9 @@
   # in case it was not enabled already enable it
   services.openssh.enable = true;
 
+  # enable flatpak
+  services.flatpak.enable = true;
+
   # TODO temp so there is a browser installed
   programs.firefox.enable = true;
 
