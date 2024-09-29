@@ -27,7 +27,7 @@
       };
       modules = [
         ./kvm/configuration.nix
-        ./modules/bundle.nix
+        ./modules
       ];
     };
   };

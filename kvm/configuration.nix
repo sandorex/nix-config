@@ -4,7 +4,7 @@
   imports = [
     ./hardware-configuration.nix
     ../modules/plasma6.nix
-    ../modules/extra-packages.nix
+    ../modules/packages.nix
   ];
 
   # Bootloader.

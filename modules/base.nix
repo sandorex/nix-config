@@ -1,4 +1,4 @@
-{config, lib, hostname, ...}:
+{config, lib, stable, unstable, hostname, ...}:
 
 {
   # allow nix command and flakes
@@ -24,4 +24,17 @@
 
   # in case it was not enabled already enable it
   services.openssh.enable = true;
+
+  # TODO temp so there is a browser installed
+  programs.firefox.enable = true;
+
+  # add useful packages for all machines
+  environment.systemPackages = with stable; [
+    git
+    curl
+    podman
+    distrobox
+    wl-clipboard
+    lm_sensors
+  ];
 }
