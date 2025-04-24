@@ -1,27 +1,27 @@
-{ ... }:
+{ config, pkgs, lib, ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
-    ../modules/plasma6.nix
-    ../modules/packages.nix
   ];
 
   # Bootloader.
   boot.loader.grub.enable = true;
-  boot.loader.grub.device = "/dev/vda";
+  boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
-  # enable ssh
-  services.openssh.enable = true;
-
+  # Define a user account. Don't forget to set a password with ‘passwd’.
   users.users.sandorex = {
     isNormalUser = true;
     description = "Sandorex";
     extraGroups = [ "networkmanager" "wheel" ];
-    packages = [];
+    packages = with pkgs; [
+      kdePackages.kate
+    ];
   };
-  
-  # do not touch
+
+  programs.firefox.enable = true;
+
+  # leave this be
   system.stateVersion = "24.05";
 }

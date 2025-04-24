@@ -18,18 +18,25 @@
     variant = "";
   };
 
-  # do not autostart SSH server but create the systemd service unless already
-  # enabled
+  # include sshd but do not autostart it if it was not explicitly enabled before here
   systemd.services.sshd.wantedBy = lib.mkIf config.services.openssh.enable (lib.mkForce []);
-
-  # in case it was not enabled already enable it
   services.openssh.enable = true;
+
+  # enable bluetooth
+  hardware.bluetooth.enable = true;
+  # hardware.bluetooth.powerOnBoot = true; # probably dont need it on by default?
 
   # enable flatpak
   services.flatpak.enable = true;
-
-  # TODO temp so there is a browser installed
-  programs.firefox.enable = true;
+  system.userActivationScripts = {
+    # adds flathub source for users
+    flatpakSetup = {
+      text = ''
+        ${stable.flatpak}/bin/flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
+      '';
+      deps = [];
+    };
+  };
 
   # add useful packages for all machines
   environment.systemPackages = with stable; [
@@ -40,4 +47,7 @@
     wl-clipboard
     lm_sensors
   ];
+
+  # make SSD great again!
+  services.fstrim.enable = true;
 }

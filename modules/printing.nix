@@ -1,4 +1,4 @@
-{...}:
+{stable, ...}:
 
 {
   services.printing.enable = true;

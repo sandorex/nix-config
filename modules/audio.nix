@@ -24,4 +24,6 @@
       ];
     };
   };
+
+  # TODO add optional bluetooth hfp tweak from ansible
 }
