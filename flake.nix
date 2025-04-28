@@ -22,7 +22,7 @@
       modules = [
         ./hosts/helium
         ./modules
-        ./modules/plasma6.nix
+        ./modules/cinnamon.nix
         ./modules/shell.nix
         ./modules/printing.nix
       ];

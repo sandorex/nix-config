@@ -16,7 +16,8 @@
     description = "Sandorex";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
-      kdePackages.kate
+      emacs
+#      kdePackages.kate
     ];
   };
 
