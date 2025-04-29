@@ -9,22 +9,24 @@
     ssh-keys-github = { url = "https://github.com/sandorex.keys"; flake = false; };
   };
 
-  outputs = { self, nixpkgs, nixpkgs-unstable, home-manager, ... } @ inputs:
+  outputs = { self, nixpkgs, nixpkgs-unstable, ... } @ inputs:
   let
     system = "x86_64-linux";
     stable = import nixpkgs { inherit system; config.allowUnfree = true; };
     unstable = import nixpkgs-unstable { inherit system; config.allowUnfree = true; };
+    prependModules = [ ];
+    appendModules = [ ./modules/base.nix ];
   in {
     nixosConfigurations = {
       helium = nixpkgs.lib.nixosSystem rec {
         specialArgs = {
-          inherit stable unstable system home-manager;
+          inherit stable unstable system;
           pkgs = stable;
           flake = self;
           hostname = "helium";
         };
         inherit system;
-        modules = [ ./hosts/${specialArgs.hostname} ];
+        modules = prependModules ++ [ ./hosts/${specialArgs.hostname} ] ++ appendModules;
       };
 
       # installer with SSH enabled
@@ -56,3 +58,4 @@
     };
   };
 }
+
