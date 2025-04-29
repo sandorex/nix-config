@@ -1,4 +1,4 @@
-{config, lib, stable, unstable, hostname, ...}:
+{ config, lib, stable, unstable, hostname, ...}:
 
 {
   # allow nix command and flakes
@@ -24,19 +24,6 @@
 
   # enable bluetooth
   hardware.bluetooth.enable = true;
-  # hardware.bluetooth.powerOnBoot = true; # probably dont need it on by default?
-
-  # enable flatpak
-  services.flatpak.enable = true;
-  system.userActivationScripts = {
-    # adds flathub source for users
-    flatpakSetup = {
-      text = ''
-        ${stable.flatpak}/bin/flatpak remote-add --user --if-not-exists flathub https://flathub.org/repo/flathub.flatpakrepo
-      '';
-      deps = [];
-    };
-  };
 
   # add useful packages for all machines
   environment.systemPackages = with stable; [
