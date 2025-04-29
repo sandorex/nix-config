@@ -1,8 +1,11 @@
-{ config, pkgs, lib, ... }:
+{ flake, config, pkgs, lib, ... }:
 
 {
   imports = [
     ./hardware-configuration.nix
+    "${flake}/modules/base.nix"
+    "${flake}/modules/cinnamon.nix"
+    "${flake}/modules/printing.nix"
   ];
 
   # Bootloader.
@@ -10,14 +13,13 @@
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
-  # Define a user account. Don't forget to set a password with ‘passwd’.
+  # TODO add initial password
   users.users.sandorex = {
     isNormalUser = true;
     description = "Sandorex";
     extraGroups = [ "networkmanager" "wheel" ];
     packages = with pkgs; [
       emacs
-#      kdePackages.kate
     ];
   };
 

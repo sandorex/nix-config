@@ -69,7 +69,20 @@
       "inputs": {
         "home-manager": "home-manager",
         "nixpkgs": "nixpkgs_2",
-        "nixpkgs-unstable": "nixpkgs-unstable"
+        "nixpkgs-unstable": "nixpkgs-unstable",
+        "ssh-keys-github": "ssh-keys-github"
+      }
+    },
+    "ssh-keys-github": {
+      "flake": false,
+      "locked": {
+        "narHash": "sha256-Vqr7nex/y4OlzBrW39108KTTMDfvw9WE+SXH/ICVjHs=",
+        "type": "file",
+        "url": "https://github.com/sandorex.keys"
+      },
+      "original": {
+        "type": "file",
+        "url": "https://github.com/sandorex.keys"
       }
     }
   },
