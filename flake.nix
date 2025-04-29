@@ -14,48 +14,24 @@
     system = "x86_64-linux";
     stable = import nixpkgs { inherit system; config.allowUnfree = true; };
     unstable = import nixpkgs-unstable { inherit system; config.allowUnfree = true; };
-    prependModules = [ ];
-    appendModules = [ ./modules/base.nix ];
-  in {
-    nixosConfigurations = {
-      helium = nixpkgs.lib.nixosSystem rec {
-        specialArgs = {
-          inherit stable unstable system;
-          pkgs = stable;
-          flake = self;
-          hostname = "helium";
-        };
-        inherit system;
-        modules = prependModules ++ [ ./hosts/${specialArgs.hostname} ] ++ appendModules;
+
+    # consistent arguments passed to all modules
+    createConfiguration = hostname: nixpkgs.lib.nixosSystem {
+      specialArgs = {
+        inherit stable unstable hostname inputs;
+        pkgs = stable;
+        flake = self;
       };
 
-      # installer with SSH enabled
-      sshInstaller = nixpkgs.lib.nixosSystem {
-        inherit system;
-        modules = [
-          "${nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
-          ({ ... }: {
-            # users.users.nixos.password = "nixos";
-            networking.hostName = "nixos-ssh-mini";
-            services.openssh.enable = true;
+      inherit system;
 
-            # use public ssh keys from github
-            users.users.root.openssh.authorizedKeys.keys = (nixpkgs.lib.splitString "\n" (
-              (builtins.readFile inputs.ssh-keys-github.outPath)
-            ));
-
-            # rename it so its different from regular nixos installer
-            isoImage.isoBaseName = "nixos-ssh-mini";
-            isoImage.volumeID = "nixos-ssh-mini";
-
-            # bigger image but faster building
-            isoImage.squashfsCompression = "gzip -Xcompression-level 1";
-            isoImage.makeUsbBootable = true;
-            isoImage.makeEfiBootable = true;
-          })
-        ];
-      };
+      # let the default.nix handle everything
+      modules = [ ./hosts/${hostname} ];
     };
+  in {
+    nixosConfigurations.helium = createConfiguration "helium";
+    nixosConfigurations.aorus = createConfiguration "aorus";
+    nixosConfigurations.sshInstaller = createConfiguration "sshInstaller";
   };
 }
 
