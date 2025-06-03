@@ -1,8 +1,8 @@
 {
-  description = "Very experimental NixOS configuration flake";
+  description = "Multi-host NixOS configuration flake";
 
   inputs = {
-    nixpkgs.url = "github:nixos/nixpkgs/nixos-24.11";
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
 
     # fetch public ssh keys from github
@@ -19,7 +19,6 @@
     createConfiguration = hostname: nixpkgs.lib.nixosSystem {
       specialArgs = {
         inherit stable unstable hostname inputs;
-        pkgs = stable;
         flake = self;
       };
 
@@ -34,4 +33,3 @@
     nixosConfigurations.sshInstaller = createConfiguration "sshInstaller";
   };
 }
-
