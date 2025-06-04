@@ -31,11 +31,14 @@
     systemd.services.sshd.wantedBy = lib.mkIf (!config.services.sshd.autostart) (lib.mkForce []);
     services.sshd.enable = true;
 
+    # sets up containers properly so podman works
+    virtualisation.containers.enable = true;
+    virtualisation.podman.enable = true;
+
     # add useful packages for all machines
     environment.systemPackages = with stable; [
       git
       curl
-      podman
       distrobox
       wl-clipboard
       lm_sensors

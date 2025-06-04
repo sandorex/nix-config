@@ -1,4 +1,4 @@
-{ pkgs, ... }:
+{ ... }:
 
 {
   imports = [
@@ -15,9 +15,10 @@
       # public github key
       "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIFW11mEmr/RJGDv+VTuOyYqiJhZSvFTYxMkt9un5WiJk sandorex@thorium"
     ];
-  };
 
-  #environment.systemPackages = with pkgs; [];
+    # required to keep the containers running
+    linger = true;
+  };
 
   services.sshd.autostart = true;
 }
