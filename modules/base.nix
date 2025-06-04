@@ -37,6 +37,10 @@
     virtualisation.containers.enable = true;
     virtualisation.podman.enable = true;
 
+    # appimage support
+    programs.appimage.enable = true;
+    programs.appimage.binfmt = true;
+
     # add useful packages for all machines
     environment.systemPackages = with stable; [
       git
@@ -46,9 +50,25 @@
       lm_sensors
       micro
       usbutils # lsusb
+      bind.dnsutils # dig
+      file # file
+      gparted
+
+      # more codecs
+      pulseaudioFull
     ];
 
     # make SSD great again!
     services.fstrim.enable = true;
+
+    # audio stuff (use pipewire not pulseaudio)
+    security.rtkit.enable = true;
+    services.pulseaudio.enable = false;
+    services.pipewire = {
+      enable = true;
+      alsa.enable = true;
+      alsa.support32Bit = true;
+      pulse.enable = true;
+    };
   };
 }

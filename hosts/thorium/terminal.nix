@@ -9,5 +9,7 @@
 
     unstable.neovim
     unstable.helix
+
+    python3
   ];
 }

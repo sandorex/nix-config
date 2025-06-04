@@ -9,5 +9,6 @@
     krita
     orca-slicer
     kitty
+    easyeffects
   ];
 }

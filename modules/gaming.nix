@@ -4,6 +4,6 @@
   programs.steam.enable = true;
   programs.gamescope = {
     enable = true;
-    capSysNice = true;
+    capSysNice = false; # does not work "operation not permitted"
   };
 }
