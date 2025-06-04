@@ -13,6 +13,8 @@
     # allow nix command and flakes
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
+    nixpkgs.config.allowUnfree = true;
+
     networking.hostName = hostname;
     networking.networkmanager.enable = true;
 
@@ -43,6 +45,7 @@
       wl-clipboard
       lm_sensors
       micro
+      usbutils # lsusb
     ];
 
     # make SSD great again!

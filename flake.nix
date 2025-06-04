@@ -28,6 +28,7 @@
       modules = [ ./hosts/${hostname} ];
     };
   in {
+    nixosConfigurations.thorium = createConfiguration "thorium";
     nixosConfigurations.helium = createConfiguration "helium";
     nixosConfigurations.aorus = createConfiguration "aorus";
     nixosConfigurations.sshInstaller = createConfiguration "sshInstaller";

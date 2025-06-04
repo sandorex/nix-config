@@ -1,4 +1,4 @@
-{stable, ...}:
+{ stable, ... }:
 
 {
   environment.shells = with stable; [ bash zsh ];

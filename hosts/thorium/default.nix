@@ -1,0 +1,28 @@
+{ flake, stable, ... }:
+
+{
+  imports = [
+    ./configuration.nix
+    ./apps.nix
+    ./terminal.nix
+    "${flake}/modules/base.nix"
+    "${flake}/modules/plasma6.nix"
+    "${flake}/modules/flatpak.nix"
+    "${flake}/modules/printing.nix"
+    "${flake}/modules/virtualization.nix"
+    "${flake}/modules/gaming.nix"
+    "${flake}/modules/bluetooth.nix"
+  ];
+
+  users.users.sandorex = {
+    isNormalUser = true;
+    description = "Sandorex";
+    extraGroups = [ "networkmanager" "wheel" ];
+  };
+
+  # use zsh by default
+  users.defaultUserShell = stable.zsh;
+  programs.zsh.enable = true;
+
+  system.stateVersion = "25.05";
+}
