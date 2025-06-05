@@ -24,6 +24,44 @@
       options = [ "fmask=0077" "dmask=0077" ];
     };
 
+  # mount slow hdd
+  fileSystems."/mnt/slowmf" =
+    { device = "/dev/disk/by-uuid/5046099b-f7f8-4fab-9e76-d295687bb2a8";
+      fsType = "ext4";
+      options = [
+        "defaults"
+        "noatime"
+        "nodiratime"
+        "nofail"
+      ];
+    };
+
+  # TODO add username variable do not hardcode it
+  # NOTE: links are fragile, any kind of containerization breaks them so bind mounts instead
+  fileSystems."/home/sandorex/slowmf" =
+    { device = "/mnt/slowmf";
+      depends = [
+        "/mnt/slowmf"
+      ];
+      fsType = "none";
+      options = [
+        "bind"
+        "nofail"
+      ];
+    };
+
+  fileSystems."/home/sandorex/ws" =
+    { device = "/mnt/slowmf/ws";
+      depends = [
+        "/mnt/slowmf"
+      ];
+      fsType = "none";
+      options = [
+        "bind"
+        "nofail"
+      ];
+    };
+
   swapDevices = [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking

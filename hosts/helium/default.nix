@@ -7,6 +7,7 @@
     "${flake}/modules/flatpak.nix"
     "${flake}/modules/cinnamon.nix"
     "${flake}/modules/printing.nix"
+    "${flake}/modules/bluetooth.nix"
   ];
 
   # leave this be

@@ -8,7 +8,6 @@
     libreoffice
     krita
     orca-slicer
-    kitty
-    easyeffects
+    qbittorrent
   ];
 }

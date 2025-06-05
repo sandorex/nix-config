@@ -1,4 +1,4 @@
-{stable, ...}:
+{ stable, ... }:
 
 {
   programs.steam.enable = true;
@@ -6,4 +6,8 @@
     enable = true;
     capSysNice = false; # does not work "operation not permitted"
   };
+
+  environment.systemPackages = with stable; [
+    mangohud
+  ];
 }

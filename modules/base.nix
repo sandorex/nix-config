@@ -52,14 +52,17 @@
       usbutils # lsusb
       bind.dnsutils # dig
       file # file
-      gparted
-
-      # more codecs
-      pulseaudioFull
+      
+      # pulseaudioFull # more codecs, but idk if this is needed
     ];
 
     # make SSD great again!
     services.fstrim.enable = true;
+
+    # reduce wait time for stop jobs
+    systemd.extraConfig = ''
+      DefaultTimeoutStopSec=15s
+    '';
 
     # audio stuff (use pipewire not pulseaudio)
     security.rtkit.enable = true;

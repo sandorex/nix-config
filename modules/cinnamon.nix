@@ -1,6 +1,10 @@
 {...}:
 
 {
+  imports = [
+    ./gui.nix
+  ];
+
   services.xserver.enable = true;
   services.libinput.enable = true;
   services.xserver.displayManager.lightdm.enable = true;

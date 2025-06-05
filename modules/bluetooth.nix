@@ -1,9 +1,12 @@
-{ ... }:
+{ stable, ... }:
 
 {
   # enable bluetooth
   hardware.bluetooth.enable = true;
   hardware.bluetooth.powerOnBoot = true;
-
-  # TODO add optional bluetooth hfp tweak from ansible
+ 
+  environment.systemPackages = with stable; [
+    # for some reason this is needed for bluetooth even when pipewire is used
+    pulseaudioFull
+  ];
 }

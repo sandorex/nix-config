@@ -10,9 +10,6 @@
   boot.loader.grub.device = "/dev/sda";
   boot.loader.grub.useOSProber = true;
 
-  # enable bluetooth
-  hardware.bluetooth.enable = true;
-
   users.users.sandorex = {
     isNormalUser = true;
     description = "Sandorex";
