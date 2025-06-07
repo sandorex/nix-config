@@ -15,6 +15,17 @@
 
     nixpkgs.config.allowUnfree = true;
 
+    # limit amount of configurations kept
+    boot.loader.systemd-boot.configurationLimit = 10;
+    boot.loader.grub.configurationLimit = 10;
+
+    # automatic garbage collection
+    nix.gc = {
+      automatic = true;
+      dates = "weekly";
+      options = "--delete-older-than 30d";
+    };
+
     networking.hostName = hostname;
     networking.networkmanager.enable = true;
 
@@ -52,8 +63,6 @@
       usbutils # lsusb
       bind.dnsutils # dig
       file # file
-      
-      # pulseaudioFull # more codecs, but idk if this is needed
     ];
 
     # make SSD great again!
@@ -63,15 +72,5 @@
     systemd.extraConfig = ''
       DefaultTimeoutStopSec=15s
     '';
-
-    # audio stuff (use pipewire not pulseaudio)
-    security.rtkit.enable = true;
-    services.pulseaudio.enable = false;
-    services.pipewire = {
-      enable = true;
-      alsa.enable = true;
-      alsa.support32Bit = true;
-      pulse.enable = true;
-    };
   };
 }

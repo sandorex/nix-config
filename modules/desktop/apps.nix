@@ -1,6 +1,6 @@
 { stable, ... }:
 
-# this module provides gui applications that are common across all devices
+# contains default graphical apps
 {
   environment.systemPackages = with stable; [
     gparted # partitioning
@@ -8,5 +8,6 @@
     vlc # proper video player
     varia # downloader + torrent
     easyeffects # mostly cause of volume normalization
+    hardinfo2 # system information
   ];
 }

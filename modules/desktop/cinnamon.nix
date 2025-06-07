@@ -1,8 +1,8 @@
-{...}:
+{ ... }:
 
 {
   imports = [
-    ./gui.nix
+    ./pipewire.nix
   ];
 
   services.xserver.enable = true;
