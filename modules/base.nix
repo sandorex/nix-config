@@ -16,8 +16,11 @@
     nixpkgs.config.allowUnfree = true;
 
     # limit amount of configurations kept
-    boot.loader.systemd-boot.configurationLimit = 10;
-    boot.loader.grub.configurationLimit = 10;
+    boot.loader.systemd-boot.configurationLimit = 15;
+    boot.loader.grub.configurationLimit = 15;
+
+    # allows running binaries not built for nix
+    programs.nix-ld.enable = true;
 
     # automatic garbage collection
     nix.gc = {

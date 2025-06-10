@@ -5,7 +5,7 @@
     "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
   ];
 
-  # users.users.nixos.password = "nixos";
+  users.users.nixos.password = "nixos";
   networking.hostName = "nixos-ssh-mini";
   services.openssh.enable = true;
 
@@ -16,10 +16,10 @@
     micro
   ];
 
-  # use public ssh keys from github
-  users.users.root.openssh.authorizedKeys.keys = (lib.splitString "\n" (
-    (builtins.readFile inputs.ssh-keys-github.outPath)
-  ));
+  # # use public ssh keys from github
+  # users.users.root.openssh.authorizedKeys.keys = (lib.splitString "\n" (
+  #   (builtins.readFile inputs.ssh-keys-github.outPath)
+  # ));
 
   # rename it so its different from regular nixos installer
   isoImage.isoBaseName = "nixos-ssh-mini";
@@ -30,4 +30,3 @@
   isoImage.makeUsbBootable = true;
   isoImage.makeEfiBootable = true;
 }
-

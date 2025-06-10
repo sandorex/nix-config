@@ -4,9 +4,6 @@
   inputs = {
     nixpkgs.url = "github:nixos/nixpkgs/nixos-25.05";
     nixpkgs-unstable.url = "github:nixos/nixpkgs/nixos-unstable";
-
-    # fetch public ssh keys from github
-    ssh-keys-github = { url = "https://github.com/sandorex.keys"; flake = false; };
   };
 
   outputs = { self, nixpkgs, nixpkgs-unstable, ... } @ inputs:
