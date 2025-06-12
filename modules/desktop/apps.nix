@@ -9,5 +9,6 @@
     varia # downloader + torrent
     easyeffects # mostly cause of volume normalization
     hardinfo2 # system information
+    qalculate-qt # calculator
   ];
 }

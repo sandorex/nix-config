@@ -11,5 +11,6 @@
     unstable.helix
 
     python3
+    libqalculate # qalc cli
   ];
 }

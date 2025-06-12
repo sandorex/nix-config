@@ -66,6 +66,9 @@
       usbutils # lsusb
       bind.dnsutils # dig
       file # file
+      # fuse-overlayfs is much faster than the alternative
+      # https://github.com/containers/podman/issues/16541
+      fuse-overlayfs # podman
     ];
 
     # make SSD great again!
