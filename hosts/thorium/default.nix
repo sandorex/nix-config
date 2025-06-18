@@ -13,7 +13,6 @@
     "${flake}/modules/bluetooth.nix"
 
     "${flake}/modules/desktop/plasma6.nix"
-    # "${flake}/modules/desktop/niri.nix" # breaks sddm
     "${flake}/modules/desktop/apps.nix"
   ];
 

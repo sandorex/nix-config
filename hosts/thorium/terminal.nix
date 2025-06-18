@@ -12,5 +12,8 @@
 
     python3
     libqalculate # qalc cli
+    yt-dlp # youtube downloader
+
+    buildah
   ];
 }
