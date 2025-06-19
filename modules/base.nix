@@ -7,6 +7,12 @@
       type = lib.types.bool;
       description = "Autostart SSH server";
     };
+
+    nix.gc.keep-generations = lib.mkOption {
+      default = 15;
+      type = lib.types.ints.positive;
+      description = "Keep this number of generations from being garbage collected";
+    };
   };
 
   config = {
@@ -15,10 +21,6 @@
 
     nixpkgs.config.allowUnfree = true;
 
-    # limit amount of configurations kept
-    boot.loader.systemd-boot.configurationLimit = 15;
-    boot.loader.grub.configurationLimit = 15;
-
     # allows running binaries not built for nix
     programs.nix-ld.enable = true;
 
@@ -26,7 +28,18 @@
     nix.gc = {
       automatic = true;
       dates = "weekly";
-      options = "--delete-older-than 30d";
+      # do not delete generations as that is done using nix-gen-gc
+      # options = "--delete-older-than 15d";
+    };
+
+    # clean up generations before garbage collecting
+    systemd.services.nix-gc.wants = [ "nix-gen-gc.service" ];
+
+    # automatic generation garbage collection
+    systemd.services.nix-gen-gc = {
+      description = "NixOS Generation Garbage Collector";
+      script = "exec ${config.nix.package.out}/bin/nix-env -vvvv --profile /nix/var/nix/profiles/system --delete-generations +${toString config.nix.gc.keep-generations}";
+      serviceConfig.Type = "oneshot";
     };
 
     networking.hostName = hostname;
@@ -69,6 +82,7 @@
       # fuse-overlayfs is much faster than the alternative
       # https://github.com/containers/podman/issues/16541
       fuse-overlayfs # podman
+      nh # nix cli helper
     ];
 
     # make SSD great again!
