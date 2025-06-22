@@ -12,7 +12,7 @@
 
   # NOTE: this prevents use of headset microphones but fixes issues with cheap earbuds
   services.pipewire.wireplumber.configPackages = [
-    (pkgs.writeTextDir "share/wireplumber/wireplumber.conf.d/10-bluez.conf" ''
+    (stable.writeTextDir "share/wireplumber/wireplumber.conf.d/10-bluez.conf" ''
     wireplumber.settings = {
       bluetooth.autoswitch-to-headset-profile = false
     }
