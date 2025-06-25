@@ -10,5 +10,7 @@
     easyeffects # mostly cause of volume normalization
     hardinfo2 # system information
     qalculate-qt # calculator
+    localsend # sharing files, links etc across devices
+    audacious # music player
   ];
 }
