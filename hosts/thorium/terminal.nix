@@ -14,6 +14,7 @@
     libqalculate # qalc cli
     yt-dlp # youtube downloader
 
+    nushell # the best shell
     buildah
   ];
 }
