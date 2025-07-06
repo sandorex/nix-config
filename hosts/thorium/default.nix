@@ -19,7 +19,10 @@
 
     kde.enable = true;
     hyprland.enable = true;
-    tuigreet.enable = true;
+    tuigreet = {
+      enable = true;
+      autologin.command = "startplasma-wayland";
+    };
   };
 
   users.users.${config.my.user} = {

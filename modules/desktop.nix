@@ -6,9 +6,16 @@
     ./desktop/plasma6.nix
     ./desktop/hyprland.nix
     ./desktop/cinnamon.nix
+    ./desktop/tuigreet.nix
   ];
 
   options = {
+    my.gui = lib.mkOption {
+      default = (config.my.kde.enable || config.my.hyprland.enable || config.my.cinnamon.enable);
+      type = lib.types.bool;
+      description = "Is GUI enabled";
+    };
+
     ## desktops ##
   
     my.kde.enable = lib.mkOption {
@@ -29,20 +36,7 @@
       description = "Enable Cinnamon desktop";
     };
 
-    my.gui = lib.mkOption {
-      default = (config.my.kde.enable || config.my.hyprland.enable || config.my.cinnamon.enable);
-      type = lib.types.bool;
-      readOnly = true;
-      description = "Is GUI enabled";
-    };
-
     ## greeters ##
-
-    my.tuigreet.enable = lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Use tuigreet greetd greeter";
-    };
 
     my.sddm.enable = lib.mkOption {
       default = false;
