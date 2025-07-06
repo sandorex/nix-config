@@ -10,7 +10,4 @@
     "${flake}/modules/desktop/apps.nix"
     "${flake}/modules/desktop/cinnamon.nix"
   ];
-
-  # leave this be
-  system.stateVersion = "24.05";
 }

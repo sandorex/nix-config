@@ -1,6 +1,8 @@
-{ ... }:
+{ config, lib, ... }:
 
 # basically sddm display manager
 {
-  services.displayManager.sddm.enable = true;
+  config = lib.mkIf config.my.sddm.enable {
+    services.displayManager.sddm.enable = true;
+  };
 }

@@ -1,6 +1,6 @@
 { stable, unstable, ... }:
 
-# graphical apps here
+# apps here
 {
   environment.systemPackages = with stable; [
     rofi-wayland # official rofi does not yet support wayland
@@ -10,5 +10,10 @@
     krita
     orca-slicer
     qbittorrent
+  ]
+  
+  ## terminal stuff
+  ++ [
+    unstable.neovim
   ];
 }

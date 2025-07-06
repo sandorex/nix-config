@@ -1,33 +1,34 @@
-{ flake, stable, ... }:
+{ config, flake, stable, ... }:
 
 {
   imports = [
     ./configuration.nix
     ./apps.nix
-    ./terminal.nix
 
-    "${flake}/modules/base.nix"
-    "${flake}/modules/flatpak.nix"
-    "${flake}/modules/printing.nix"
-    "${flake}/modules/virtualization.nix"
-    "${flake}/modules/gaming.nix"
-    "${flake}/modules/bluetooth.nix"
-    "${flake}/modules/desktop/apps.nix"
-
-    "${flake}/modules/desktop/plasma6.nix"
-    "${flake}/modules/desktop/hyprland.nix"
-    "${flake}/modules/desktop/tuigreet.nix"
+    "${flake}/modules"
   ];
 
-  users.users.sandorex = {
+  my = {
+    user = "sandorex";
+
+    libvirtd.enable = true;
+    podman.enable = true;
+    bluetooth.enable = true;
+    gaming.enable = true;
+    apps.terminal = true;
+
+    kde.enable = true;
+    hyprland.enable = true;
+    tuigreet.enable = true;
+  };
+
+  users.users.${config.my.user} = {
     isNormalUser = true;
-    description = "Sandorex";
+    description = "${config.my.user}";
     extraGroups = [ "networkmanager" "wheel" ];
   };
 
   # use zsh by default
   users.defaultUserShell = stable.zsh;
   programs.zsh.enable = true;
-
-  system.stateVersion = "25.05";
 }

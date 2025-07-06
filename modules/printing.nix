@@ -1,9 +1,19 @@
-{ stable, ... }:
+{ config, lib, stable, ... }:
 
 {
-  services.printing.enable = true;
-  services.printing.drivers = with stable; [
-    # Xerox 3010
-    foo2zjs
-  ];
+  options = {
+    my.printing = lib.mkOption {
+      default = config.my.gui; # include automatically if gui
+      type = lib.types.bool;
+      description = "Enable printing support";
+    };
+  };
+
+  config = {
+    services.printing.enable = true;
+    services.printing.drivers = with stable; [
+      # Xerox 3010
+      foo2zjs
+    ];
+  };
 }
