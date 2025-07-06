@@ -10,7 +10,9 @@
     easyeffects # mostly cause of volume normalization
     hardinfo2 # system information
     qalculate-qt # calculator
-    localsend # sharing files, links etc across devices
     audacious # music player
   ];
+
+  # sharing files, links etc more secure variant of kdeconnect
+  programs.localsend.enable = true;
 }

@@ -5,7 +5,14 @@
     "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
   ];
 
-  users.users.nixos.password = "nixos";
+  users.users.nixos = {
+    # password is required for ssh
+    password = lib.mkForce "nixos";
+
+    # installer has initial password set, this is to prevent warnings
+    initialHashedPassword = lib.mkForce null;
+  };
+
   networking.hostName = "nixos-ssh-mini";
   services.openssh.enable = true;
 
