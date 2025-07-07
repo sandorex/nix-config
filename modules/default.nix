@@ -12,6 +12,7 @@
     ./gaming.nix
     ./packages.nix
     ./desktop.nix
+    ./ddcutil.nix
   ];
 
   options = {

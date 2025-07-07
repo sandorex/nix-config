@@ -29,6 +29,11 @@
           message = "Extra apps cannot be enabled without gui";
         }
       ];
+
+      fonts.packages = with stable; []
+        ++ (lib.optionals extraTUIWithGUI [
+          nerd-fonts.fira-code # proper font for terminal
+        ]);
   
       environment.systemPackages = with stable; []
         ## gui stuff ##
@@ -45,7 +50,6 @@
         ## terminal stuff when gui is present ##
         ++ (lib.optionals extraTUIWithGUI [
           kitty # proper terminal
-          nerd-fonts.fira-code # proper font for terminal
         ])
 
         ## terminal stuff ##

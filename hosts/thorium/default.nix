@@ -1,16 +1,28 @@
-{ config, flake, stable, ... }:
+{ config, flake, stable, unstable, ... }:
 
 {
   imports = [
     ./configuration.nix
-    ./apps.nix
 
     "${flake}/modules"
   ];
 
-  my = {
-    user = "sandorex";
+  my.user = "sandorex";
 
+  users.users.${config.my.user} = {
+    isNormalUser = true;
+    description = "${config.my.user}";
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
+  };
+
+  # use zsh by default
+  users.defaultUserShell = stable.zsh;
+  programs.zsh.enable = true;
+
+  my = {
     libvirtd.enable = true;
     podman.enable = true;
     bluetooth.enable = true;
@@ -21,17 +33,23 @@
     hyprland.enable = true;
     tuigreet = {
       enable = true;
+      # autologin into KDE for now
       autologin.command = "startplasma-wayland";
     };
   };
 
-  users.users.${config.my.user} = {
-    isNormalUser = true;
-    description = "${config.my.user}";
-    extraGroups = [ "networkmanager" "wheel" ];
-  };
+  environment.systemPackages = with stable; [
+    vivaldi
+    librewolf
+    libreoffice
+    krita
+    orca-slicer
+    qbittorrent
 
-  # use zsh by default
-  users.defaultUserShell = stable.zsh;
-  programs.zsh.enable = true;
+    ## terminal stuff
+    unstable.neovim
+  ];
+
+  # ext. monitor brightness control
+  my.ddcutil.enable = true;
 }
