@@ -22,6 +22,7 @@ in
       kdePackages.kwalletmanager
 
       rofi-wayland # official rofi does not yet support wayland
+      pavucontrol # gui for audio
       playerctl # controlling players
       waybar # the bar
       grim # screenshot
@@ -30,6 +31,7 @@ in
 
     fonts.packages = with stable; [
       font-awesome # for waybar
+      nerd-fonts.bigblue-terminal
     ];
 
     programs.hyprland.enable = true;
