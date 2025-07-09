@@ -22,10 +22,6 @@
   users.defaultUserShell = stable.zsh;
   programs.zsh.enable = true;
 
-  dotfiles.enabled = [
-    "nvim"
-  ];
-
   my = {
     libvirtd.enable = true;
     podman.enable = true;
@@ -56,4 +52,8 @@
 
   # ext. monitor brightness control
   my.ddcutil.enable = true;
+
+  dotfiles.clone.enable = true;
+  dotfiles.dotfiles = {
+  };
 }

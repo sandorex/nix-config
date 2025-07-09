@@ -1,36 +1,91 @@
-{ config, lib, ... }:
+{ config, lib, stable, ... }:
 
 let
-  # TODO assumed location try to get it somehow or just check it?
-  # configDir = "/home/${config.my.user}/nix-config/config/configs";
-  # configDir = ../config/configs
-  dotfilesDir = "/home/${config.my.user}/nix-config/config/dotfiles";
+  inherit (builtins) map attrNames readDir readFile isString filter split replaceStrings concatStringsSep;
 
-  configDir = ../config/rules;
-  configSuffix = ".conf";
-  configPlaceholder = "@dotfiles@";
+  rulesDir = ../config/rules;
 
-  ruleNames = builtins.map (x: lib.strings.removeSuffix configSuffix x) (builtins.attrNames (builtins.readDir configDir));
-  _ = builtins.trace ruleNames null;
+  # used in the rules to make the dotfiles directory dynamic
+  placeholder = "@dotfiles@";
+  placeholderValue = "${config.dotfiles.path}/config/dotfiles";
 
-  configContents = builtins.map (x: builtins.readFile "${configDir}/${x}${configSuffix}") (builtins.map (x: toString x) config.dotfiles.enabled);
+  # gets names of all rule files
+  ruleList = lib.pipe rulesDir [
+    readDir
+    attrNames
+    (map (lib.removeSuffix ".conf"))
+  ];
 
-  rulesFilter = line: (builtins.isString line) && line != "" && !(lib.strings.hasPrefix "#" line);
-  # rules = builtins.concatStringsSep "\n" ruleFileContents;
+  rules = lib.pipe config.dotfiles.dotfiles [
+    # filter only enabled
+    (lib.filterAttrs (_: v: v.enable))
 
-  # builtins.map (x: nixpkgs.lib.strings.removeSuffix x) (builtins.attrNames (builtins.readDir ./config/configs))
-  # TODO use replaceStrings
+    # get only names
+    attrNames
+
+    # read every rule file
+    (map (x: readFile "${rulesDir}/${x}.conf"))
+
+    # add them together
+    (concatStringsSep "\n")
+
+    # replace the placeholder
+    (replaceStrings [placeholder] [placeholderValue])
+
+    # split into lines
+    (split "\n")
+
+    # filter comments and empty lines
+    (filter (line: (isString line) && line != "" && !(lib.hasPrefix "#" line)))
+  ];
 in
 {
   options = {
-    dotfiles.enabled = lib.mkOption {
-      default = [];
-      type = with lib.types; listOf (enum ruleNames); # allow only valid configs
-      description = "Which dotfiles to install";
+    dotfiles.path = lib.mkOption {
+      default = "/home/${config.my.user}/nix-config";
+      type = lib.types.str;
+      description = "Path on host where dotfiles are stored";
+      example = "/home/user/.dotfiles";
+    };
+
+    dotfiles.clone.url = lib.mkOption {
+      default = "https://github.com/sandorex/nix-config";
+      type = lib.types.str;
+      description = "Path on host where dotfiles are stored";
+      example = "https://github.com/user/dotfiles";
+    };
+
+    dotfiles.clone.enable = lib.mkEnableOption "Clone repository automatically";
+
+    dotfiles.dotfiles = lib.mkOption {
+      type = lib.types.submodule {
+        options = lib.genAttrs ruleList (rule: {
+          enable = lib.mkEnableOption "dotfiles for ${rule}";
+        });
+      };
+      default = {};
     };
   };
 
-  config = lib.mkIf (config.dotfiles.enabled != []) {
-    systemd.user.tmpfiles.users.${config.my.user}.rules = (builtins.filter rulesFilter (builtins.split "\n" (builtins.replaceStrings [configPlaceholder] [dotfilesDir] (builtins.concatStringsSep "\n" configContents))));
-  };
+  config = lib.mkMerge [
+    {
+      assertions = [
+        {
+          assertion = ruleList != [];
+          message = "No dotfiles rules found!";
+        }
+      ];
+    }
+    (lib.mkIf (rules != []) {
+      systemd.user.tmpfiles.users.${config.my.user}.rules = rules;
+    })
+    (lib.mkIf (config.dotfiles.clone.enable) {
+      system.userActivationScripts = {
+        # clone repository if it does not exist
+        dotfilesClone = ''
+          [ -e "${config.dotfiles.path}" ] || ${stable.git} clone "${config.dotfiles.clone.url}" "${config.dotfiles.path}"
+        '';
+      };
+    })
+  ];
 }
