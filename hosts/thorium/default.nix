@@ -22,6 +22,10 @@
   users.defaultUserShell = stable.zsh;
   programs.zsh.enable = true;
 
+  dotfiles.enabled = [
+    "nvim"
+  ];
+
   my = {
     libvirtd.enable = true;
     podman.enable = true;

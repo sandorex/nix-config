@@ -13,6 +13,7 @@
     ./packages.nix
     ./desktop.nix
     ./ddcutil.nix
+    ./dotfiles.nix
   ];
 
   options = {

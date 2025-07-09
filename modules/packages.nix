@@ -2,6 +2,7 @@
 
 # contains all packages (gui and tui)
 {
+  # TODO rename to extras.enable and extras.terminal.enable
   options = {
     my.apps.extras = lib.mkOption {
       default = true;
