@@ -28,6 +28,7 @@
     bluetooth.enable = true;
     gaming.enable = true;
     apps.terminal = true;
+    helpers.enable = true;
 
     kde.enable = true;
     hyprland.enable = true;

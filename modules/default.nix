@@ -14,6 +14,7 @@
     ./desktop.nix
     ./ddcutil.nix
     ./dotfiles.nix
+    ./helpers.nix
   ];
 
   options = {
