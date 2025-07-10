@@ -9,7 +9,9 @@
   config = lib.mkIf config.my.helpers.enable {
     environment.systemPackages = [
       (stable.writeShellScriptBin "mynix" ''
-        cd ${config.dotfiles.path}
+        set -eo pipefail
+
+        cd ${config.my.localPath}
 
         case "$1" in
             repl)

@@ -1,4 +1,4 @@
-{ config, lib, stable, unstable, hostname, ...}:
+{ config, lib, stable, unstable, hostname, repo, ...}:
 
 {
   imports = [
@@ -19,9 +19,23 @@
 
   options = {
     my.user = lib.mkOption {
-      default = null;
-      type = lib.types.nullOr lib.types.str;
+      default = repo.owner;
+      type = lib.types.str;
       description = "Main user of the system";
+    };
+
+    my.localPath = lib.mkOption {
+      default = "/home/${config.my.user}/${repo.localName}";
+      type = lib.types.str;
+      description = "Path on host where dotfiles are stored";
+      readOnly = true;
+    };
+
+    my.repoURL = lib.mkOption {
+      default = repo.url;
+      type = lib.types.str;
+      description = "URL to the git repository";
+      readOnly = true;
     };
 
     services.sshd.autostart = lib.mkOption {
@@ -32,13 +46,6 @@
   };
 
   config = {
-    assertions = [
-      {
-        assertion = config.my.user != null;
-        message = "Main user option not set";
-      }
-    ];
-  
     # allow nix command and flakes
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 

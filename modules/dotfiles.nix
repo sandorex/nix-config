@@ -7,7 +7,7 @@ let
 
   # used in the rules to make the dotfiles directory dynamic
   placeholder = "@dotfiles@";
-  placeholderValue = "${config.dotfiles.path}/config/dotfiles";
+  placeholderValue = "${config.my.localPath}/config/dotfiles";
 
   # gets names of all rule files
   ruleList = lib.pipe rulesDir [
@@ -16,7 +16,7 @@ let
     (map (lib.removeSuffix ".conf"))
   ];
 
-  rules = lib.pipe config.dotfiles.dotfiles [
+  rules = lib.pipe config.dotfiles [
     # filter only enabled
     (lib.filterAttrs (_: v: v.enable))
 
@@ -40,31 +40,13 @@ let
   ];
 in
 {
-  options = {
-    dotfiles.path = lib.mkOption {
-      default = "/home/${config.my.user}/nix-config";
-      type = lib.types.str;
-      description = "Path on host where dotfiles are stored";
-      example = "/home/user/.dotfiles";
+  options.dotfiles = lib.mkOption {
+    type = lib.types.submodule {
+      options = lib.genAttrs ruleList (rule: {
+        enable = lib.mkEnableOption "dotfiles for ${rule}";
+      });
     };
-
-    dotfiles.clone.url = lib.mkOption {
-      default = "https://github.com/sandorex/nix-config";
-      type = lib.types.str;
-      description = "Path on host where dotfiles are stored";
-      example = "https://github.com/user/dotfiles";
-    };
-
-    dotfiles.clone.enable = lib.mkEnableOption "Clone repository automatically";
-
-    dotfiles.dotfiles = lib.mkOption {
-      type = lib.types.submodule {
-        options = lib.genAttrs ruleList (rule: {
-          enable = lib.mkEnableOption "dotfiles for ${rule}";
-        });
-      };
-      default = {};
-    };
+    default = {};
   };
 
   config = lib.mkMerge [
@@ -78,14 +60,6 @@ in
     }
     (lib.mkIf (rules != []) {
       systemd.user.tmpfiles.users.${config.my.user}.rules = rules;
-    })
-    (lib.mkIf (config.dotfiles.clone.enable) {
-      system.userActivationScripts = {
-        # clone repository if it does not exist
-        dotfilesClone = ''
-          [ -e "${config.dotfiles.path}" ] || ${stable.git} clone "${config.dotfiles.clone.url}" "${config.dotfiles.path}"
-        '';
-      };
     })
   ];
 }

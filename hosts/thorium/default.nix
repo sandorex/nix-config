@@ -7,8 +7,6 @@
     "${flake}/modules"
   ];
 
-  my.user = "sandorex";
-
   users.users.${config.my.user} = {
     isNormalUser = true;
     description = "${config.my.user}";
@@ -58,7 +56,5 @@
   # ext. monitor brightness control
   my.ddcutil.enable = true;
 
-  dotfiles.clone.enable = true;
-  dotfiles.dotfiles = {
-  };
+  dotfiles = {};
 }

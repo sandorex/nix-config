@@ -66,6 +66,8 @@
 
             nushell # the best shell
             buildah
+
+            shellcheck
         ]);
 
       # NOTE: localsend needs ports open so use this syntax
