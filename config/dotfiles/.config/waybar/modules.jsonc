@@ -22,16 +22,17 @@
   },
   "custom/task": {
     "format": " <span font='14'>{icon}</span> {text} ",
-    "exec": "extras/task.sh waybar",
+    "tooltip": false,
+    "exec": "extras/task.sh get",
+    "interval": "once",
     "signal": 2,
     "format-icons": {
       "inactive": "󱌟 ",
       "active": "󰳷 ",
     },
     "return-type": "json",
-    "on-click": "extras/task.sh start && pkill -RTMIN+2 waybar",
-    "on-click-right": "extras/task.sh stop && pkill -RTMIN+2 waybar",
-    "on-click-middle": "extras/task.sh done && pkill -RTMIN+2 waybar"
+    "on-click": "extras/task.sh set && pkill -RTMIN+2 waybar",
+    "on-click-right": "extras/task.sh reset && pkill -RTMIN+2 waybar",
   },
   "group/brightness": {
     "orientation": "horizontal",
@@ -170,7 +171,7 @@
     "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
     "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
     "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
-    "on-click": "blueman-manager"
+    "on-click": "overskride"
   },
   "custom/power": {
     "format" : " <span font='14'>󰤂</span> ",

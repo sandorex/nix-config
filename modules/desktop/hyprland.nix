@@ -16,19 +16,30 @@ in
     my.gui = true;
 
     environment.systemPackages = with stable; [
-      # using kwallet and so should be kinda compatible with kde plasma side by side
+      # using kwallet
       kdePackages.kwallet
       kdePackages.kwallet-pam
       kdePackages.kwalletmanager
 
+      adwaita-icon-theme
+
+      # theming
+      kdePackages.breeze
+      kdePackages.breeze-gtk
+      kdePackages.breeze-icons
+      kdePackages.qt6ct
+      libsForQt5.qt5ct
+      nwg-look
+
       rofi-wayland # official rofi does not yet support wayland
       pavucontrol # gui for audio
       playerctl # controlling players
-      blueman # gui for bluetooth
+      overskride # gui for bluetooth (blueman sucks)
       libnotify # notifications
       waybar # the bar
       wev # key detection thingy
       grim # screenshot
+      slurp # select region wayland (for grim)
       mako # notification system
     ];
 
@@ -38,5 +49,26 @@ in
     ];
 
     programs.hyprland.enable = true;
+
+    qt = {
+      enable = true;
+      style = "breeze";
+      platformTheme = "qt5ct";
+    };
+
+    programs.dconf.profiles.user = {
+      databases = [{
+        lockAll = true;
+        settings = {
+          "org/gnome/desktop/interface" = {
+            gtk-theme = "Adwaita";
+          };
+
+          "org/gnome/desktop/interface" = {
+            color-scheme = "prefer-dark";
+          };
+        };
+      }];
+    };
   };
 }
