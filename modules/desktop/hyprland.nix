@@ -24,6 +24,8 @@ in
       rofi-wayland # official rofi does not yet support wayland
       pavucontrol # gui for audio
       playerctl # controlling players
+      blueman # gui for bluetooth
+      libnotify # notifications
       waybar # the bar
       grim # screenshot
       mako # notification system
