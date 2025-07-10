@@ -1,0 +1,165 @@
+#!/usr/bin/env bash
+# interactive git commit editor
+# date of creation: 10-06-2024
+
+# NOTE -m enabled job control so `suspend` works
+set -m -eu -o pipefail
+
+if git diff --cached --quiet; then
+    echo "There are no staged changes"
+    exit 0
+fi
+
+GIT_ROOT="$(git rev-parse --show-toplevel)"
+
+# this file contains the final commit message
+COMMIT_MSG_FILE="$(mktemp)"
+
+# this file is used for temporary editing before appending to the above file
+TEMP_FILE="$(mktemp)"
+
+function find_files() {
+    git diff --cached --name-only
+}
+
+files=($(find_files))
+file_count="${#files[@]}"
+index=0
+refresh_needed=0
+
+trap "rm -f $COMMIT_MSG_FILE $TEMP_FILE" EXIT
+
+function next() {
+    if [[ $index -eq $(( file_count - 1 )) ]]; then
+        echo "This is the last change"
+    else
+        index=$(( index + 1))
+    fi
+}
+
+function prev() {
+    if [[ $index -eq 0 ]]; then
+        echo "This is the first change"
+    else
+        index=$(( index - 1))
+    fi
+}
+
+function current_diff() {
+    echo "-- git-explain-commit --"
+    git --no-pager diff --color=always --cached -- "${GIT_ROOT}/${files[$index]}"
+}
+
+# TODO disabled suspend as it messes up the menu, find a way to make it work nicer
+trap "" SIGTSTP
+
+while true; do
+    # refresh status if needed
+    if [[ "$refresh_needed" -eq 1 ]]; then
+        files=($(find_files))
+        file_count="${#files[@]}"
+        index=0
+        refresh_needed=0
+    fi
+
+    clear
+    current_diff
+    echo "(Change $(( index + 1 ))/${file_count})"
+    echo -n "[Quit/View/Commit/Edit/Append/Next/Previous/Suspend/Refresh/Help] "
+    read -e -n1
+    echo
+
+    case "$REPLY" in
+        [qQ])
+            echo -n "Are you sure you want to discard the message? [y/N] "
+            read -n1
+            echo
+
+            case "$REPLY" in
+                [Yy])
+                    echo "Goodbye."
+                    exit 0
+                    ;;
+                *)
+                    ;;
+            esac
+            ;;
+        [vV])
+            # prevent sless options from messing with this
+            current_diff | LESS='-R --mouse' less
+            ;;
+        [cC])
+            clear
+            cat <<EOF
+--------------------------------- MSG -----------------------------------------
+$(cat "${COMMIT_MSG_FILE}")
+--------------------------------- MSG -----------------------------------------
+EOF
+            echo -n "Do you want to commit changes with this message? [y/N] "
+            read -n1
+            echo
+
+            case "$REPLY" in
+                [yY])
+                    # --file wont open the editor at all
+                    if git commit --file="${COMMIT_MSG_FILE}"; then
+                        # quit if commit was successfull
+                        break
+                    else
+                        echo "Something went wrong while committing.."
+                        read -n1
+                    fi
+                    ;;
+                *)
+                    # do nothing and just go back to the menu
+                    ;;
+            esac
+            ;;
+        [eE])
+            "${EDITOR:-vi}" "${COMMIT_MSG_FILE}"
+            ;;
+        [aA])
+            # clean the file
+            echo "" > "${TEMP_FILE}"
+
+            # open editor
+            "${EDITOR:-vi}" "${TEMP_FILE}"
+
+            # append to the commit msg
+            cat "${TEMP_FILE}" >> "${COMMIT_MSG_FILE}"
+            ;;
+        [nN])
+            next
+            ;;
+        [pP])
+            prev
+            ;;
+        [sS])
+            refresh_needed=1
+
+            # requires set -m
+            suspend
+            ;;
+        [rR])
+            refresh_needed=1
+            ;;
+        [hH])
+            cat <<EOF
+-------------------------------- HELP -----------------------------------------
+q) Quit and discard the message
+c) Run git commit with current message as template
+e) Edit the current commit message in the editor
+a) Append text to commit message, opens the editor
+n) Go to next change
+p) Go to previous change
+s) Suspend script, use fg to bring it back
+r) Refresh git status (do this if you change the git staged)
+-------------------------------------------------------------------------------
+EOF
+            # wait for key press
+            read -n1
+            ;;
+        *)
+            ;;
+    esac
+done

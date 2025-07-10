@@ -1,0 +1,36 @@
+themes {
+    darklight {
+        // accent around actions like QUIT RESIZE ETC
+        fg 250
+        // session title, keybinding surrounding characters
+        white 99
+
+        bg 0
+        // bar background color
+        black 236
+
+        red 9
+        green 34
+        yellow 11
+        blue 39
+        magenta 201
+        cyan 159
+        orange 208
+    }
+}
+
+theme "catppuccin-macchiato"
+
+// hide lines around the screen
+pane_frames false
+
+// do not use unicode
+simplified_ui true
+
+keybinds {
+    shared_except "resize" "move" {
+        // switch tabs quickly even while in locked mode
+        bind "F1" { GoToPreviousTab; }
+        bind "F2" { GoToNextTab; }
+    }
+}

@@ -1,0 +1,30 @@
+{
+  "output": "HDMI-A-1", // show only on main monitor
+  "height": 30,
+  "spacing": 4,
+  // "reload_style_on_change": true, // used for tweaking
+  "modules-left": [
+    "custom/start",
+    "hyprland/workspaces",
+    // "wlr/taskbar",
+    "custom/task"
+  ],
+  "modules-center": [
+    "mpris"
+  ],
+  "modules-right": [
+    "temperature",
+    "idle_inhibitor",
+    "group/brightness",
+    "bluetooth",
+    "pulseaudio",
+    "group/tray",
+    // "privacy",
+    "clock",
+    "custom/power"
+  ],
+  "include": [
+    "modules.jsonc",
+    "hyprland.jsonc"
+  ],
+}

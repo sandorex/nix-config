@@ -1,0 +1,32 @@
+#!/usr/bin/env bash
+# toggles dark mode in kde plasma by switching the looknfeel
+
+set -euo pipefail
+
+if plasma-apply-lookandfeel -l | grep -q 'org.kde.breezetwilight.desktop'; then
+    THEME_LIGHT="org.kde.breezetwilight.desktop"
+else
+    THEME_LIGHT="org.kde.breeze.desktop"
+fi
+
+THEME_DARK="org.kde.breezedark.desktop"
+
+# plasma-apply-looknfeel does not specify which is currently used
+current="$(grep 'LookAndFeelPackage=' ~/.config/kdeglobals)"
+case "$current" in
+    '')
+        echo "Error reading looknfeel package"
+        exit 1
+        ;;
+    *"$THEME_DARK")
+        echo "Applying light theme ($THEME_LIGHT)"
+        plasma-apply-lookandfeel -a "$THEME_LIGHT"
+        ;;
+    *)
+        echo "Applying dark theme ($THEME_DARK)"
+        plasma-apply-lookandfeel -a "$THEME_DARK"
+        ;;
+esac
+
+# always use breeze light cursor
+plasma-apply-cursortheme Breeze_Light
