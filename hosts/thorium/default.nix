@@ -40,7 +40,11 @@
   };
 
   environment.systemPackages = with stable; [
-    vivaldi
+    # enable codecs and force kwallet6 with regardless of desktop
+    (stable.vivaldi.override {
+      proprietaryCodecs = true;
+      commandLineArgs = "--password-store=kwallet6";
+    })
     librewolf
     libreoffice
     krita

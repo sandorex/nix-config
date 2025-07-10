@@ -27,6 +27,7 @@ in
       blueman # gui for bluetooth
       libnotify # notifications
       waybar # the bar
+      wev # key detection thingy
       grim # screenshot
       mako # notification system
     ];
@@ -37,9 +38,5 @@ in
     ];
 
     programs.hyprland.enable = true;
-
-    xdg.portal.extraPortals = with stable; [
-      kdePackages.xdg-desktop-portal-kde
-    ];
   };
 }
