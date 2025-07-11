@@ -83,6 +83,7 @@
       bind.dnsutils # dig
       file # file
       nh # nix cli helper
+      unzip
     ];
 
     # disable sshd autostart if not requested

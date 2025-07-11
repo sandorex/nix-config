@@ -86,11 +86,11 @@
   "network": {
     "format-wifi": "{essid} ({signalStrength}%)  ",
     "format-ethernet": "<span font='11'>󰈀 </span>",
-    "format-disconnected": "Disconnected ⚠",
+    "format-disconnected": " Disconnected ⚠ ",
     "tooltip-format": "{ifname} {ipaddr}/{cidr}",
     "tooltip-format-wifi": "{ifname } {essid} {frequency}",
     "tooltip-format-disconnected": "Disconnected",
-    "on-click": "extras/terminal.sh --title 'NetworkManager TUI' nmtui",
+    "on-click": "nm-connection-editor"
   },
   "tray": {
     "icon-size": 20,
@@ -140,9 +140,9 @@
     "ignored-sinks": [
       "Easy Effects Sink"
     ],
-    "on-click": "extras/sink-switcher.py",
-    "on-click-middle": "pavucontrol",
-    "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+    "on-click-right": "extras/sink-switcher.py",
+    "on-click-middle": "pavucontrol"
   },
   "bluetooth": {
     "format-on": "<span font='12' color='#00BFFF'>  </span>",

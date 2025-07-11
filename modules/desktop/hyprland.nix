@@ -31,6 +31,7 @@ in
       libsForQt5.qt5ct
       nwg-look
 
+      networkmanagerapplet # networkmanager applet and nm-connection-editor
       rofi-wayland # official rofi does not yet support wayland
       pavucontrol # gui for audio
       playerctl # controlling players
@@ -41,6 +42,18 @@ in
       grim # screenshot
       slurp # select region wayland (for grim)
       mako # notification system
+
+      # hypr stuff
+      hypridle
+      hyprpaper
+      hyprpolkitagent # polkit
+      hyprshot
+
+      # general applications
+      kdePackages.kate
+      kdePackages.gwenview
+      kdePackages.dolphin
+      kdePackages.ark
     ];
 
     fonts.packages = with stable; [
