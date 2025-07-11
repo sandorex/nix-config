@@ -25,7 +25,10 @@
     podman.enable = true;
     bluetooth.enable = true;
     gaming.enable = true;
-    apps.terminal = true;
+    extras = {
+      gui.enable = true;
+      terminal.enable = true;
+    };
     helpers.enable = true;
 
     hyprland.enable = true;

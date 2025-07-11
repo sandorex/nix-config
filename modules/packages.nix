@@ -4,13 +4,13 @@
 {
   # TODO rename to extras.enable and extras.terminal.enable
   options = {
-    my.apps.extras = lib.mkOption {
-      default = true;
+    my.extras.gui.enable = lib.mkOption {
+      default = false;
       type = lib.types.bool;
       description = "Install extra gui applications";
     };
 
-    my.apps.terminal = lib.mkOption {
+    my.extras.terminal.enable = lib.mkOption {
       default = false;
       type = lib.types.bool;
       description = "Install extra terminal applications";
@@ -19,14 +19,14 @@
 
   config =
     let
-      extraGUI = config.my.apps.extras;
-      extraTUI = config.my.apps.terminal;
-      extraTUIWithGUI = config.my.apps.terminal && config.my.gui;
+      extraGUI = config.my.extras.gui.enable;
+      extraTUI = config.my.extras.terminal.enable;
+      extraTUIWithGUI = config.my.extras.terminal.enable && config.my.gui;
     in
     {
       assertions = [
         {
-          assertion = (config.my.apps.extras && config.my.gui) || !config.my.apps.extras;
+          assertion = (config.my.extras.gui.enable && config.my.gui) || !config.my.extras.gui.enable;
           message = "Extra apps cannot be enabled without gui";
         }
       ];
@@ -55,19 +55,19 @@
 
         ## terminal stuff ##
         ++ (lib.optionals extraTUI [
-            lsd
-            starship
+          lsd
+          starship
 
-            unstable.helix # proper editor
+          unstable.helix # proper editor
 
-            python3
-            libqalculate # qalc cli
-            yt-dlp # youtube downloader
+          python3
+          libqalculate # qalc cli
+          yt-dlp # youtube downloader
 
-            nushell # the best shell
-            buildah
+          nushell # the best shell
+          buildah
 
-            shellcheck
+          shellcheck
         ]);
 
       # NOTE: localsend needs ports open so use this syntax
