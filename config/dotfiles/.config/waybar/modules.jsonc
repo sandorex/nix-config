@@ -164,8 +164,8 @@
     "menu-file": "power_menu.xml",
     "menu-actions": {
       "logout": "hyprctl dispatch exit",
-      "shutdown": "shutdown",
-      "reboot": "reboot",
+      "shutdown": "systemctl shutdown",
+      "reboot": "systemctl reboot",
       "suspend": "systemctl suspend",
       "hibernate": "systemctl hibernate"
     }
