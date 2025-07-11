@@ -1,20 +1,4 @@
 {
-  "wlr/taskbar": {
-    "format": "{icon}",
-    "icon-size": 20,
-    "tooltip-format": "{title}",
-    "on-click": "activate",
-    "on-click-middle": "close",
-    "ignore-list": [
-      "kitty"
-    ],
-    // "app_ids-mapping": {
-    //   "firefoxdeveloperedition": "firefox-developer-edition"
-    // },
-    "rewrite": {
-      "Firefox Web Browser": "Firefox"
-    }
-  },
   "custom/start": {
     "format": "  <span font='12'> </span>",
     "tooltip": false,
@@ -150,15 +134,15 @@
       // use `pactl list sinks` to find names
       "alsa_output.pci-0000_0a_00.1.hdmi-stereo": "󰡁 ",
       "alsa_output.pci-0000_0a_00.6.analog-stereo": " ",
-      "alsa_output.pci-0000_0a_00.6.analog-stereo-muted": "󰟎 ",
       "default": ["", " ", " "]
     },
     "max-volume": 120,
     "ignored-sinks": [
       "Easy Effects Sink"
     ],
-    "on-click": "pavucontrol",
-    "on-click-middle": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
+    "on-click": "extras/sink-switcher.py",
+    "on-click-middle": "pavucontrol",
+    "on-click-right": "pactl set-sink-mute @DEFAULT_SINK@ toggle"
   },
   "bluetooth": {
     "format-on": "<span font='12' color='#00BFFF'>  </span>",

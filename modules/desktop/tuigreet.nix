@@ -9,13 +9,13 @@
       description = "Use tuigreet greetd greeter";
     };
 
-    # commands to use
-    # kde: startplasma-wayland
-    # hyprland: hyprland
     my.tuigreet.autologin.command = lib.mkOption {
       default = null;
-      type = with lib.types; nullOr (str);
-      description = "Enables autologin with this command";
+      type = with lib.types; nullOr (enum [
+        "startplasma-wayland"
+        "hyprland"
+      ]);
+      description = "Enable autologin with following command";
     };
 
     my.tuigreet.autologin.user = lib.mkOption {

@@ -8,6 +8,9 @@ space = "none"
 tab = ">"
 space = "·"
 
+[editor.file-picker]
+hidden = false
+
 [keys.normal]
 C-up = "@10k"
 C-down = "@10j"

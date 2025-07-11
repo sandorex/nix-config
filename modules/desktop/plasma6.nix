@@ -35,8 +35,8 @@
       programs.dconf.enable = true;
     })
 
-    (lib.mkIf config.my.sddm.enable {
-      services.displayManager.sddm.enable = true;
-    })
+    {
+      services.displayManager.sddm.enable = config.my.sddm.enable;
+    }
   ];
 }

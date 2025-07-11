@@ -1,4 +1,4 @@
-{ config, flake, stable, unstable, ... }:
+{ flake, config, lib, stable, unstable, ... }:
 
 {
   imports = [
@@ -28,17 +28,24 @@
     apps.terminal = true;
     helpers.enable = true;
 
-    kde.enable = true;
     hyprland.enable = true;
     tuigreet = {
       enable = true;
-      # autologin into KDE for now
-      autologin.command = "startplasma-wayland";
+      autologin.command = "hyprland";
     };
   };
 
+  # add plain plasma specialisation as backup
+  specialisation.plasma.configuration.my = {
+    hyprland.enable = lib.mkForce false;
+    tuigreet.enable = lib.mkForce false;
+
+    kde.enable = true;
+    sddm.enable = true;
+  };
+
   environment.systemPackages = with stable; [
-    # enable codecs and force kwallet6 with regardless of desktop
+    # enable codecs and force kwallet6 regardless of desktop
     (stable.vivaldi.override {
       proprietaryCodecs = true;
       commandLineArgs = "--password-store=kwallet6";
@@ -47,6 +54,7 @@
     libreoffice
     krita
     orca-slicer
+    cura-appimage
     qbittorrent
 
     ## terminal stuff
