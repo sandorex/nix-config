@@ -12,41 +12,50 @@ let
   # gets names of all rule files
   ruleList = lib.pipe rulesDir [
     readDir
+
+    # get only file names
     attrNames
+
+    # filter only conf files
+    (filter (name: (lib.hasSuffix ".conf" name)))
+
+    # remove suffix
     (map (lib.removeSuffix ".conf"))
-  ];
-
-  rules = lib.pipe config.dotfiles [
-    # filter only enabled
-    (lib.filterAttrs (_: v: v.enable))
-
-    # get only names
-    attrNames
-
-    # read every rule file
-    (map (x: readFile "${rulesDir}/${x}.conf"))
-
-    # add them together
-    (concatStringsSep "\n")
-
-    # replace the placeholder
-    (replaceStrings [placeholder] [placeholderValue])
-
-    # split into lines
-    (split "\n")
-
-    # filter comments and empty lines
-    (filter (line: (isString line) && line != "" && !(lib.hasPrefix "#" line)))
   ];
 in
 {
-  options.dotfiles = lib.mkOption {
-    type = lib.types.submodule {
-      options = lib.genAttrs ruleList (rule: {
-        enable = lib.mkEnableOption "dotfiles for ${rule}";
-      });
+  options = {
+    dotfiles.placeholder = lib.mkOption {
+      default = placeholder;
+      type = lib.types.str;
+      readOnly = true;
+      internal = true;
+      description = "Placeholder value which is replaced by actual dotfiles path";
     };
-    default = {};
+
+    dotfiles.configs = lib.mkOption {
+      default = (lib.genAttrs ruleList
+        (rule: lib.pipe "${rulesDir}/${rule}.conf" [
+          readFile
+        
+          # split into lines
+          (split "\n")
+
+          # filter comments and empty lines
+          (filter (line: (isString line) && line != "" && !(lib.hasPrefix "#" line)))
+        ])
+      );
+      type = lib.types.attrs;
+      readOnly = true;
+      internal = true;
+      description = "Contains all dotfiles rules";
+    };
+
+    dotfiles.enabled = lib.mkOption {
+      type = with lib.types; listOf (listOf str);
+      default = [];
+      description = "List of lists of lines that are added to user systemd-tmpfiles but with expanded placeholder";
+    };
   };
 
   config = lib.mkMerge [
@@ -58,8 +67,24 @@ in
         }
       ];
     }
-    (lib.mkIf (rules != []) {
-      systemd.user.tmpfiles.users.${config.my.user}.rules = rules;
+    (lib.mkIf (config.dotfiles.enabled != []) {
+      systemd.user.tmpfiles.users.${config.my.user}.rules = (
+        lib.pipe config.dotfiles.enabled [
+          lib.flatten
+
+          # concat all lists into one string
+          (concatStringsSep "\n")
+
+          # replace the placeholder
+          (replaceStrings [placeholder] [placeholderValue])
+
+          # split into lines
+          (split "\n")
+
+          # filter empty arrays
+          (filter isString)
+        ]
+      );
     })
   ];
 }

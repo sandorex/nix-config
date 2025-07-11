@@ -66,6 +66,4 @@
 
   # ext. monitor brightness control
   my.ddcutil.enable = true;
-
-  dotfiles = {};
 }

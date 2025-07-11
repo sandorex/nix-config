@@ -33,12 +33,12 @@
 
   programs.firefox.enable = true;
 
-  dotfiles = {
-    bin.enable = true;
-    bash.enable = true;
-    helix.enable = true;
-    nano.enable = true;
-    kitty.enable = true;
-    lsd.enable = true;
-  };
+  dotfiles.enabled = with config.dotfiles.configs; [
+    bin
+    bash
+    kitty
+    helix
+    nano
+    lsd
+  ];
 }
