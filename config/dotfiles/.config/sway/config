@@ -19,8 +19,8 @@ output $mon2 pos 0 0    res 1920x1080
 output $mon1 pos 0 1080 res 1920x1080
 
 # set wallpapers
-output * bg city.png stretch
-output $mon1 bg street.png stretch
+output * bg street.png stretch
+output $mon1 bg city.png stretch
 
 ### INPUT ###
 include inputs.conf
@@ -39,7 +39,10 @@ bar {
 }
 
 # hide cursor when idle for short period
-seat * hide_cursor 500
+seat * hide_cursor 2000
+
+gaps outer 15
+gaps inner 15
 
 # remove title but leave border on focused window
 default_border pixel
@@ -68,6 +71,11 @@ bindsym $mod+Shift+r exec sway -C 2>&1 | grep -E 'Error on line [0-9]+' > ~/.cac
 
 # Exit sway (logs you out of your Wayland session)
 bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
+
+# volume control
+bindsym XF86AudioMute exec pactl set-sink-mute @DEFAULT_SINK@ toggle
+bindsym XF86AudioRaiseVolume exec pactl set-sink-volume @DEFAULT_SINK@ +5%
+bindsym XF86AudioLowerVolume exec pactl set-sink-volume @DEFAULT_SINK@ -5%
 
 # moving around
 bindsym $mod+Left focus left
@@ -161,7 +169,9 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-#exec dbus-update-activation-environment --all
+# focus primary monitor on start
+exec swaymsg focus output $mon1
+
 # sway does not want to set XDG_CURRENT_DESKTOP
 exec systemctl --user set-environment XDG_CURRENT_DESKTOP=sway XDG_SESSION_DESKTOP=sway
 exec systemctl --user import-environment XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP

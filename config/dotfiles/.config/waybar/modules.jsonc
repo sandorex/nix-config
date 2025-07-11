@@ -163,7 +163,7 @@
     "menu": "on-click",
     "menu-file": "power_menu.xml",
     "menu-actions": {
-      "logout": "hyprctl dispatch exit",
+      "logout": "swaymsg exit",
       "shutdown": "systemctl shutdown",
       "reboot": "systemctl reboot",
       "suspend": "systemctl suspend",
