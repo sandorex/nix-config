@@ -134,5 +134,3 @@ cdalias ws "$HOME/ws"
 cdalias slowmf "/mnt/slowmf"
 
 unset cdalias
-
-if [ -e /home/sandorex/.nix-profile/etc/profile.d/nix.sh ]; then . /home/sandorex/.nix-profile/etc/profile.d/nix.sh; fi # added by Nix installer

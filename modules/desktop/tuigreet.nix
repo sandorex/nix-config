@@ -14,6 +14,7 @@
       type = with lib.types; nullOr (enum [
         "startplasma-wayland"
         "hyprland"
+        "sway"
       ]);
       description = "Enable autologin with following command";
     };

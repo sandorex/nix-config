@@ -31,20 +31,20 @@
     };
     helpers.enable = true;
 
-    hyprland.enable = true;
-    tuigreet = {
-      enable = true;
-      autologin.command = "hyprland";
-    };
-  };
-
-  # add plain plasma specialisation as backup
-  specialisation.plasma.configuration.my = {
-    hyprland.enable = lib.mkForce false;
-    tuigreet.enable = lib.mkForce false;
-
     kde.enable = true;
     sddm.enable = true;
+  };
+
+  # add swaywm specialization
+  specialisation.sway.configuration.my = {
+    kde.enable = lib.mkForce false;
+    sddm.enable = lib.mkForce false;
+
+    sway.enable = true;
+    tuigreet = {
+      enable = true;
+      autologin.command = "sway";
+    };
   };
 
   environment.systemPackages = with stable; [

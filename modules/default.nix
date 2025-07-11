@@ -84,6 +84,8 @@
       file # file
       nh # nix cli helper
       unzip
+      libnotify # notifications
+      bc # cli calculator
     ];
 
     # disable sshd autostart if not requested

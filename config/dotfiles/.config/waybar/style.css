@@ -165,18 +165,30 @@ menu {
 }
 
 #workspaces button {
-  padding: 0 10px;
+  padding: 0 5px;
 }
 
+#workspaces button.empty:not(.focused) {
+  color: gray;
+}
 /* #workspaces button.active { */
   /* background-color: #64727D; */
 /* } */
 
 /* highlight main monitor workspace */
-#workspaces button.hosting-monitor {
-  color: #fb6afa;
-  /* border-radius: 16px; */
-}
+/* #workspaces button.hosting-monitor, */
+/* #workspaces button.current_output { */
+  /* color: #fb6afa; */
+/* } */
+
+/* #workspaces button:not(.hosting-monitor):not(.current_output).visible { */
+  /* color: #6afb6b; */
+/* } */
+
+/* #workspaces button:not(.visible) { */
+  /* color: */ 
+  /* background-color: red; */
+/* } */
 
 /* highlight secondary monitor workspace */
 /* #workspaces button:not(.hosting-monitor) { */

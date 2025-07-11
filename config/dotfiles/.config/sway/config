@@ -1,39 +1,35 @@
-# EXPERIMENTAL SWAYWM CONFIG
-# TODO LIST
-
 include /etc/sway/config-vars.d/*
 include /etc/sway/config.d/*
 
 set $super Mod4
-set $hyper Mod3
 set $alt Mod1
-
-set $mod Mod3
+set $mod Mod4
 
 set $term kitty
+set $menu rofi -show drun -i | xargs swaymsg exec --
 
-set $menu wofi --show drun  -i | xargs swaymsg exec --
+set $scripts ~/.config/sway/scripts
+
+### Monitors ###
+set $mon1 "Dell Inc. DELL U2414H 292K46B839FL"
+set $mon2 "ASUSTek COMPUTER INC VA249 KCLMQS107820"
+
+# vertical layout (negative pos causes issues)
+output $mon2 pos 0 0    res 1920x1080
+output $mon1 pos 0 1080 res 1920x1080
+
+# set wallpapers
+output * bg city.png stretch
+output $mon1 bg street.png stretch
 
 ### INPUT ###
-input type:keyboard {
-    xkb_layout us_plus_hyper_mod
-
-    repeat_delay 350
-    repeat_rate 25
-}
-
-input "1241:41119:E-Signal_USB_Gaming_Mouse" {
-    accel_profile "flat"
-    pointer_accel "0.0"
-}
+include inputs.conf
 
 ### BAR ###
-# TODO move to waybar
 bar {
-    # moved the tray to the bottom to reduce clutter
+    # show only on second monitor to show the workspace
+    output $mon2
     position bottom
-
-    # clock removed as it already exists in parent compositor
 
     colors {
         statusline #ffffff
@@ -42,19 +38,19 @@ bar {
     }
 }
 
+# hide cursor when idle for short period
+seat * hide_cursor 500
+
 # remove title but leave border on focused window
 default_border pixel
 default_floating_border none
-
-# Default wallpaper (more resolutions are available in /usr/share/backgrounds/sway/)
-output * bg /usr/share/backgrounds/sway/Sway_Wallpaper_Blue_1920x1080.png fill
 
 # keybindings
 # Start a terminal
 bindsym $mod+Return exec $term
 
 # Kill focused window
-bindsym $mod+Shift+q kill
+bindsym $mod+q kill
 
 # Start your launcher
 bindsym $mod+d exec $menu
@@ -73,11 +69,18 @@ bindsym $mod+Shift+r exec sway -C 2>&1 | grep -E 'Error on line [0-9]+' > ~/.cac
 # Exit sway (logs you out of your Wayland session)
 bindsym $mod+Shift+e exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -B 'Yes, exit sway' 'swaymsg exit'
 
-# Moving around:
+# moving around
+bindsym $mod+Left focus left
+bindsym $mod+Down focus down
+bindsym $mod+Up focus up
+bindsym $mod+Right focus right
+
 bindsym $mod+Shift+Left move left
 bindsym $mod+Shift+Down move down
 bindsym $mod+Shift+Up move up
 bindsym $mod+Shift+Right move right
+
+bindsym $mod+Grave exec $scripts/swap-workspaces.sh
 
 # Workspaces:
 # Switch to workspace
@@ -163,12 +166,6 @@ bindsym $mod+r mode "resize"
 exec systemctl --user set-environment XDG_CURRENT_DESKTOP=sway XDG_SESSION_DESKTOP=sway
 exec systemctl --user import-environment XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP
 
-# start kde polkit
-exec "/usr/lib/x86_64-linux-gnu/libexec/polkit-kde-authentication-agent-1"
+exec ~/.config/waybar/waybar.sh
 
-# start gnome keyring
-exec gnome-keyring-daemon --start --components=secrets
-exec export $(gnome-keyring-daemon)
-
-# start wallet pam? do i even need this?
-exec "/usr/share/libpam-kwallet-common/pam_kwallet_init"
+# exec mako # it seems to be already running?
