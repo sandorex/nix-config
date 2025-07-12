@@ -18,7 +18,14 @@
                 nix repl --expr "builtins.getFlake \"$PWD\""
                 ;;
             *) # just redirect to nixos-rebuild
-                sudo nixos-rebuild --flake . "$@"
+                read -p "Enter specialisation (press enter for none): " ans
+
+                arg=""
+                if [[ -n "$ans" ]]; then
+                    arg="--specialisation $ans"
+                fi
+
+                sudo nixos-rebuild $arg --flake . "$@"
                 ;;
         esac
       '')

@@ -1,22 +1,8 @@
 {
   // show workspaces active on all monitors
   "sway/workspaces": {
-    // "current-only": true,
-    "format": " {value} ",
-    "all-outputs": true
-
-    // show all workspaces
-    // "persistent-workspaces": {
-    //   "1": [],
-    //   "2": [],
-    //   "3": [],
-    //   "4": [],
-    //   "5": [],
-    //   "6": [],
-    //   "7": [],
-    //   "8": [],
-    //   "9": [],
-    //   "10": []
-    // }
+    "format": "{name}",
+    "all-outputs": true,
+    "disable-scroll": true
   }
 }

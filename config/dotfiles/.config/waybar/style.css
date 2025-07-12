@@ -164,7 +164,6 @@ menu {
   color: #ffffff;
 }
 
-/* NOTE for hyprland add :.hosting-monitor */
 /* highlight main monitor */
 #workspaces button.current_output.visible,
 #workspaces button.hosting-monitor.visible {

@@ -44,10 +44,11 @@
       jq
 
       # general applications
-      kdePackages.kate
-      kdePackages.gwenview
-      kdePackages.dolphin
-      kdePackages.ark
+      qimgv            # image viewer
+      kdePackages.kate # text editor
+      file-roller      # archive manager
+      musicpod         # music player
+      xfce.thunar      # file manager
     ];
 
     fonts.packages = with stable; [
@@ -62,15 +63,23 @@
       platformTheme = "qt5ct";
     };
 
-    environment.sessionVariables = {
-      # fix for dolphin MIME types being empty
-      XDG_MENU_PREFIX = "plasma-";
-      # TODO define other XDG directories as sway does not
+    services.udisks2.enable = true;
 
-      XDG_PICTURES_DIR = "/home/${config.my.user}/Pictures";
-    };
-
-    environment.etc."/xdg/menus/plasma-applications.menu".text = builtins.readFile "${stable.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
+    # define XDG directories as sway does not set them
+    environment.sessionVariables =
+      let
+        home = "/home/${config.my.user}";
+      in
+      {
+        XDG_DESKTOP_DIR="${home}/Desktop";
+        XDG_DOCUMENTS_DIR="${home}/Documents";
+        XDG_DOWNLOAD_DIR="${home}/Downloads";
+        XDG_MUSIC_DIR="${home}/Music";
+        XDG_PICTURES_DIR="${home}/Pictures";
+        XDG_PUBLICSHARE_DIR="${home}/Public";
+        XDG_TEMPLATES_DIR="${home}/Templates";
+        XDG_VIDEOS_DIR="${home}/Videos";
+      };
 
     programs.dconf.profiles.user = {
       databases = [{
