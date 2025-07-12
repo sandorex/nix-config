@@ -6,4 +6,4 @@
 # cd in script directory
 cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
 
-waybar -c config.jsonc
+exec waybar -c config.jsonc

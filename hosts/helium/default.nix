@@ -22,8 +22,8 @@
     };
     helpers.enable = true;
 
-    kde.enable = true;
-    sddm.enable = true;
+    cinnamon.enable = true;
+    lightdm.enable = true;
   };
 
   environment.systemPackages = with stable; [
@@ -39,6 +39,5 @@
     kitty
     helix
     nano
-    lsd
   ];
 }

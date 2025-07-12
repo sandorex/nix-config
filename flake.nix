@@ -41,36 +41,5 @@
     # nixosConfigurations.aorus = createConfiguration "aorus";
     # nixosConfigurations.sshInstaller = createConfiguration "sshInstaller";
 
-    # automatic installer via `nix run`
-    packages.${system}.default = (stable.writeShellApplication {
-      name = "setup";
-      runtimeInputs = with stable; [ git ];
-      text = ''
-        set -euo pipefail
-
-        OS="$(grep '^NAME' /etc/os-release | sed 's/NAME=//')"
-
-        # allow specifying hostname
-        if [[ "$#" -ge 1 ]]; then
-            NAME="#$1"
-        else
-            NAME=""
-        fi
-
-        if [[ "$OS" == "NixOS" ]]; then
-            echo "Cloning dotfiles into home"
-            [[ -e "$HOME/${repo.localName}" ]] || git clone --recurse-submodules "${repo.url}" --branch "${repo.branch}" "$HOME/${repo.localName}"
-
-            echo "Building NixOS from dotfiles"
-            echo sudo nixos-rebuild boot --flake "$HOME/${repo.localName}$NAME"
-
-            echo "Done!"
-            echo -e "\nPlease restart your computer!"
-        else
-            echo "Non-NixOS host not supported yet.."
-            exit 1
-        fi
-      '';
-    });
   };
 }

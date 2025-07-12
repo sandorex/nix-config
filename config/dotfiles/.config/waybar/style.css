@@ -39,7 +39,7 @@ button:hover {
 }
 
 #workspaces button.focused {
-  background-color: #64727D;
+  background-color: #4C565E;
   box-shadow: inset 0 -3px #ffffff;
 }
 
@@ -164,33 +164,14 @@ menu {
   color: #ffffff;
 }
 
-#workspaces button {
-  padding: 0 5px;
+/* NOTE for hyprland add :.hosting-monitor */
+/* highlight main monitor */
+#workspaces button.current_output.visible,
+#workspaces button.hosting-monitor.visible {
+  color: #2A9CFF;
 }
 
-#workspaces button.empty:not(.focused) {
-  color: gray;
+/* highlight secondary monitor */
+#workspaces button.visible {
+  color: #DE781F;
 }
-/* #workspaces button.active { */
-  /* background-color: #64727D; */
-/* } */
-
-/* highlight main monitor workspace */
-/* #workspaces button.hosting-monitor, */
-/* #workspaces button.current_output { */
-  /* color: #fb6afa; */
-/* } */
-
-/* #workspaces button:not(.hosting-monitor):not(.current_output).visible { */
-  /* color: #6afb6b; */
-/* } */
-
-/* #workspaces button:not(.visible) { */
-  /* color: */ 
-  /* background-color: red; */
-/* } */
-
-/* highlight secondary monitor workspace */
-/* #workspaces button:not(.hosting-monitor) { */
-  /* color: red; */
-/* } */

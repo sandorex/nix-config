@@ -64,7 +64,10 @@
       "default": "",
       "chromium": " ",
     },
-    // "ignored-players": ["firefox"]
+    "ignored-players": [
+      "firefox",
+      "chromium"
+    ]
   },
   "idle_inhibitor": {
     "format": "{icon}",

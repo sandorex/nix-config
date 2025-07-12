@@ -1,4 +1,4 @@
-{ flake, config, lib, stable, ... }:
+{ config, lib, stable, ... }:
 
 {
   options = {
@@ -61,6 +61,16 @@
       style = "breeze";
       platformTheme = "qt5ct";
     };
+
+    environment.sessionVariables = {
+      # fix for dolphin MIME types being empty
+      XDG_MENU_PREFIX = "plasma-";
+      # TODO define other XDG directories as sway does not
+
+      XDG_PICTURES_DIR = "/home/${config.my.user}/Pictures";
+    };
+
+    environment.etc."/xdg/menus/plasma-applications.menu".text = builtins.readFile "${stable.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
 
     programs.dconf.profiles.user = {
       databases = [{

@@ -2,7 +2,7 @@
   // show workspaces active on all monitors
   "sway/workspaces": {
     // "current-only": true,
-    "format": "{value}",
+    "format": " {value} ",
     "all-outputs": true
 
     // show all workspaces
