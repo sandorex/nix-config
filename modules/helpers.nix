@@ -42,8 +42,8 @@
 
                 sudo nixos-rebuild "$cmd" --flake . $arg "$@"
                 ;;
-            build)
-                sudo nixos-rebuild build --flake . "$@"
+            boot)
+                sudo nixos-rebuild boot --flake . "$@"
                 ;;
             *)
                 echo "Invalid command '$1'"
