@@ -35,18 +35,6 @@
     sddm.enable = true;
   };
 
-  # add swaywm specialization
-  specialisation.sway.configuration.my = {
-    kde.enable = lib.mkForce false;
-    sddm.enable = lib.mkForce false;
-
-    sway.enable = true;
-    tuigreet = {
-      enable = true;
-      autologin.command = "sway";
-    };
-  };
-
   environment.systemPackages = with stable; [
     # enable codecs and force kwallet6 regardless of desktop
     (stable.vivaldi.override {
@@ -66,4 +54,13 @@
 
   # ext. monitor brightness control
   my.ddcutil.enable = true;
+
+  my.flatpak.install = [
+    "com.obsproject.Studio"
+    "md.obsidian.Obsidian"  # notes
+    "com.stremio.Stremio"
+
+    "org.freecad.FreeCAD"   # CAD software
+    "org.kde.kdenlive"      # video editor
+  ];
 }

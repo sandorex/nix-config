@@ -31,6 +31,10 @@
     librewolf
   ];
 
+  my.flatpak.install = [
+    "com.stremio.Stremio"
+  ];
+
   programs.firefox.enable = true;
 
   dotfiles.enabled = with config.dotfiles.configs; [

@@ -14,5 +14,10 @@
     environment.systemPackages = with stable; [
       mangohud
     ];
+
+    my.flatpak.install = [
+      "com.usebottles.bottles"      # general purpose proton/wine launcher
+      "com.heroicgameslauncher.hgl" # GOG/Epic games launcher
+    ];
   };
 }

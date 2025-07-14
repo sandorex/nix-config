@@ -1,6 +1,5 @@
-{ config, lib, stable, ... }:
+{ config, lib, stable, hostname, ... }:
 
-# defines helper functions for managing nixos
 {
   options = {
     my.helpers.enable = lib.mkEnableOption "helpers";
@@ -17,15 +16,38 @@
             repl)
                 nix repl --expr "builtins.getFlake \"$PWD\""
                 ;;
-            *) # just redirect to nixos-rebuild
-                read -p "Enter specialisation (press enter for none): " ans
+            update)
+                nix flake update
+                ;;
+            check)
+                nix flake check
+                ;;
+            list)
+                nixos-rebuild list-generations
+                ;;
 
-                arg=""
-                if [[ -n "$ans" ]]; then
+            # nixos-rebuild
+            switch|test)
+                cmd="$1"
+                shift
+
+                # ask for specialisations if there are any defined
+                if grep -ERq 'specialisation.\w+.configuration' ./hosts/${hostname}; then
+                  read -p "Specialisation (enter for none): " ans
+
+                  if [[ -n "$ans" ]]; then
                     arg="--specialisation $ans"
+                  fi
                 fi
 
-                sudo nixos-rebuild $arg --flake . "$@"
+                sudo nixos-rebuild "$cmd" --flake . $arg "$@"
+                ;;
+            build)
+                sudo nixos-rebuild build --flake . "$@"
+                ;;
+            *)
+                echo "Invalid command '$1'"
+                exit 1
                 ;;
         esac
       '')
