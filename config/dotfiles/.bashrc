@@ -41,6 +41,22 @@ HISTTIMEFORMAT="[%F %T %Z]"
 # ignore duplicate commands and those that start with space
 HISTCONTROL='ignoreboth'
 
+# map Ctrl+Z to fg
+bind '"\C-z":"fg\n"' # switch to foreground (requires `stty susp undef`)
+
+before_command() {
+  # re-enable ^Z so you can suspend commands that are not smart like sleep, cat etc
+  stty susp ^Z
+}
+after_command() {
+  # disable ^Z so the keybinding can be used
+  stty susp undef
+}
+
+# run in PS0 which is shown before the actual command
+PS0='$(before_command)'
+PROMPT_COMMAND="$PROMPT_COMMAND after_command ;"
+
 # as bash cant really do right aligned prompt im just printing next line with center alignment
 __center_align_printf() {
     termwidth="$(tput cols)"
@@ -70,7 +86,7 @@ __prompt_cmd() {
     echo -en "\033]0;$(pwd)\a"
 }
 
-PROMPT_COMMAND="__prompt_cmd ; $PROMPT_COMMAND"
+PROMPT_COMMAND="$PROMPT_COMMAND __prompt_cmd ;"
 PS1='\[$(tput setaf 4)\]$_BASH_JOBS\[$(tput setaf 11)\]$\[$(tput sgr0)\] '
 
 # enable bash completion

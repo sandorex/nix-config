@@ -43,6 +43,7 @@
                 sudo nixos-rebuild "$cmd" --flake . $arg "$@"
                 ;;
             boot)
+                shift
                 sudo nixos-rebuild boot --flake . "$@"
                 ;;
             *)
