@@ -1,8 +1,6 @@
 { config, lib, stable, unstable, ... }:
 
-# contains all packages (gui and tui)
 {
-  # TODO rename to extras.enable and extras.terminal.enable
   options = {
     my.extras.gui.enable = lib.mkOption {
       default = false;
@@ -19,59 +17,81 @@
 
   config =
     let
-      extraGUI = config.my.extras.gui.enable;
-      extraTUI = config.my.extras.terminal.enable;
-      extraTUIWithGUI = config.my.extras.terminal.enable && config.my.gui;
+      gui = config.my.extras.gui.enable;
+      tui = config.my.extras.terminal.enable;
     in
     {
       assertions = [
         {
-          assertion = (config.my.extras.gui.enable && config.my.gui) || !config.my.extras.gui.enable;
+          assertion = (gui && config.my.gui) || !gui;
           message = "Extra apps cannot be enabled without gui";
         }
       ];
 
-      fonts.packages = with stable; []
-        ++ (lib.optionals extraTUIWithGUI [
-          nerd-fonts.fira-code # proper font for terminal
-        ]);
+      # fonts enabled if gui extras are
+      fonts.packages = with stable; (lib.optionals gui [
+        nerd-fonts.fira-code # proper font for terminal
+      ]);
   
-      environment.systemPackages = with stable; []
-        ## gui stuff ##
-        ++ (lib.optionals extraGUI [
-          gparted # partitioning
-          vlc # proper video player
-          varia # downloader + torrent
-          easyeffects # mostly cause of volume normalization
-          hardinfo2 # system information
-          qalculate-qt # calculator
-          audacious # music player
-        ])
+      environment.systemPackages = with stable; [
+        # utilities
+        git
+        curl
+        wl-clipboard
+        lm_sensors
 
-        ## terminal stuff when gui is present ##
-        ++ (lib.optionals extraTUIWithGUI [
-          kitty # proper terminal
-        ])
+        # common linux commands
+        usbutils # lsusb
+        bind.dnsutils # dig
+        file # file
+        unzip
 
-        ## terminal stuff ##
-        ++ (lib.optionals extraTUI [
-          lsd
-          starship
+        # used in scripts
+        libnotify # notify-send
+        bc # cli calculator
+      ]
 
-          unstable.helix # proper editor
+      ## GUI APPS ##
+      ++ (lib.optionals gui [
+        kitty # proper terminal
+        gparted # partitioning
+        vlc # proper video player
+        # varia # downloader + torrent # NOTE: currently broken package use flatpak instead
+        easyeffects # mostly cause of volume normalization
+        hardinfo2 # system information
+        qalculate-qt # calculator
+        audacious # music player
+      ])
 
-          python3
-          libqalculate # qalc cli
-          yt-dlp # youtube downloader
+      ## TUI APPS ##
+      ++ (lib.optionals tui [
+        lsd
+        starship
 
-          nushell # the best shell
-          buildah
+        unstable.helix # proper editor
 
-          shellcheck
-        ]);
+        python3
+        libqalculate # qalc cli
+        yt-dlp # youtube downloader
+
+        nushell # the best shell
+        buildah # container builder thingy
+
+        shellcheck
+      ]);
+
+      # flatpaks to install (will not be installed if flatpak is disabled!)
+      my.flatpak.install = [
+        "io.github.giantpinkrobots.varia" # torrent + downloader
+      ];
 
       # NOTE: localsend needs ports open so use this syntax
       # sharing files, links etc more secure variant of kdeconnect
-      programs.localsend.enable = lib.mkDefault extraGUI;
+      programs.localsend.enable = lib.mkDefault gui;
+
+      dotfiles.enabled = with config.dotfiles.configs; [] ++ (lib.optionals gui [
+        # setup kitty dotfiles, its awful without it
+        kitty
+      ]);
     };
 }

@@ -52,6 +52,9 @@
     unstable.neovim
   ];
 
+  # manual sandboxing
+  programs.firejail.enable = true;
+
   # ext. monitor brightness control
   my.ddcutil.enable = true;
 

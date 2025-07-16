@@ -72,22 +72,6 @@
     programs.appimage.enable = true;
     programs.appimage.binfmt = true;
 
-    # add useful packages for all machines
-    environment.systemPackages = with stable; [
-      git
-      curl
-      wl-clipboard
-      lm_sensors
-      micro
-      usbutils # lsusb
-      bind.dnsutils # dig
-      file # file
-      nh # nix cli helper
-      unzip
-      libnotify # notifications
-      bc # cli calculator
-    ];
-
     # disable sshd autostart if not requested
     systemd.services.sshd.wantedBy = lib.mkIf (!config.services.sshd.autostart) (lib.mkForce []);
     services.sshd.enable = true;
