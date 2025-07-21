@@ -13,6 +13,7 @@
     extraGroups = [
       "networkmanager"
       "wheel"
+      "dialout" # for arduino
     ];
   };
 
@@ -36,11 +37,6 @@
   };
 
   environment.systemPackages = with stable; [
-    # enable codecs and force kwallet6 regardless of desktop
-    (stable.vivaldi.override {
-      proprietaryCodecs = true;
-      commandLineArgs = "--password-store=kwallet6";
-    })
     librewolf
     libreoffice
     krita
@@ -50,6 +46,7 @@
 
     ## terminal stuff
     unstable.neovim
+    stable.luarocks # for neovim treesitter
   ];
 
   # manual sandboxing
@@ -65,5 +62,6 @@
 
     "org.freecad.FreeCAD"   # CAD software
     "org.kde.kdenlive"      # video editor
+    "com.vivaldi.Vivaldi"   # browser
   ];
 }

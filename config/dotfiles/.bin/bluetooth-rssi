@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
-import click
 import subprocess
 import re
+import time
+import os
 
 from typing import List, Tuple, Optional
 
@@ -36,20 +37,24 @@ def get_device_rssi(device: str) -> Optional[int]:
 
     return int(re_results.group(1))
 
-@click.command()
-@click.argument("device", default="")
-def main(device: str):
+def main():
     """
     Simple script that shows RSSI of connected bluetooth devices
 
     Useful for debugging signal issues
     """
-    if not device:
-        print("Listing bluetooth RSSI of connected devices:")
-        for d_addr, d_name in get_devices():
-            print(f"  {d_name} {d_addr} = {get_device_rssi(d_addr)}")
-    else:
-        print(get_device_rssi(device))
+    cmd = subprocess.run(["clear"], capture_output=True)
+    clear = cmd.stdout.decode("utf-8")
+
+    try:
+        while True:
+            print(f"{clear}Listing bluetooth RSSI of connected devices:")
+            for d_addr, d_name in get_devices():
+                print(f"  {d_name} {d_addr} = {get_device_rssi(d_addr)}")
+
+            time.sleep(0.5)
+    except KeyboardInterrupt:
+        pass
 
 if __name__ == "__main__":
     main()

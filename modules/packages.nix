@@ -92,6 +92,7 @@
       dotfiles.enabled = with config.dotfiles.configs; [] ++ (lib.optionals gui [
         # setup kitty dotfiles, its awful without it
         kitty
+        easyeffects
       ]);
     };
 }

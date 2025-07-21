@@ -19,6 +19,12 @@
     # enable bluetooth
     hardware.bluetooth.enable = true;
     hardware.bluetooth.powerOnBoot = true;
+    hardware.bluetooth.settings = {
+      Policy = {
+        # disable automatic connection
+        ReconnectAttempts = 0;
+      };
+    };
  
     environment.systemPackages = with stable; [
       # for some reason this is needed for bluetooth even when pipewire is used
