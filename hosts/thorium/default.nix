@@ -46,7 +46,6 @@
 
     ## terminal stuff
     unstable.neovim
-    stable.luarocks # for neovim treesitter
   ];
 
   # manual sandboxing

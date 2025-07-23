@@ -1,4 +1,4 @@
-{ config, lib, stable, unstable, hostname, repo, ...}:
+{ config, lib, stable, unstable, hostname, repo, ... }:
 
 {
   imports = [
@@ -50,6 +50,8 @@
     nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
     nixpkgs.config.allowUnfree = true;
+
+    nix.channel.enable = false;
 
     networking.hostName = hostname;
     networking.networkmanager.enable = true;

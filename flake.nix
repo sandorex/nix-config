@@ -15,7 +15,7 @@
       url = "https://github.com/${owner}/${name}";
       branch = "dev";
 
-      # name of local dotfiles, added to user's home
+      # name of local dotfiles, appended to user's home
       localName = "${name}";
     };
 
@@ -23,10 +23,16 @@
     stable = import nixpkgs { inherit system; config.allowUnfree = true; };
     unstable = import nixpkgs-unstable { inherit system; config.allowUnfree = true; };
 
+    # this is a shortcut so i dont have to use flake.outputs.packages.x86_64-linux.something
+    my = {
+      packages = import ./packages stable;
+      overlays = import ./overlays {};
+    };
+
     # consistent arguments passed to all modules
     createConfiguration = hostname: nixpkgs.lib.nixosSystem {
       specialArgs = {
-        inherit stable unstable hostname repo inputs;
+        inherit stable unstable hostname repo inputs my;
         flake = self;
       };
 
@@ -41,5 +47,8 @@
     # nixosConfigurations.aorus = createConfiguration "aorus";
     # nixosConfigurations.sshInstaller = createConfiguration "sshInstaller";
 
+    packages.${system} = my.packages;
+
+    overlays = my.overlays;
   };
 }
