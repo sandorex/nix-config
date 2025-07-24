@@ -1,0 +1,66 @@
+#!/usr/bin/env bash
+# simple wrapper script to run nix develop using firejail
+#
+# this script exists because
+# https://github.com/netblue30/firejail/issues/5713
+
+set -eo pipefail
+
+args=(
+    # keep tab completions
+    --tab
+    --keep-shell-rc
+
+    --blacklist=/mnt
+    --blacklist=/media
+
+    # disable default profile
+    --noprofile
+
+    # mount tmpfs on ~/.cache
+    --private-cache
+
+    --private-dev
+)
+
+# whitelisted RW paths
+whitelist=(
+  "$PWD"
+)
+
+# whitelisted RO paths
+whitelist_ro=(
+    "$HOME/.config/zellij"
+    "$HOME/.config/tmux"
+
+    # editors
+    "$HOME/.emacs.d"
+    "$HOME/.config/helix"
+    "$HOME/.config/nvim"
+
+    # shell stuff
+    "$HOME/.config/shell" # shell agnostic stufff
+    "$HOME/.config/bash"
+    "$HOME/.inputrc" # needed for bash
+    "$HOME/.bashrc"
+    "$HOME/.config/zsh"
+    "$HOME/.zshrc"
+)
+
+for path in "${whitelist[@]}"; do
+    args+=("--whitelist=$path")
+done
+
+for path in "${whitelist_ro[@]}"; do
+    args+=(
+        "--whitelist=$path"
+        "--read-only=$path"
+    )
+done
+
+if [[ "$PWD" == "/home/$USER" ]]; then
+    echo "Running in HOME directory is unsafe"
+    exit 66
+fi
+
+exec firejail "${args[@]}" -- nix develop "$@"
