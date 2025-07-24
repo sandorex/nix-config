@@ -352,6 +352,7 @@
   ;; prefer simpc over c mode
   (add-to-list 'auto-mode-alist '("\\.c\\'" . simpc-mode)))
 (use-package simpzig-mode)
+(use-package simpnix-mode)
 
 (use-package move-text
   :config

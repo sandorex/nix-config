@@ -44,8 +44,7 @@
     cura-appimage
     qbittorrent
 
-    ## terminal stuff
-    unstable.neovim
+    emacs
   ];
 
   # manual sandboxing
