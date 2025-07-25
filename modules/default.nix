@@ -113,7 +113,13 @@
 
         # just call the helper script
         script = ''
-          ${mynix}/bin/mynix check-updates-notify
+          set -eo pipefail
+
+          last_update="$(${mynix}/bin/mynix up-to-date)"
+          code=$?
+          if [[ $code -eq 1 ]]; then
+              ${stable.libnotify}/bin/notify-send -i update-low -a "mynix" "You should probably update" "Last update was $last_update"
+          fi
         '';
       };
     };

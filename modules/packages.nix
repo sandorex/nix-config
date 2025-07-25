@@ -17,19 +17,19 @@
 
   config =
     let
-      gui = config.my.extras.gui.enable;
-      tui = config.my.extras.terminal.enable;
+      extraGui = config.my.extras.gui.enable;
+      extraTui = config.my.extras.terminal.enable;
     in
     {
       assertions = [
         {
-          assertion = (gui && config.my.gui) || !gui;
+          assertion = (extraGui && config.my.gui) || !extraGui;
           message = "Extra apps cannot be enabled without gui";
         }
       ];
 
       # fonts enabled if gui extras are
-      fonts.packages = with stable; (lib.optionals gui [
+      fonts.packages = with stable; (lib.optionals extraGui [
         nerd-fonts.fira-code # proper font for terminal
       ]);
   
@@ -37,7 +37,6 @@
         # utilities
         git
         curl
-        wl-clipboard
         lm_sensors
 
         # common linux commands
@@ -47,12 +46,17 @@
         unzip
 
         # used in scripts
-        libnotify # notify-send
         bc # cli calculator
       ]
 
+      # it may pull in weird dependencies when i dont have a gui
+      ++ (lib.optionals config.my.gui [
+        libnotify     # notify-send
+        wl-clipboard  # clipboard on wayland
+      ])
+
       ## GUI APPS ##
-      ++ (lib.optionals gui [
+      ++ (lib.optionals extraGui [
         kitty # proper terminal
         gparted # partitioning
         vlc # proper video player
@@ -64,7 +68,7 @@
       ])
 
       ## TUI APPS ##
-      ++ (lib.optionals tui [
+      ++ (lib.optionals extraTui [
         lsd
 
         unstable.helix # proper editor
@@ -86,9 +90,9 @@
 
       # NOTE: localsend needs ports open so use this syntax
       # sharing files, links etc more secure variant of kdeconnect
-      programs.localsend.enable = lib.mkDefault gui;
+      programs.localsend.enable = lib.mkDefault extraGui;
 
-      dotfiles.enabled = with config.dotfiles.configs; [] ++ (lib.optionals gui [
+      dotfiles.enabled = with config.dotfiles.configs; [] ++ (lib.optionals extraGui [
         # setup kitty dotfiles, its awful without it
         kitty
         easyeffects

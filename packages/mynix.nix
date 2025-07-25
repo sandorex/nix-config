@@ -10,19 +10,23 @@ pkgs.writeShellScriptBin "mynix" ''
   ${ if localPath != null then "cd \"${localPath}\"" else ""}
 
   case "$1" in
+      run)
+          shift
+          nix run ".#$1" "$@"
+          ;;
       repl)
           nix repl --expr "builtins.getFlake \"$PWD\""
           ;;
       update)
           nix flake update
           ;;
-      check-updates)
-          # after how many days its gonna nag for updating
-          days=4
+      up-to-date)
+          # after how many days to consider updating
+          days=5
 
           diff="$(( $(date +'%s') - $(stat -c %Y flake.lock) ))"
 
-          # print human reabable time
+          # print human readable time
           T="$diff"
           D=$((T/60/60/24))
           H=$((T/60/60%24))
@@ -32,18 +36,11 @@ pkgs.writeShellScriptBin "mynix" ''
           (( M > 0 )) && printf '%d minutes ' $M
           echo
 
-          # check mtime of flake lockfile
+          # exit with 1 when not up to date
           if [[ "$diff" -gt "$(( days * 86400 ))" ]]; then
-              exit 0
-          else
               exit 1
-          fi
-          ;;
-      check-updates-notify)
-          last_update="$("$0" check-updates)"
-          code=$?
-          if [[ $code -eq 0 ]]; then
-              notify-send -i update-low -a "mynix" "You should probably update" "Last update was $last_update"
+          else
+              exit 0
           fi
           ;;
       check)
@@ -74,16 +71,17 @@ pkgs.writeShellScriptBin "mynix" ''
           shift
           sudo nixos-rebuild boot --flake . "$@"
           ;;
-      \'\')
+      ''')
           cat <<EOF
   Usage: $0 <command>
 
   Just a wrapper to run with proper path to flake without specifying it each time
 
   Commands:
+      run           - nix run using the flake
       repl          - start repl using flake
       update        - update the flake (does not rebuild)
-      check-updates - checks for updates and prints how long ago
+      up-to-date    - checks for updates and prints how long ago
                       was last update
       check         - checks flake for errors
 
