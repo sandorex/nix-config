@@ -3,7 +3,7 @@
 {
   options = {
     nix.gc.keep-generations = lib.mkOption {
-      default = 15;
+      default = 10;
       type = lib.types.ints.positive;
       description = "Keep this number of generations from being garbage collected";
     };

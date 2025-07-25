@@ -20,7 +20,6 @@
       gui.enable = true;
       terminal.enable = true;
     };
-    helpers.enable = true;
 
     cinnamon.enable = true;
     lightdm.enable = true;

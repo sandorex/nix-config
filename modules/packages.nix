@@ -1,4 +1,4 @@
-{ config, lib, stable, unstable, ... }:
+{ config, lib, stable, unstable, my, ... }:
 
 {
   options = {
@@ -66,7 +66,6 @@
       ## TUI APPS ##
       ++ (lib.optionals tui [
         lsd
-        starship
 
         unstable.helix # proper editor
 

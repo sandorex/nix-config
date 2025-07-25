@@ -1,4 +1,4 @@
-{ config, lib, stable, unstable, hostname, repo, ... }:
+{ config, lib, stable, unstable, hostname, repo, my, ... }:
 
 {
   imports = [
@@ -14,7 +14,6 @@
     ./desktop.nix
     ./ddcutil.nix
     ./dotfiles.nix
-    ./helpers.nix
   ];
 
   options = {
@@ -45,45 +44,77 @@
     };
   };
 
-  config = {
-    # allow nix command and flakes
-    nix.settings.experimental-features = [ "nix-command" "flakes" ];
+  config =
+    let
+      # override the script so it has proper localPath
+      mynix = (my.packages.mynix.override {
+        localPath = config.my.localPath;
+        inherit hostname;
+      });
 
-    nixpkgs.config.allowUnfree = true;
+      updateReminderService = "update-reminder";
+    in
+    {
+      # allow nix command and flakes
+      nix.settings.experimental-features = [ "nix-command" "flakes" ];
 
-    nix.channel.enable = false;
+      nixpkgs.config.allowUnfree = true;
 
-    networking.hostName = hostname;
-    networking.networkmanager.enable = true;
+      nix.channel.enable = false;
 
-    time.timeZone = "Europe/Belgrade";
+      networking.hostName = hostname;
+      networking.networkmanager.enable = true;
 
-    # NOTE: use en_GB so dates are correctly formatted
-    i18n.defaultLocale = "en_GB.UTF-8";
+      time.timeZone = "Europe/Belgrade";
 
-    # every keyboard is US
-    services.xserver.xkb = {
-      layout = "us";
-      variant = "";
+      # NOTE: use en_GB so dates are correctly formatted
+      i18n.defaultLocale = "en_GB.UTF-8";
+
+      # every keyboard is US
+      services.xserver.xkb = {
+        layout = "us";
+        variant = "";
+      };
+
+      # allows running binaries not built for nix
+      programs.nix-ld.enable = true;
+
+      # appimage support
+      programs.appimage.enable = true;
+      programs.appimage.binfmt = true;
+
+      # disable sshd autostart if not requested
+      systemd.services.sshd.wantedBy = lib.mkIf (!config.services.sshd.autostart) (lib.mkForce []);
+      services.sshd.enable = true;
+
+      # make SSD great again!
+      services.fstrim.enable = true;
+
+      # reduce wait time for stop jobs
+      systemd.extraConfig = ''
+        DefaultTimeoutStopSec=15s
+      '';
+
+      # add the helper script
+      environment.systemPackages = [ mynix ];
+
+      # if gui then nag with notifications to update
+      systemd.timers.${updateReminderService} = lib.mkIf config.my.gui {
+        description = "Update Reminder Timer";
+        wantedBy = [ "timers.target" ];
+        partOf = [ "${updateReminderService}.service" ];
+        timerConfig.OnCalendar = "8:00";
+        timerConfig.Persistent="true";
+      };
+
+      systemd.services.${updateReminderService} = lib.mkIf config.my.gui {
+        description = "Reminder to update";
+        serviceConfig.Type = "simple";
+
+        # just call the helper script
+        script = ''
+          ${mynix}/bin/mynix check-updates-notify
+        '';
+      };
     };
-
-    # allows running binaries not built for nix
-    programs.nix-ld.enable = true;
-
-    # appimage support
-    programs.appimage.enable = true;
-    programs.appimage.binfmt = true;
-
-    # disable sshd autostart if not requested
-    systemd.services.sshd.wantedBy = lib.mkIf (!config.services.sshd.autostart) (lib.mkForce []);
-    services.sshd.enable = true;
-
-    # make SSD great again!
-    services.fstrim.enable = true;
-
-    # reduce wait time for stop jobs
-    systemd.extraConfig = ''
-      DefaultTimeoutStopSec=15s
-    '';
-  };
 }

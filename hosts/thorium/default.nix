@@ -1,4 +1,4 @@
-{ flake, config, lib, stable, unstable, ... }:
+{ flake, config, lib, stable, unstable, my, ... }:
 
 {
   imports = [
@@ -30,7 +30,6 @@
       gui.enable = true;
       terminal.enable = true;
     };
-    helpers.enable = true;
 
     kde.enable = true;
     sddm.enable = true;
@@ -45,6 +44,9 @@
     qbittorrent
 
     emacs
+
+    my.packages.irscrutinizer
+    arduino-ide
   ];
 
   # manual sandboxing
