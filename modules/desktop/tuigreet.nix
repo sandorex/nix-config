@@ -1,4 +1,4 @@
-{ config, stable, lib, ... }:
+{ config, pkgs, lib, ... }:
 
 # setup tuigreet the best greeter thingy
 {
@@ -57,7 +57,7 @@
           };
 
           default_session = {
-            command = "${stable.greetd.tuigreet}/bin/tuigreet ${args}";
+            command = "${pkgs.greetd.tuigreet}/bin/tuigreet ${args}";
           };
         };
       };

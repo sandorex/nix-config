@@ -1,4 +1,4 @@
-{ config, lib, stable, ... }:
+{ config, lib, pkgs, ... }:
 
 let
   cfg = config.my.hyprland;
@@ -15,7 +15,7 @@ in
   config = lib.mkIf cfg.enable {
     my.gui = true;
 
-    environment.systemPackages = with stable; [
+    environment.systemPackages = with pkgs; [
       # using kwallet
       kdePackages.kwallet
       kdePackages.kwallet-pam
@@ -56,7 +56,7 @@ in
       kdePackages.ark
     ];
 
-    fonts.packages = with stable; [
+    fonts.packages = with pkgs; [
       font-awesome # for waybar
       nerd-fonts.bigblue-terminal
     ];

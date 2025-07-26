@@ -1,4 +1,4 @@
-{ config, lib, stable, ... }:
+{ lib, ... }:
 
 # contains all desktop options and imports all the files
 {

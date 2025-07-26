@@ -1,4 +1,4 @@
-{ config, lib, stable, ... }:
+{ config, lib, pkgs, ... }:
 
 # basically setups ddcutil to work properly
 let
@@ -17,6 +17,6 @@ in
     hardware.i2c.enable = true;
     boot.kernelModules = ["i2c-dev"];
 
-    environment.systemPackages = with stable; [ ddcutil ];
+    environment.systemPackages = with pkgs; [ ddcutil ];
   };
 }

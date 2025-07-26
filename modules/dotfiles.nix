@@ -1,4 +1,4 @@
-{ config, lib, stable, ... }:
+{ config, lib, ... }:
 
 let
   inherit (builtins) map attrNames readDir readFile isString filter split replaceStrings concatStringsSep;

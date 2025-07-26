@@ -1,4 +1,4 @@
-{ stable, ... }:
+{ pkgs, ... }:
 
 {
   # keep kde stuff hopefully from breaking
@@ -7,7 +7,7 @@
   # enable wayland mode for sddm
   services.displayManager.sddm.wayland.enable = false;
 
-  environment.systemPackages = with stable; [
+  environment.systemPackages = with pkgs; [
     kdePackages.kwallet
     kdePackages.sddm
     waybar

@@ -1,4 +1,4 @@
-{ config, lib, stable, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   options = {
@@ -13,7 +13,7 @@
       wrapperFeatures.gtk = true;
     };
 
-    environment.systemPackages = with stable; [
+    environment.systemPackages = with pkgs; [
       # using kwallet
       kdePackages.kwallet
       kdePackages.kwallet-pam
@@ -51,7 +51,7 @@
       xfce.thunar      # file manager
     ];
 
-    fonts.packages = with stable; [
+    fonts.packages = with pkgs; [
       # waybar
       font-awesome
       nerd-fonts.bigblue-terminal

@@ -1,4 +1,4 @@
-{ config, stable, lib, ... }:
+{ config, pkgs, lib, ... }:
 
 {
   options = {
@@ -23,7 +23,7 @@
       services.desktopManager.plasma6.enable = true;
 
       # remove some unecessary bloat
-      environment.plasma6.excludePackages = with stable.kdePackages; [
+      environment.plasma6.excludePackages = with pkgs.kdePackages; [
         kamoso
         kmail
         kmousetool

@@ -1,4 +1,4 @@
-{ flake, config, stable, ... }:
+{ flake, config, pkgs, ... }:
 
 {
   imports = [
@@ -25,7 +25,7 @@
     lightdm.enable = true;
   };
 
-  environment.systemPackages = with stable; [
+  environment.systemPackages = with pkgs; [
     emacs
     librewolf
   ];

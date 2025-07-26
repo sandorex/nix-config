@@ -20,26 +20,40 @@
     };
 
     system = "x86_64-linux";
-    stable = import nixpkgs { inherit system; config.allowUnfree = true; };
-    unstable = import nixpkgs-unstable { inherit system; config.allowUnfree = true; };
+
+    pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
+    pkgsUnstable = import nixpkgs-unstable { inherit system; config.allowUnfree = true; };
 
     # this is a shortcut so i dont have to use flake.outputs.packages.x86_64-linux.something
     my = {
-      packages = import ./packages stable;
+      packages = import ./packages { inherit pkgs; };
       overlays = import ./overlays {};
     };
 
     # consistent arguments passed to all modules
     createConfiguration = hostname: nixpkgs.lib.nixosSystem {
       specialArgs = {
-        inherit stable unstable hostname repo inputs my;
+        inherit pkgsUnstable inputs hostname repo my;
         flake = self;
       };
 
       inherit system;
 
-      # let the default.nix handle everything
-      modules = [ ./hosts/${hostname} ];
+      modules = [
+        {
+          # allow unfree
+          nixpkgs.config.allowUnfree = true;
+
+          # allow nix command and flakes
+          nix.settings.experimental-features = [ "nix-command" "flakes" ];
+
+          # disable channels
+          nix.channel.enable = false;
+        }
+
+        # default.nix imports wanted modules or nothing if desired
+        ./hosts/${hostname}
+      ];
     };
   in {
     nixosConfigurations.thorium = createConfiguration "thorium";

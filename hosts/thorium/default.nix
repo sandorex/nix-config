@@ -1,4 +1,4 @@
-{ flake, config, lib, stable, unstable, my, ... }:
+{ flake, config, lib, pkgs, my, ... }:
 
 {
   imports = [
@@ -18,7 +18,7 @@
   };
 
   # use zsh by default
-  users.defaultUserShell = stable.zsh;
+  users.defaultUserShell = pkgs.zsh;
   programs.zsh.enable = true;
 
   my = {
@@ -35,7 +35,7 @@
     sddm.enable = true;
   };
 
-  environment.systemPackages = with stable; [
+  environment.systemPackages = with pkgs; [
     librewolf
     libreoffice
     krita

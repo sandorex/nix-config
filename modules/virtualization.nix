@@ -1,4 +1,4 @@
-{ config, lib, stable, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   options = {
@@ -29,7 +29,7 @@
       virtualisation.containers.enable = true;
       virtualisation.podman.enable = true;
 
-      environment.systemPackages = with stable; [
+      environment.systemPackages = with pkgs; [
         distrobox
         # fuse-overlayfs is much faster than the alternative
         # https://github.com/containers/podman/issues/16541

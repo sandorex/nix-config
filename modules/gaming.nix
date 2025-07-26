@@ -1,4 +1,4 @@
-{ config, lib, stable, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   options = {
@@ -11,7 +11,7 @@
 
   config = lib.mkIf config.my.gaming.enable {
     programs.steam.enable = true;
-    environment.systemPackages = with stable; [
+    environment.systemPackages = with pkgs; [
       mangohud
     ];
 

@@ -1,4 +1,4 @@
-{ config, lib, stable, unstable, my, ... }:
+{ config, lib, pkgs, pkgsUnstable, my, ... }:
 
 {
   options = {
@@ -29,11 +29,11 @@
       ];
 
       # fonts enabled if gui extras are
-      fonts.packages = with stable; (lib.optionals extraGui [
+      fonts.packages = with pkgs; (lib.optionals extraGui [
         nerd-fonts.fira-code # proper font for terminal
       ]);
   
-      environment.systemPackages = with stable; [
+      environment.systemPackages = with pkgs; [
         # utilities
         git
         curl
@@ -71,7 +71,7 @@
       ++ (lib.optionals extraTui [
         lsd
 
-        unstable.helix # proper editor
+        pkgsUnstable.helix # proper editor
 
         python3
         libqalculate # qalc cli

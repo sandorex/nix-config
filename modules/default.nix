@@ -1,4 +1,4 @@
-{ config, lib, stable, unstable, hostname, repo, my, ... }:
+{ config, lib, pkgs, hostname, repo, my, ... }:
 
 {
   imports = [
@@ -55,13 +55,6 @@
       updateReminderService = "update-reminder";
     in
     {
-      # allow nix command and flakes
-      nix.settings.experimental-features = [ "nix-command" "flakes" ];
-
-      nixpkgs.config.allowUnfree = true;
-
-      nix.channel.enable = false;
-
       networking.hostName = hostname;
       networking.networkmanager.enable = true;
 
@@ -118,7 +111,7 @@
           last_update="$(${mynix}/bin/mynix up-to-date)"
           code=$?
           if [[ $code -eq 1 ]]; then
-              ${stable.libnotify}/bin/notify-send -i update-low -a "mynix" "You should probably update" "Last update was $last_update"
+              ${pkgs.libnotify}/bin/notify-send -i update-low -a "mynix" "You should probably update" "Last update was $last_update"
           fi
         '';
       };

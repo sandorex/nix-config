@@ -1,4 +1,4 @@
-{ config, lib, stable, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   options = {
@@ -11,7 +11,7 @@
 
   config = {
     services.printing.enable = true;
-    services.printing.drivers = with stable; [
+    services.printing.drivers = with pkgs; [
       # Xerox 3010
       foo2zjs
     ];

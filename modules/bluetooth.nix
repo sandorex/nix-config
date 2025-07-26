@@ -1,4 +1,4 @@
-{ config, lib, stable, ... }:
+{ config, lib, pkgs, ... }:
 
 {
   options = {
@@ -26,14 +26,14 @@
       };
     };
  
-    environment.systemPackages = with stable; [
+    environment.systemPackages = with pkgs; [
       # for some reason this is needed for bluetooth even when pipewire is used
       pulseaudioFull
     ];
 
     # NOTE: this prevents use of headset microphones but fixes issues with cheap earbuds
     services.pipewire.wireplumber.configPackages = lib.optionals (config.my.bluetooth.disableHeadsetProfile && config.my.pipewire.enable) [
-      (stable.writeTextDir "share/wireplumber/wireplumber.conf.d/10-bluez.conf" ''
+      (pkgs.writeTextDir "share/wireplumber/wireplumber.conf.d/10-bluez.conf" ''
       wireplumber.settings = {
         bluetooth.autoswitch-to-headset-profile = false
       }

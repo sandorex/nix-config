@@ -1,4 +1,4 @@
-{ inputs, stable, lib, ... }:
+{ inputs, pkgs, lib, ... }:
 
 {
   imports = [
@@ -17,7 +17,7 @@
   services.openssh.enable = true;
 
   # some useful packages
-  environment.systemPackages = with stable; [
+  environment.systemPackages = with pkgs; [
     git
     lm_sensors
     micro
