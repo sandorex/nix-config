@@ -52,4 +52,6 @@ stdenv.mkDerivation rec {
     libcxx
     jdk
   ];
+
+  meta.mainProgram = "irscrutinizer";
 }

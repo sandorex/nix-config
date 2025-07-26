@@ -64,4 +64,8 @@
     "org.kde.kdenlive"      # video editor
     "com.vivaldi.Vivaldi"   # browser
   ];
+
+  dotfiles.enabled = with config.dotfiles.configs; [
+    zsh
+  ];
 }

@@ -2,6 +2,12 @@
 
 let
   cfg = config.my.hyprland;
+
+  # taken from plasma6 nixos module
+  activationScript = ''
+    # will be rebuilt automatically
+    rm -fv $HOME/.cache/ksycoca*
+  '';
 in
 {
   options = {
@@ -16,11 +22,6 @@ in
     my.gui = true;
 
     environment.systemPackages = with pkgs; [
-      # using kwallet
-      kdePackages.kwallet
-      kdePackages.kwallet-pam
-      kdePackages.kwalletmanager
-
       adwaita-icon-theme
 
       # theming
@@ -48,20 +49,82 @@ in
       hyprpaper
       hyprpolkitagent # polkit
       hyprshot
+    ] ++ (with kdePackages; [
+      ark
+      dolphin
+      dolphin-plugins
+      okular
+      gwenview
+      kate # kate + kwrite
 
-      # general applications
-      kdePackages.kate
-      kdePackages.gwenview
-      kdePackages.dolphin
-      kdePackages.ark
-    ];
+      # kwallet
+      kwallet
+      kwallet-pam
+      kwalletmanager
+
+      # dependencies
+      ffmpegthumbs
+      kdegraphics-thumbnailers
+      kfilemetadata
+      kimageformats
+      kio
+      kio-admin
+      kio-extras
+      kio-fuse
+      kservice
+      libheif
+      plasma-workspace # huge but without it dolphin does not work
+      qt6ct
+      qtimageformats
+      qtwayland
+    ]);
 
     fonts.packages = with pkgs; [
       font-awesome # for waybar
       nerd-fonts.bigblue-terminal
     ];
 
+    system.userActivationScripts.rebuildSycoca = activationScript;
+    systemd.user.services.nixos-rebuild-sycoca = {
+      description = "Rebuild KDE system configuration cache";
+      wantedBy = [ "graphical-session-pre.target" ];
+      serviceConfig.Type = "oneshot";
+      script = activationScript;
+    };
+
     programs.hyprland.enable = true;
+
+    services.power-profiles-daemon.enable = lib.mkDefault true;
+    services.udisks2.enable = true;   
+
+    dotfiles.enabled = with config.dotfiles.configs; [
+      hyprland
+      waybar
+      rofi
+      mako
+    ];
+
+    security.polkit.enable = true;
+
+    xdg.portal = {
+      enable = true;
+      extraPortals = with pkgs; [ kdePackages.xdg-desktop-portal-kde ];
+      config = {
+        hyprland = {
+          default = [
+            "hyprland"
+            "kde"
+          ];
+          "org.freedesktop.impl.portal.FileChooser" = [ "kde" ];
+        };
+      };
+      configPackages = lib.mkForce [ ];
+    };
+
+    environment.variables = {
+      # fixed dolphin mime issues
+      XDG_MENU_PREFIX = "plasma-";
+    };
 
     qt = {
       enable = true;

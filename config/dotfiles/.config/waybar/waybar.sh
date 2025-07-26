@@ -3,7 +3,14 @@
 #
 # this allows all paths inside the config to be relative
 
+set -eo pipefail
+
 # cd in script directory
 cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
 
-exec waybar -c config.jsonc
+prefix=""
+if [[ -n "$1" ]]; then
+    prefix="${1}-"
+fi
+
+exec waybar -c ${prefix}config.jsonc

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, hostname, repo, my, ... }:
+{ flake, config, lib, pkgs, hostname, repo, my, ... }:
 
 {
   imports = [
@@ -27,7 +27,6 @@
       default = "/home/${config.my.user}/${repo.localName}";
       type = lib.types.str;
       description = "Path on host where dotfiles are stored";
-      readOnly = true;
     };
 
     my.repoURL = lib.mkOption {
@@ -111,6 +110,23 @@
               ${pkgs.libnotify}/bin/notify-send -i update-low -a "mynix" "You should probably update" "Last update was $last_update"
           fi
         '';
+      };
+
+      virtualisation.vmVariant = {
+        # as the password is set non-declaratively you cannot login by default
+        users.users.${config.my.user}.initialPassword = "password";
+
+        # TODO this is only for thorium, helium does not have this amount of ram
+        virtualisation = {
+          memorySize = 8192;
+          cores = 6;
+        };
+
+        # use dotfiles from nix store, as the repository is not cloned in the vm
+        my.localPath = "${flake}";
+
+        # disable flatpak as it wont have space to install it in the vm
+        my.flatpak.enable = lib.mkForce false;
       };
     };
 }

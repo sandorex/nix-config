@@ -93,7 +93,7 @@
     "tooltip-format": "{ifname} {ipaddr}/{cidr}",
     "tooltip-format-wifi": "{ifname } {essid} {frequency}",
     "tooltip-format-disconnected": "Disconnected",
-    "on-click": "nm-connection-editor"
+    "on-click": "nmtui connect"
   },
   "tray": {
     "icon-size": 20,

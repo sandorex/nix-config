@@ -4,7 +4,7 @@
 {
   imports = [
     ./desktop/plasma6.nix
-    # ./desktop/hyprland.nix # not useable
+    ./desktop/hyprland.nix
     ./desktop/cinnamon.nix
     ./desktop/swaywm.nix
     ./desktop/tuigreet.nix

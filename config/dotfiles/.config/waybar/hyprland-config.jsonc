@@ -5,7 +5,7 @@
   // "reload_style_on_change": true, // used for tweaking
   "modules-left": [
     "custom/start",
-    "sway/workspaces",
+    "hyprland/workspaces",
     "custom/task"
   ],
   "modules-center": [
@@ -24,6 +24,6 @@
   ],
   "include": [
     "modules.jsonc",
-    "sway.jsonc"
+    "hyprland.jsonc"
   ],
 }
