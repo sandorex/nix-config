@@ -71,6 +71,18 @@ pkgs.writeShellScriptBin "mynix" ''
           shift
           sudo nixos-rebuild boot --flake . "$@"
           ;;
+      build-vm)
+          shift
+
+          # allow passing a specialisation
+          arg=""
+          if [[ -n "$2" ]]; then
+            arg="--specialisation $2"
+          fi
+
+          # by default just build curreng host
+          nixos-rebuild build-vm --flake "''${1:-.}" $arg
+          ;;
       ''')
           cat <<EOF
   Usage: $0 <command>
@@ -90,6 +102,7 @@ pkgs.writeShellScriptBin "mynix" ''
       switch
       test
       boot
+      build-vm
 
   EOF
           ;;

@@ -106,11 +106,8 @@
 
         # just call the helper script
         script = ''
-          set -eo pipefail
-
-          last_update="$(${mynix}/bin/mynix up-to-date)"
-          code=$?
-          if [[ $code -eq 1 ]]; then
+          # if not up to date just send a notification
+          if ! last_update="$(${mynix}/bin/mynix up-to-date)"; then
               ${pkgs.libnotify}/bin/notify-send -i update-low -a "mynix" "You should probably update" "Last update was $last_update"
           fi
         '';
