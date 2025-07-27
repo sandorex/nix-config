@@ -2,12 +2,6 @@
 
 let
   cfg = config.my.hyprland;
-
-  # taken from plasma6 nixos module
-  activationScript = ''
-    # will be rebuilt automatically
-    rm -fv $HOME/.cache/ksycoca*
-  '';
 in
 {
   options = {
@@ -22,14 +16,11 @@ in
     my.gui = true;
 
     environment.systemPackages = with pkgs; [
-      adwaita-icon-theme
 
       # theming
       kdePackages.breeze
       kdePackages.breeze-gtk
       kdePackages.breeze-icons
-      kdePackages.qt6ct
-      libsForQt5.qt5ct
       nwg-look
 
       networkmanagerapplet # networkmanager applet and nm-connection-editor
@@ -84,17 +75,39 @@ in
       nerd-fonts.bigblue-terminal
     ];
 
-    system.userActivationScripts.rebuildSycoca = activationScript;
-    systemd.user.services.nixos-rebuild-sycoca = {
-      description = "Rebuild KDE system configuration cache";
-      wantedBy = [ "graphical-session-pre.target" ];
+    # fixes dolphin mime issues
+    system.userActivationScripts.rebuildSycoca = ''
+      # will be rebuilt automatically (taken from plasma6 nixos module)
+      rm -fv $HOME/.cache/ksycoca*
+    '';
+
+    systemd.user.services.nixos-qt-theme = {
+      description = "Sets up QT theming";
+      wantedBy = [ "graphical-session.target" ];
       serviceConfig.Type = "oneshot";
-      script = activationScript;
+      script = ''
+        # render offscreen cause it has no access to the display
+        export QT_QPA_PLATFORM=offscreen
+        export XDG_MENU_PREFIX=plasma-
+
+        # set the theme to breeze-dark
+        ${pkgs.kdePackages.plasma-workspace}/bin/plasma-apply-lookandfeel -a org.kde.breezedark.desktop
+      '';
     };
 
-    programs.hyprland.enable = true;
+    # using uwsm so just use the services
+    systemd.user.services.mako.enable = true;
+    systemd.user.services.hyprpaper.enable = true; # does not have `programs.hyprpaper.enable` atm
+    services.hypridle.enable = true;
 
-    services.power-profiles-daemon.enable = lib.mkDefault true;
+    programs.hyprlock.enable = true;
+    programs.uwsm.enable = true;
+    programs.hyprland = {
+      enable = true;
+      withUWSM = true;
+    };
+
+    # services.power-profiles-daemon.enable = lib.mkDefault true;
     services.udisks2.enable = true;   
 
     dotfiles.enabled = with config.dotfiles.configs; [
@@ -121,6 +134,7 @@ in
       configPackages = lib.mkForce [ ];
     };
 
+    # NOTE: UWSM seems to override XDG_MENU_PREFIX
     environment.variables = {
       # fixed dolphin mime issues
       XDG_MENU_PREFIX = "plasma-";
@@ -128,19 +142,17 @@ in
 
     qt = {
       enable = true;
-      style = "breeze";
-      platformTheme = "qt5ct";
+      # use qt theme from KDE (so i can use plasma-apply* scripts)
+      platformTheme = "kde6";
     };
 
-    programs.dconf.profiles.user = {
-      databases = [{
-        lockAll = true;
+    programs.dconf = {
+      enable = true;
+      profiles.user.databases = [{
         settings = {
+          # TODO does not work
           "org/gnome/desktop/interface" = {
-            gtk-theme = "Adwaita";
-          };
-
-          "org/gnome/desktop/interface" = {
+            gtk-theme = "Adwaita:dark";
             color-scheme = "prefer-dark";
           };
         };
