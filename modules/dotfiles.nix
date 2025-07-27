@@ -25,14 +25,6 @@ let
 in
 {
   options = {
-    dotfiles.placeholder = lib.mkOption {
-      default = placeholder;
-      type = lib.types.str;
-      readOnly = true;
-      internal = true;
-      description = "Placeholder value which is replaced by actual dotfiles path";
-    };
-
     dotfiles.configs = lib.mkOption {
       default = (lib.genAttrs ruleList
         (rule: lib.pipe "${rulesDir}/${rule}.conf" [

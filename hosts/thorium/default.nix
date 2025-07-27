@@ -26,9 +26,9 @@
     podman.enable = true;
     bluetooth.enable = true;
     gaming.enable = true;
-    extras = {
+    apps = {
       gui.enable = true;
-      terminal.enable = true;
+      editor.enable = true;
     };
 
     kde.enable = true;
@@ -42,11 +42,14 @@
     orca-slicer
     cura-appimage
     qbittorrent
+    my.packages.irscrutinizer
+    arduino-ide
 
     emacs
 
-    my.packages.irscrutinizer
-    arduino-ide
+    yt-dlp # youtube downloader
+    nushell # the best shell
+    buildah # container builder thingy
   ];
 
   # manual sandboxing

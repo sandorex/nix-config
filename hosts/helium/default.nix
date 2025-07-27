@@ -16,9 +16,9 @@
   my = {
     podman.enable = true;
     bluetooth.enable = true;
-    extras = {
+    apps = {
       gui.enable = true;
-      terminal.enable = true;
+      editor.enable = true;
     };
 
     cinnamon.enable = true;
@@ -35,12 +35,4 @@
   ];
 
   programs.firefox.enable = true;
-
-  dotfiles.enabled = with config.dotfiles.configs; [
-    bin
-    bash
-    kitty
-    helix
-    nano
-  ];
 }

@@ -91,17 +91,18 @@
       environment.systemPackages = [ mynix ];
 
       # if gui then nag with notifications to update
-      systemd.timers.${updateReminderService} = lib.mkIf config.my.gui {
+      systemd.user.timers.${updateReminderService} = lib.mkIf config.my.gui {
         description = "Update Reminder Timer";
-        wantedBy = [ "timers.target" ];
+        wantedBy = [ "graphical-session.target" ];
         partOf = [ "${updateReminderService}.service" ];
         timerConfig.OnCalendar = "8:00";
         timerConfig.Persistent="true";
       };
 
-      systemd.services.${updateReminderService} = lib.mkIf config.my.gui {
+      systemd.user.services.${updateReminderService} = lib.mkIf config.my.gui {
         description = "Reminder to update";
         serviceConfig.Type = "simple";
+        enableStrictShellChecks = true;
 
         # just call the helper script
         script = ''
