@@ -148,12 +148,11 @@ in
     programs.dconf = {
       enable = true;
       profiles.user.databases = [{
+        lockAll = true;
         settings = {
           # NOTE: this was copied from KDE Plasma session using
           # `dconf dump /org/gnome/desktop/interface`
           "org/gnome/desktop/interface" = {
-            cursor-theme = "Breeze_Light";
-            cursor-size = lib.gvariant.mkInt32 24;
             gtk-theme = "Breeze-Dark";
             icon-theme = "breeze-dark";
             color-scheme = "prefer-dark";
