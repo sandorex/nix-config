@@ -1,8 +1,0 @@
-{
-  // show workspaces active on all monitors
-  "hyprland/workspaces": {
-    "active-only": true,
-    "all-outputs": true,
-    "sort-by": "name"
-  }
-}

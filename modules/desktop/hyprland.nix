@@ -16,7 +16,6 @@ in
     my.gui = true;
 
     environment.systemPackages = with pkgs; [
-
       # theming
       kdePackages.breeze
       kdePackages.breeze-gtk
@@ -150,10 +149,18 @@ in
       enable = true;
       profiles.user.databases = [{
         settings = {
-          # TODO does not work
+          # NOTE: this was copied from KDE Plasma session using
+          # `dconf dump /org/gnome/desktop/interface`
           "org/gnome/desktop/interface" = {
-            gtk-theme = "Adwaita:dark";
+            cursor-theme = "Breeze_Light";
+            cursor-size = lib.gvariant.mkInt32 24;
+            gtk-theme = "Breeze-Dark";
+            icon-theme = "breeze-dark";
             color-scheme = "prefer-dark";
+            font-antialiasing="grayscale";
+            font-hinting="slight";
+            font-name="Noto Sans,  10";
+            font-rgba-order="rgb";
           };
         };
       }];

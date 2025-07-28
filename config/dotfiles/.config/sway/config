@@ -16,6 +16,9 @@ set $mon2 "ASUSTek COMPUTER INC VA249 KCLMQS107820"
 output $mon1 pos 0 1080 res 1920x1080
 output $mon2 pos 0 0    res 1920x1080
 
+# tv
+output "MS Telematica SNN 0x00000001" pos 0 1080 res 1920x1080
+
 # set wallpapers
 output * bg street.png stretch
 output $mon1 bg city.png stretch

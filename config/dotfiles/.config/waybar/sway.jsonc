@@ -1,8 +1,0 @@
-{
-  // show workspaces active on all monitors
-  "sway/workspaces": {
-    "format": "{name}",
-    "all-outputs": true,
-    "disable-scroll": true
-  }
-}

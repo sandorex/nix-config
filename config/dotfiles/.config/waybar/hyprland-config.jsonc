@@ -1,5 +1,8 @@
 {
-  "output": "HDMI-A-1", // show only on main monitor
+  "output": [
+    "HDMI-A-1", // main monitor
+    "Virtual-1" // qemu for nixos-rebuild build-vm
+  ],
   "height": 32,
   "spacing": 4,
   // "reload_style_on_change": true, // used for tweaking
@@ -16,11 +19,11 @@
     "idle_inhibitor",
     "group/brightness",
     "bluetooth",
-    "pulseaudio",
+    // "pulseaudio",
     "group/tray",
     // "privacy",
     "clock",
-    "custom/power"
+    "custom/power#hyprland"
   ],
   "include": [
     "modules.jsonc",

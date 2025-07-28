@@ -2,6 +2,24 @@
 <interface>
   <object class="GtkMenu" id="menu">
     <child>
+      <object class="GtkMenuItem" id="reload">
+        <property name="label"> Reload WM</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="reload_bar">
+        <property name="label"> Reload Bar</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkMenuItem" id="monitor2_off">
+        <property name="label"> Toggle Second Monitor</property>
+      </object>
+    </child>
+    <child>
+      <object class="GtkSeparatorMenuItem" id="delimiter1"/>
+    </child>
+    <child>
       <object class="GtkMenuItem" id="logout">
         <property name="label">󰗽 Logout</property>
       </object>
@@ -17,7 +35,7 @@
       </object>
     </child>
     <child>
-      <object class="GtkSeparatorMenuItem" id="delimiter1"/>
+      <object class="GtkSeparatorMenuItem" id="delimiter2"/>
     </child>
     <child>
       <object class="GtkMenuItem" id="reboot">

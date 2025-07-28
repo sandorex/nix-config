@@ -9,8 +9,10 @@ set -eo pipefail
 cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
 
 prefix=""
-if [[ -n "$1" ]]; then
+if [[ "$#" -ge 1 ]]; then
     prefix="${1}-"
+elif [[ -n "$XDG_CURRENT_DESKTOP" ]]; then
+    prefix="${XDG_CURRENT_DESKTOP}"
 fi
 
 exec waybar -c ${prefix}config.jsonc
