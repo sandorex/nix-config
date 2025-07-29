@@ -113,6 +113,10 @@
         '';
       };
 
+      dotfiles.enabled = with config.dotfiles.configs; [
+        bin # contains scripts and stuff
+      ];
+
       virtualisation.vmVariant = {
         # as the password is set non-declaratively you cannot login by default
         users.users.${config.my.user}.initialPassword = "password";

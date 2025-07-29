@@ -50,6 +50,8 @@
     yt-dlp # youtube downloader
     nushell # the best shell
     buildah # container builder thingy
+
+    rofi-wayland # for some scripts
   ];
 
   # manual sandboxing
