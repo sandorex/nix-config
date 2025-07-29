@@ -1,1 +1,10 @@
-@theme "Arc-Dark.rasi"
+@theme "spotlight-dark.rasi"
+
+configuration {
+    /* focus on hover */
+    hover-select: true;
+
+    /* accept using single click */
+    me-select-entry: "";
+    me-accept-entry: [ MousePrimary, MouseSecondary, MouseDPrimary ];
+}

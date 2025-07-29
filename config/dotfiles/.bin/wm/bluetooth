@@ -1,0 +1,189 @@
+#!/usr/bin/env python3
+# rofi script for managing bluetooth devices
+
+import sys
+import subprocess
+import re
+import time
+
+from collections import namedtuple
+
+Device = namedtuple("Device", "name addr connected")
+
+PAT_DEVICE = re.compile(r"^Device ([:A-Z0-9]+) (.+)$", re.MULTILINE)
+def _get_devices(filter=None):
+    args = ["bluetoothctl", "devices"]
+    if filter:
+        args.append(filter)
+
+    process = subprocess.run(args, capture_output=True, check=True)
+    stdout = process.stdout.decode("utf-8")
+
+    devices = []
+    for m in PAT_DEVICE.finditer(stdout):
+        addr = m.group(1)
+        name = m.group(2)
+
+        devices.append((name, addr))
+
+    return devices
+
+def get_devices():
+    paired = _get_devices("Paired")
+    connected = _get_devices("Connected")
+
+    devices = {}
+
+    for (name, addr) in paired:
+        devices[addr] = Device(name, addr, False)
+
+    # mark connected devices
+    for (name, addr) in connected:
+        devices[addr] = Device(name, addr, True)
+
+    # convert to easy list
+    return list(devices.values())
+
+def get_pairable_devices():
+    paired = _get_devices("Paired")
+    all = _get_devices()
+
+    devices = {}
+
+    for (name, addr) in all:
+        devices[addr] = Device(name, addr, None)
+
+    # remove paired devices
+    for (name, addr) in paired:
+        del devices[addr]
+
+    # convert to easy list
+    return list(devices.values())
+
+def rofi(data, title="Bluetooth", timeout=None, rofi_args=[]):
+    args = [
+        "rofi",
+        "-dmenu",
+
+        # use markup
+        "-markup-rows",
+
+        # case insensitive search
+        "-i",
+
+        # return the index of item selected
+        "-format", "i",
+
+        # do not accept custom input
+        "-no-custom",
+
+        "-p", title
+    ] + rofi_args
+
+    process = subprocess.run(args, input=bytes(data, "utf-8"), timeout=timeout, capture_output=True)
+    stdout = process.stdout.decode("utf-8")
+
+    # user cancelled
+    if process.returncode == 1:
+        return None
+
+    return int(stdout)
+
+def connect(device):
+    subprocess.run(["bluetoothctl", "connect", device.addr], check=True)
+
+def disconnect(device):
+    subprocess.run(["bluetoothctl", "disconnect", device.addr], check=True)
+
+def pair(device):
+    subprocess.run(["bluetoothctl", "pair", device.addr], check=True)
+
+def unpair(device):
+    subprocess.run(["bluetoothctl", "remove", device.addr], check=True)
+
+def pair_menu():
+    process = subprocess.Popen(["bluetoothctl", f"--timeout=999", "scan", "on"])
+    try:
+        while True:
+            devices = get_pairable_devices()
+            data = [ f"<span foreground=\"#e6d7ff\">Refresh</span>" ]
+            for device in devices:
+                data.append(f"<b>{device.name}</b> ({device.addr})")
+
+            try:
+                index = rofi("\n".join(data), timeout=5, rofi_args=[
+                    "-mesg", "Automatically refreshes every 5 seconds"
+                ])
+            except subprocess.TimeoutExpired:
+                continue
+
+            # cancelled by user
+            if index is None:
+                break
+
+            if index == 0:
+                # just reload
+                continue
+
+            # shifted index by one cause of reload entry
+            pair(devices[index - 1])
+
+            break
+    finally:
+        # ask nicely
+        process.terminate()
+
+        # murder it in cold blood
+        try:
+            process.wait(timeout=5)
+        except subprocess.TimeoutExpired:
+            pass
+
+def device_menu(device):
+    data = [
+        "Disconnect" if device.connected else "Connect",
+        "Unpair"
+    ]
+
+    index = rofi("\n".join(data))
+
+    # user cancelled
+    if index is None:
+        sys.exit(0)
+
+    match index:
+        case 0:
+            if device.connected:
+                disconnect(device)
+            else:
+                connect(device)
+        case 1:
+            unpair(device)
+        case _:
+            raise RuntimeException(f"Invalid device_menu index {index}")
+
+def main():
+    # style the devices for rofi
+    devices = get_devices()
+    data = []
+    for device in get_devices():
+        if device.connected:
+            data.append(f"<b>{device.name}</b>")
+        else:
+            data.append(f"<span foreground=\"gray\">{device.name}</span>")
+
+    data.append(f"<span foreground=\"#e6d7ff\">Pair a new device</span>")
+
+    index = rofi("\n".join(data))
+
+    # user cancelled
+    if index is None:
+        sys.exit(0)
+
+    # detect if pair option is selected
+    if index == len(devices):
+        pair_menu()
+    else:
+        device_menu(devices[index])
+
+main()
