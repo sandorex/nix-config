@@ -142,7 +142,8 @@ def pair_menu():
 def device_menu(device):
     data = [
         "Disconnect" if device.connected else "Connect",
-        "Unpair"
+        "Unpair",
+        "Back"
     ]
 
     index = rofi("\n".join(data))
@@ -160,7 +161,8 @@ def device_menu(device):
         case 1:
             unpair(device)
         case _:
-            raise RuntimeException(f"Invalid device_menu index {index}")
+            # go back to main menu
+            main()
 
 def main():
     # style the devices for rofi
