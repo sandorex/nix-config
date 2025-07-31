@@ -11,30 +11,9 @@ if [[ -z "$ZSH_VERSION" ]]; then
     compdef() { :; }
 fi
 
-# WARNING edit fish aliases then copy changes here!
+alias z=fg
 alias a=arcam
-# alias e="$EDITOR1"
-# alias ee="$EDITOR2"
-# alias eee="$EDITOR3"
-# alias se="sudo -e"
-# alias s='sudo'
 alias g='git'
-# alias gd='git diff'
-# alias gds='git diff --staged'
-# alias gl='git l'
-# alias gll='git ll'
-# alias gs='git status'
-# alias gss='git show'
-# alias ga='git add'
-# alias gau='git add -u'
-# alias gap='git add --patch'
-# alias gr='git restore'
-# alias gri='git rebase -i'
-# alias grm='git rm --cached'
-# alias gc='git diff --check'
-# alias gcs='git diff --staged --check'
-# alias gcc='git commit'
-# alias gm='git merge --no-commit --squash'
 alias f="$FILE_MANAGER"
 alias mv='mv -i' # safe mv, ask on overwrite
 

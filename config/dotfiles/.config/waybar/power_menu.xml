@@ -12,7 +12,7 @@
       </object>
     </child>
     <child>
-      <object class="GtkMenuItem" id="monitor2_off">
+      <object class="GtkMenuItem" id="monitor2_toggle">
         <property name="label"> Toggle Second Monitor</property>
       </object>
     </child>

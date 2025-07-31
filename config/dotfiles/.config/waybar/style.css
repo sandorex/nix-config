@@ -55,7 +55,7 @@ button:hover {
 #clock,
 #temperature,
 #tray,
-#pulseaudio,
+/* #pulseaudio, */
 #idle_inhibitor {
   padding: 0 10px;
   color: #ffffff;

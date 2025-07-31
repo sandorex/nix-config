@@ -12,7 +12,7 @@ prefix=""
 if [[ "$#" -ge 1 ]]; then
     prefix="${1}-"
 elif [[ -n "$XDG_CURRENT_DESKTOP" ]]; then
-    prefix="${XDG_CURRENT_DESKTOP}"
+    prefix="${XDG_CURRENT_DESKTOP,,}-"
 fi
 
 exec waybar -c ${prefix}config.jsonc

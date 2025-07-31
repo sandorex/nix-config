@@ -1,6 +1,14 @@
 { config, pkgs, lib, ... }:
 
 # setup tuigreet the best greeter thingy
+let
+  # commands to autologin into specific desktop environments
+  autologinCommands = {
+    hyprland-uwsm = "uwsm start hyprland-uwsm.desktop";
+    kde6 = "startplasma-wayland";
+    sway = "sway";
+  };
+in
 {
   options = {
     my.tuigreet.enable = lib.mkOption {
@@ -9,14 +17,10 @@
       description = "Use tuigreet greetd greeter";
     };
 
-    my.tuigreet.autologin.command = lib.mkOption {
+    my.tuigreet.autologin.desktop = lib.mkOption {
       default = null;
-      type = with lib.types; nullOr (enum [
-        "startplasma-wayland"
-        "hyprland"
-        "sway"
-      ]);
-      description = "Enable autologin with following command";
+      type = with lib.types; nullOr (enum (builtins.attrNames autologinCommands));
+      description = "Enable autologin to specific desktop enviroment";
     };
 
     my.tuigreet.autologin.user = lib.mkOption {
@@ -30,7 +34,7 @@
     services.greetd =
       let
         autologinUser = config.my.tuigreet.autologin.user;
-        autologinCommand = config.my.tuigreet.autologin.command;
+        autologinCommand = autologinCommands.${config.my.tuigreet.autologin.desktop};
       
         # NOTE: without this all sessions appear twice
         baseSessionsDir = "${config.services.displayManager.sessionData.desktops}";

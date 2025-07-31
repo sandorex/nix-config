@@ -1,6 +1,6 @@
 { pkgs
 , localPath ? null
-, hostname ? null
+, cfgHostname ? null
 , ...
 }:
 
@@ -9,10 +9,18 @@ pkgs.writeShellScriptBin "mynix" ''
 
   ${ if localPath != null then "cd \"${localPath}\"" else ""}
 
+  host="${ if cfgHostname != null then cfgHostname else "$HOSTNAME" }"
+
+  function get_spec() {
+      # basically get all specialisation attributes for specified host
+      nix eval --apply 'x: builtins.concatStringsSep "\n" (builtins.attrNames x)' ".#nixosConfigurations.''${1:?}.config.specialisation" --raw 2>/dev/null
+  }
+
   case "$1" in
       run)
-          shift
-          nix run ".#$1" "$@"
+          name="$2"
+          shift 2
+          nix run ".#packages.x86_64-linux.$name" "$@"
           ;;
       repl)
           nix repl --expr "builtins.getFlake \"$PWD\""
@@ -46,42 +54,45 @@ pkgs.writeShellScriptBin "mynix" ''
       check)
           nix flake check
           ;;
+      spec)
+          shift
+          host="''${1:-$host}"
+
+          echo "Getting specialisations for host '$host'"
+          spec=($(get_spec $host))
+          echo "''${spec[*]}"
+          ;;
 
       # nixos-rebuild
       list)
           nixos-rebuild list-generations
           ;;
-      switch|test)
+      switch|test|build-vm)
           cmd="$1"
           shift
 
-          # ask for specialisations if there are any defined
+          # ask for specialisation if there are any defined to prevent freezes
+          # caused by erasing running desktop environment
+          spec=($(get_spec $host))
           arg=""
-          if grep -ERq 'specialisation.\w+.configuration' "./hosts/${ if hostname != null then hostname else "$HOSTNAME"}"; then
-            read -p "Specialisation (enter for none): " ans
+          if [[ "''${#spec[@]}" -ne 0 ]]; then
+              echo "Specialisations: ''${spec[*]}"
+              read -p "Selected (enter for none): " ans
 
-            if [[ -n "$ans" ]]; then
-              arg="--specialisation $ans"
-            fi
+              if [[ -n "$ans" ]]; then
+                arg="--specialisation $ans"
+              fi
           fi
 
-          sudo nixos-rebuild "$cmd" --flake . $arg "$@"
+          if [[ "$cmd" == "build-vm" ]]; then
+              nixos-rebuild build-vm --flake . $arg
+          else
+              sudo nixos-rebuild "$cmd" --flake . $arg "$@"
+          fi
           ;;
       boot)
           shift
           sudo nixos-rebuild boot --flake . "$@"
-          ;;
-      build-vm)
-          shift
-
-          # allow passing a specialisation
-          arg=""
-          if [[ -n "$2" ]]; then
-            arg="--specialisation $2"
-          fi
-
-          # by default just build curreng host
-          nixos-rebuild build-vm --flake "''${1:-.}" $arg
           ;;
       ''')
           cat <<EOF

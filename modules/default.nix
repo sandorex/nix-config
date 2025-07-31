@@ -48,7 +48,7 @@
       # override the script so it has proper localPath
       mynix = (my.packages.mynix.override {
         localPath = config.my.localPath;
-        inherit hostname;
+        cfgHostname = hostname;
       });
 
       updateReminderService = "update-reminder";
@@ -96,7 +96,7 @@
         wantedBy = [ "graphical-session.target" ];
         partOf = [ "${updateReminderService}.service" ];
         timerConfig.OnCalendar = "8:00";
-        timerConfig.Persistent="true";
+        timerConfig.Persistent = "true";
       };
 
       systemd.user.services.${updateReminderService} = lib.mkIf config.my.gui {
@@ -117,18 +117,16 @@
         bin # contains scripts and stuff
       ];
 
+      # settings for build-vm
       virtualisation.vmVariant = {
         # as the password is set non-declaratively you cannot login by default
         users.users.${config.my.user}.initialPassword = "password";
 
-        # TODO this is only for thorium, helium does not have this amount of ram
-        virtualisation = {
-          memorySize = 8192;
-          cores = 6;
+        # mount dotfiles in the vm when testing
+        virtualisation.sharedDirectories.dotfiles = {
+          source = config.my.localPath;
+          target = config.my.localPath;
         };
-
-        # use dotfiles from nix store, as the repository is not cloned in the vm
-        my.localPath = "${flake}";
 
         # disable flatpak as it wont have space to install it in the vm
         my.flatpak.enable = lib.mkForce false;

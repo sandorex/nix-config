@@ -73,4 +73,10 @@
   dotfiles.enabled = with config.dotfiles.configs; [
     zsh
   ];
+
+  # make 'nixos-rebuild build-vm' a lot faster
+  virtualisation.vmVariant.virtualisation = {
+    memorySize = 8192;
+    cores = 6;
+  };
 }
