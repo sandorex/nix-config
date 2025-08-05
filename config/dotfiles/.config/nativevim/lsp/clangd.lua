@@ -1,4 +1,3 @@
--- does not make sense to run clangd in a container
 -- NOTE: below configuration requires the compile_commands.json to be in current directory!
 
 ---@type vim.lsp.Config

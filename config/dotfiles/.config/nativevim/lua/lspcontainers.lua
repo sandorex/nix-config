@@ -9,6 +9,8 @@ function M.find_manager()
         return "podman"
     elseif M.is_available("docker") then
         return "docker"
+    else
+        print("Error: no support container manager is found")
     end
 end
 

@@ -9,4 +9,4 @@ require("core.lsp")
 require("core.statusline")
 require("core.keybindings")
 require("core.functions")
-
+require("plugins")

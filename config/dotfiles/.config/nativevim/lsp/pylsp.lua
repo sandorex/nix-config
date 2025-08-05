@@ -1,5 +1,3 @@
--- does not make sense to run clangd in a container
-
 -- this is a fork of pyls
 -- https://github.com/python-lsp/python-lsp-server
 
@@ -27,8 +25,11 @@ return {
         pylsp = {
             plugins = {
                 pycodestyle = {
-                    -- TODO port of from old config
-                    -- ignore = { "W391" },
+                    'E302', -- expected 2 blank lines..
+                    'E402', -- module import not at top..
+                    'W391', -- empty line on end of file
+                    'E261', -- 2 spaces before inline comment..
+                    'E305', -- 2 lines after statement blah blah..
                 },
             },
         },

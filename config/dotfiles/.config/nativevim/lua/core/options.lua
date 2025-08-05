@@ -42,11 +42,13 @@ vim.o.expandtab = true   -- use spaces instead of tabs
 vim.o.undofile = true    -- enable persistent undo
 vim.o.undolevels = 10000 -- 10x more undo levels
 
+vim.o.scrolloff = 3
+
 -- define <leader> and <localleader> keys
 vim.g.mapleader = vim.keycode("<space>")
 vim.g.maplocalleader = vim.keycode("<cr>")
 
--- remove netrw banner for cleaner looking
+-- remove netrw banner for cleaner look
 vim.g.netrw_banner = 0
 
 -- smart filtering for directories
