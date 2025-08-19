@@ -55,13 +55,32 @@
         ./hosts/${hostname}
       ];
     };
-  in {
-    nixosConfigurations.thorium = createConfiguration "thorium";
-    nixosConfigurations.helium = createConfiguration "helium";
-    # nixosConfigurations.aorus = createConfiguration "aorus";
-    # nixosConfigurations.sshInstaller = createConfiguration "sshInstaller";
 
-    packages.${system} = my.packages;
+    configurations = [
+      "thorium"
+      "helium"
+      "sshInstaller"
+    ];
+
+    # creates package for each config that has an image type set, basically all
+    # installers are going to have a package that builds them
+    packageImageAliases = nixpkgs.lib.pipe configurations [
+      # check if it has defined image format
+      (builtins.filter (x: self.nixosConfigurations.${x}.config.system.build ? image))
+
+      # name it appropriately
+      (builtins.map (name: {
+        inherit name;
+        value = self.nixosConfigurations.${name}.config.system.build.image;
+      }))
+
+      # convert it to an attrs
+      builtins.listToAttrs
+    ];
+  in {
+    nixosConfigurations = nixpkgs.lib.genAttrs configurations createConfiguration;
+
+    packages.${system} = my.packages // packageImageAliases;
 
     overlays = my.overlays;
   };

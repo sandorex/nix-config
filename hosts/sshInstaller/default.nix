@@ -29,7 +29,7 @@
   # ));
 
   # rename it so its different from regular nixos installer
-  isoImage.isoBaseName = "nixos-ssh-mini";
+  isoImage.isoBaseName = lib.mkForce "nixos-ssh-mini";
   isoImage.volumeID = "nixos-ssh-mini";
 
   # bigger image but faster building
