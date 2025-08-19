@@ -18,6 +18,7 @@
     my.flatpak.install = [
       "com.usebottles.bottles"      # general purpose proton/wine launcher
       "com.heroicgameslauncher.hgl" # GOG/Epic games launcher
+      "net.davidotek.pupgui2"       # proton-qt, manging proton versions
     ];
   };
 }

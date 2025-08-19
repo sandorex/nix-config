@@ -45,7 +45,7 @@
     my.packages.irscrutinizer
     arduino-ide
 
-    emacs
+    zellij # terminal multiplexer
 
     yt-dlp # youtube downloader
     nushell # the best shell

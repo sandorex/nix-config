@@ -98,8 +98,9 @@
       # editor, just add all of them..
       ++ (lib.optionals extraEditor [
         helix
-        emacs
         neovim
       ]);
     };
+
+  # TODO set mime types for VLC at least
 }
