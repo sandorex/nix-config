@@ -87,7 +87,7 @@ __prompt_cmd() {
 }
 
 PROMPT_COMMAND="$PROMPT_COMMAND __prompt_cmd ;"
-PS1='\[$(tput setaf 4)\]$_BASH_JOBS\[$(tput setaf 11)\]$\[$(tput sgr0)\] '
+PS1='\[$(tput setaf 4)\]$_BASH_JOBS$([ "$SHLVL" -gt 1 ] && echo -n "$SHLVL")\[$(tput setaf 11)\]$\[$(tput sgr0)\] '
 
 # enable bash completion
 if ! shopt -oq posix; then
