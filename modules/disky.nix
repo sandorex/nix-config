@@ -1,17 +1,21 @@
 { config, lib, pkgs, ... }:
 
 let
-  # inherit (builtins) map mapAttrs attrNames attrValues concatStringsSep;
-
   formatCmd = fs: {
-    ext4 = "mkfs.ext4";
-    vfat = "mkfs.vfat -F 32"; # TODO idk if this is correct
+    ext4 = "${pkgs.e2fsprogs}/bin/mkfs.ext4";
+    vfat = "${pkgs.dosfstools}/bin/mkfs.vfat"; # TODO should the boot partition be vfat or fat32?
   }.${fs};
 
-  # TODO use executables from pkgs for sfdisk etc
-  # TODO if there is nothing configured just write 'no disks configured' and exit do not write any code
   script = pkgs.writeShellScriptBin "disky" ''
     set -eo pipefail
+
+    ${
+      # if nothing is configured just quit
+      if config.disky == {} then ''
+        echo "No disks configured for host"
+        exit 1
+      '' else ""
+    }
 
     DISKS=(${
       # write all the disks so they can be checked
@@ -25,11 +29,7 @@ let
       ]
     })
 
-    if [[ "''${#DISKS[@]}" -eq 0 ]]; then
-        echo "No disks configured for host"
-        exit 0
-    fi
-
+    # do not modify anything if there are any drives missing on the system
     not_found=()
     for i in "''${DISKS[@]}"; do
         if [[ ! -e "$i" ]]; then
@@ -60,11 +60,14 @@ let
           ;;
     esac
 
+    # cache the password
+    sudo echo -n ""
+
     ${
       # apply the sfdisk partition layout before formatting
       lib.pipe config.disky [
         (builtins.mapAttrs (k: v: ''
-          sudo sfdisk ${k} <<EOF
+          sudo ${pkgs.util-linux}/bin/sfdisk ${k} <<EOF
           ${v.sfdisk}
           EOF
 
@@ -102,7 +105,6 @@ in
               Passed verbatim to `fileSystems`
 
               Used for error checking etc:
-                - Checked if UUIDs defined are in the dump so its truly declarative
                 - The `fsType` is used to format the partition properly
             '';
           };
@@ -115,19 +117,83 @@ in
       });
     };
 
-    # TODO this may not be the way to do it but it kinda works as its easy to access the config
+    # NOTE this is janky but works, and you can easily access it via `nixosConfigurations.*.config.diskyScript`
     diskyScript = lib.mkOption {
-      # default = null;
       default = script;
-      description = "The disky install script, run it to format the partitions automatically (dangerous)";
+      description = "The disky install script derivation, run it to format the partitions automatically (dangerous)";
       readOnly = true;
     };
   };
 
   config = {
-    # TODO check if drive are accessed using /dev/disk/by-id/
+    warnings =
+      let
+        # only /dev/disk/by-id/ should be used when referring to drives in disky
+        # https://wiki.archlinux.org/title/Persistent_block_device_naming#World_Wide_Name
+        badDrivePath = lib.pipe config.disky [
+          builtins.attrNames
+          (builtins.filter (x: !lib.hasPrefix "/dev/disk/by-id/" x))
+          (builtins.map (x: "Disky drive '${x}' does not use by-id path"))
+        ];
+
+        # fileSystems should be mounted by /dev/disk/by-partuuid/ cause its restored by sfdisk, and uuid
+        # is regenerated on formatting and its not recommended to set it explicitly
+        badFsPath = lib.pipe config.disky [
+          # go over each fs defined
+          (lib.mapAttrs (k: v: lib.pipe v.fs [
+            # filter fs (fsType of "none" is a bind mount)
+            (lib.filterAttrs (k2: v2:
+              v2.fsType != "none" && !(lib.hasPrefix "/dev/disk/by-partuuid/" v2.device)
+            ))
+            (lib.mapAttrs (k2: v2: {
+              parentName = k;
+              fsName = k2;
+              fs = v2;
+            }))
+            builtins.attrValues
+          ]))
+
+          builtins.attrValues
+
+          lib.flatten
+
+          (builtins.map (x: "fileSystem.\"${x.fsName}\".device (${x.fs.fsType}) does not use PARTUUID (disky.\"${x.parentName}\")"))
+        ];
+
+        # check if UUIDs used to mount things are the same as in in the dump (using PARTUUID)
+        # badUUID = lib.pipe config.disky [
+        #   (lib.mapAttrs (k: v: lib.pipe v.fs [
+        #     # filter fs (fsType of "none" is a bind mount)
+        #     (lib.filterAttrs (k2: v2:
+        #       v2.fsType != "none" && (lib.hasPrefix "/dev/disk/by-partuuid/" v2.device)
+        #     ))
+        #     (lib.mapAttrs (k2: v2: {
+        #       parentName = k;
+        #       fsName = k2;
+        #       fs = v2;
+        #       uuid = builtins.elemAt (builtins.match "/dev/disk/by-partuuid/(.+)" v2.device) 0;
+        #     }))
+        #     builtins.attrValues
+
+        #     # check if uuid is in sfdisk dump
+        #     (builtins.filter (x: (lib.match "(${lib.escapeRegex x.uuid})" v.sfdisk) != []))
+        #     # (builtins.map (x: x.))
+        #     # (lib.filterAttrs (k2: v2: v2.))
+        #   ]))
+
+        #   builtins.attrValues
+
+        #   lib.flatten
+
+        #   (builtins.map (x: "fileSystem.\"${x.fsName}\".device ${x.uuid} is not in sfdisk dump"))
+
+        #   (x: lib.traceSeq x x)
+        ];
+      in []
+      ++ badDrivePath
+      ++ badFsPath;
 
     # merge all `disky.*.fs` into one
-    fileSystems =  lib.mkMerge (builtins.attrValues (builtins.mapAttrs (k: v: v.fs) config.disky));
+    fileSystems = lib.mkMerge (builtins.attrValues (builtins.mapAttrs (k: v: v.fs) config.disky));
   };
 }
