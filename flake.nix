@@ -19,6 +19,7 @@
       localName = "${name}";
     };
 
+    flake = self;
     system = "x86_64-linux";
 
     pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
@@ -26,15 +27,14 @@
 
     # this is a shortcut so i dont have to use flake.outputs.packages.x86_64-linux.something
     my = {
-      packages = import ./packages { inherit pkgs; };
-      overlays = import ./overlays {};
+      packages = import ./packages { inherit pkgs repo flake; };
+      overlays = import ./overlays { inherit repo flake; };
     };
 
     # consistent arguments passed to all modules
     createConfiguration = hostname: nixpkgs.lib.nixosSystem {
       specialArgs = {
-        inherit pkgsUnstable inputs hostname repo my;
-        flake = self;
+        inherit pkgsUnstable inputs hostname repo my flake;
       };
 
       inherit system;

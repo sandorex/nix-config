@@ -2,6 +2,7 @@
 , stdenv
 , fetchzip
 , pkgs
+, ...
 }:
 
 stdenv.mkDerivation rec {

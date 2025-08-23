@@ -188,7 +188,7 @@ in
         #   (builtins.map (x: "fileSystem.\"${x.fsName}\".device ${x.uuid} is not in sfdisk dump"))
 
         #   (x: lib.traceSeq x x)
-        ];
+        # ];
       in []
       ++ badDrivePath
       ++ badFsPath;
