@@ -33,11 +33,13 @@ hidden = false
 esc = ["collapse_selection", "keep_primary_selection"]
 
 # use file picker in current directory by default
-space."f" = "file_picker_in_current_buffer_directory"
+space."f" = "file_picker_in_current_directory"
 space."F" = "file_picker"
+space."A-f" = "file_picker_in_current_buffer_directory"
 
-space."e" = "file_explorer_in_current_buffer_directory"
+space."e" = "file_explorer_in_current_directory"
 space."E" = "file_explorer"
+space."A-e" = "file_explorer_in_current_buffer_directory"
 
 # quick shortcuts for common things
 "A-x" = ":buffer-previous"
