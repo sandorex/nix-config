@@ -17,7 +17,10 @@
 
   config = lib.mkMerge [
     (lib.mkIf config.my.libvirtd.enable {
-      virtualisation.libvirtd.enable = true;
+      virtualisation.libvirtd = {
+        enable = true;
+        qemu.vhostUserPackages = with pkgs; [ virtiofsd ];
+      };
       programs.virt-manager.enable = true;
 
       # allow user to use libvirtd without sudo

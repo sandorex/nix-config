@@ -47,6 +47,7 @@
         bind.dnsutils # dig
         file # file
         unzip
+        unrar
       ]
 
       # it may pull in weird dependencies when i dont have a gui
