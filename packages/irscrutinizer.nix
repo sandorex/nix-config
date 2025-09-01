@@ -25,7 +25,13 @@ stdenv.mkDerivation rec {
     rm -r $out/Linux-arm/ $out/Linux-i386/
 
     install -m 444 -D ${pname}.desktop -t $out/share/applications
-    install -m 444 -D ${pname}.png -t $out/share/icons
+    substituteInPlace $out/share/applications/${pname}.desktop \
+      --replace-fail '${""}''${project.exepath}' "$out/bin/irscrutinizer" \
+      --replace-fail '${""}''${project.icon}' "irscrutinizer"
+
+    # copy the icon
+    mkdir -p $out/share/icons/hicolor/64x64/apps
+    cp irscrutinizer.png $out/share/icons/hicolor/64x64/apps/irscrutinizer.png
 
     # create symlink for each application
     mkdir -p $out/bin
