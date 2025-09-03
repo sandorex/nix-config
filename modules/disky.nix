@@ -149,7 +149,7 @@ in
     };
   };
 
-  config = {
+  config = lib.mkIf (config.disky != {}) {
     warnings =
       let
         # basically filterMap for each fs in disky
@@ -187,7 +187,7 @@ in
 
         badFsPath = eachFs (x:
           if x.fs.fsType != "none" && !(lib.hasPrefix "/dev/disk/by-partuuid/" x.fs.device) then
-            "fileSystem.\"${x.fsName}\".device (${x.fs.fsType}) does not use PARTUUID (disky.\"${x.parentName}\")"
+            "Mountpoint \"${x.fsName}\" (${x.fs.fsType}) does not use PARTUUID (disky.\"${x.parentName}\")"
           else
             null
         );

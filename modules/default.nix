@@ -14,6 +14,7 @@
     ./desktop.nix
     ./ddcutil.nix
     ./dotfiles.nix
+    ./serial.nix
   ];
 
   options = {
