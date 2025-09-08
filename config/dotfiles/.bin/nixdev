@@ -7,6 +7,8 @@
 set -eo pipefail
 
 args=(
+    --quiet
+
     # keep tab completions
     --tab
     --keep-shell-rc

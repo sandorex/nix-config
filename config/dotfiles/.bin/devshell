@@ -32,10 +32,9 @@ function build() {
     local drv_path
 
     # print the eval output to console just in case of errors
-    exec 5>&1
-
     # NOTE: `.drvPath` is necessary as `nix eval` does not evaluate to a
     # derivation if `--raw` is passed
+    exec 5>&1
     drv_path=$(nix eval --raw "${1:?}.drvPath" | tee /dev/fd/5)
 
     # newline cause nix eval does not print a newline
@@ -61,9 +60,7 @@ fi
 
 if [[ "$1" == "--list" ]]; then
     echo "Listing devshell roots"
-    nix-store --gc --print-roots | grep "/$LINK_DIR/"
-    # find all links that have the links dir in the path
-    find "$GCROOTS" -lname "*/$LINKS_DIR/*" -exec readlink {} +
+    find "$GCROOTS" -type l -lname "*/$LINK_DIR/*" -exec readlink {} +
     exit
 fi
 

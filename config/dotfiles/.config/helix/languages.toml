@@ -6,6 +6,10 @@ indent = { tab-width = 4, unit = "    " }
 name = "javascript"
 indent = { tab-width = 4, unit = "    " }
 
+[[language]]
+name = "bash"
+indent = { tab-width = 4, unit = "    " }
+
 ## LSP ##
 [language-server.godot]
 command = "nc"

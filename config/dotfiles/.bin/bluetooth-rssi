@@ -48,7 +48,7 @@ def main():
 
     try:
         while True:
-            print(f"{clear}Listing bluetooth RSSI of connected devices:")
+            # print(f"{clear}Listing bluetooth RSSI of connected devices:")
             for d_addr, d_name in get_devices():
                 print(f"  {d_name} {d_addr} = {get_device_rssi(d_addr)}")
 
