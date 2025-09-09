@@ -5,35 +5,49 @@ let
   # override the script so it has proper localPath
   mynix = (my.packages.mynix.override {
     localPath = config.my.localPath;
-    inherit hostname;
+    cfgHostname = hostname;
+    thresholdDays = config.my.update-reminder.threshold;
   });
 
   serviceName = "update-reminder";
 in
 {
-  environment.systemPackages = [ mynix ];
+  options.my = {
+    update-reminder.enable = lib.mkOption {
+      default = config.my.gui;
+      type = lib.types.bool;
+      description = "Automatic reminder when user should update their system (gui only)";
+    };
 
-  # if gui then nag to update
-  systemd.timers.${serviceName} = lib.mkIf config.my.gui {
-    description = "Update Reminder Timer";
-    wantedBy = [ "timers.target" ];
-    partOf = [ "${serviceName}.service" ];
-    timerConfig.OnCalendar = "8:00";
-    timerConfig.Persistent="true";
+    update-reminder.threshold = lib.mkOption {
+      default = 5;
+      type = lib.types.ints.positive;
+      description = "Threshold when to trigger update reminder";
+    };
   };
 
-  systemd.services.${serviceName} = lib.mkIf config.my.gui {
-    description = "Reminder to update";
-    serviceConfig.Type = "simple";
+  config = {
+    environment.systemPackages = [ mynix ];
 
-    script = ''
-      set -eo pipefail
+    # if gui then nag with notifications to update
+    systemd.user.timers.${serviceName} = lib.mkIf config.my.update-reminder.enable {
+      description = "Update Reminder Timer";
+      wantedBy = [ "graphical-session.target" ];
+      partOf = [ "${serviceName}.service" ];
+      timerConfig.OnCalendar = "8:00";
+      timerConfig.Persistent = "true";
+    };
 
-      last_update="$(${mynix}/bin/mynix up-to-date)"
-      code=$?
-      if [[ $code -eq 1 ]]; then
-          ${pkgs.libnotify}/bin/notify-send -u critical -i update-low -a "mynix" "You should probably update" "Last update was $last_update"
-      fi
-    '';
+    systemd.user.services.${serviceName} = lib.mkIf config.my.update-reminder.enable {
+      description = "Reminder to update";
+      serviceConfig.Type = "simple";
+      enableStrictShellChecks = true;
+      script = ''
+        # if not up to date just send a notification
+        if ! last_update="$(${mynix}/bin/mynix up-to-date)"; then
+            ${pkgs.libnotify}/bin/notify-send -u critical -i update-low -a "mynix" "You should probably update" "Last update was $last_update"
+        fi
+      '';
+    };
   };
 }

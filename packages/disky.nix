@@ -5,7 +5,6 @@
 
 # this is just a wrapper to run diskyScript with current hostname as nixosConfiguration name
 
-# TODO maybe refer to the main flake somehow?
 pkgs.writeShellScriptBin "disky-runner" ''
   set -eo pipefail
 

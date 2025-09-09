@@ -27,7 +27,7 @@
 
     # this is a shortcut so i dont have to use flake.outputs.packages.x86_64-linux.something
     my = {
-      packages = import ./packages { inherit pkgs repo flake; };
+      packages = import ./packages { inherit repo flake pkgs; };
       overlays = import ./overlays { inherit repo flake; };
     };
 

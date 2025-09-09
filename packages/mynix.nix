@@ -1,6 +1,7 @@
 { pkgs
 , localPath ? null
 , cfgHostname ? null
+, thresholdDays ? 5
 , ...
 }:
 
@@ -29,9 +30,6 @@ pkgs.writeShellScriptBin "mynix" ''
           nix flake update
           ;;
       up-to-date)
-          # after how many days to consider updating
-          days=5
-
           diff="$(( $(date +'%s') - $(stat -c %Y flake.lock) ))"
 
           # print human readable time
@@ -45,7 +43,7 @@ pkgs.writeShellScriptBin "mynix" ''
           echo
 
           # exit with 1 when not up to date
-          if [[ "$diff" -gt "$(( days * 86400 ))" ]]; then
+          if [[ "$diff" -gt "$(( ${ toString thresholdDays } * 86400 ))" ]]; then
               exit 1
           else
               exit 0
@@ -85,7 +83,7 @@ pkgs.writeShellScriptBin "mynix" ''
           fi
 
           if [[ "$cmd" == "build-vm" ]]; then
-              nixos-rebuild build-vm --flake . $arg
+              nixos-rebuild build-vm --flake . $arg "$@"
           else
               sudo nixos-rebuild "$cmd" --flake . $arg "$@"
           fi
