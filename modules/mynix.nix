@@ -14,7 +14,7 @@ in
 {
   options.my = {
     update-reminder.enable = lib.mkOption {
-      default = config.my.gui;
+      default = false;
       type = lib.types.bool;
       description = "Automatic reminder when user should update their system (gui only)";
     };

@@ -1,11 +1,17 @@
-{ flake, config, lib, pkgs, my, ... }:
+{ config, lib, pkgs, my, ... }:
 
 {
   imports = [
-    ./configuration.nix
+    ../../modules/base/workstation.nix
 
-    "${flake}/modules"
+    ./hardware-configuration.nix
+    ./disks.nix
   ];
+
+  system.stateVersion = "25.05";
+
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
 
   users.users.${config.my.user} = {
     isNormalUser = true;
@@ -25,12 +31,17 @@
     libvirtd.enable = true;
     podman.enable = true;
     bluetooth.enable = true;
+    printing.enable = true;
     gaming.enable = true;
+    flatpak.enable = true;
     apps = {
       gui.enable = true;
       editor.enable = true;
     };
 
+    update-reminder.enable = true;
+
+    pipewire.enable = true;
     kde.enable = true;
     sddm.enable = true;
   };
@@ -67,11 +78,12 @@
 
     "org.freecad.FreeCAD"   # CAD software
     "org.kde.kdenlive"      # video editor
-    "com.vivaldi.Vivaldi"   # browser
+    "com.vivaldi.Vivaldi"   # browser (nix package was borked)
   ];
 
   dotfiles.enabled = with config.dotfiles.configs; [
     zsh
+    helix
   ];
 
   # make 'nixos-rebuild build-vm' a lot faster

@@ -3,7 +3,7 @@
 {
   options = {
     my.pipewire.enable = lib.mkOption {
-      default = config.my.gui; # enable by default if gui
+      default = false;
       type = lib.types.bool;
       description = "Use pipewire";
     };

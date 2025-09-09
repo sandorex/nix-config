@@ -10,7 +10,7 @@ in
 {
   options = {
     my.flatpak.enable = lib.mkOption {
-      default = config.my.gui; # enable by default if using gui
+      default = false;
       type = lib.types.bool;
       description = "Enable flatpak support";
     };
@@ -63,10 +63,10 @@ in
           ${pkgs.flatpak}/bin/flatpak install --user -y --noninteractive ${flathubRemote} "''${apps_to_install[@]}"
         fi
       '';
-      serviceConfig = {
-        # the service should not keep running
-        Type = "oneshot";
-      };
+
+      # the service should not keep running
+      serviceConfig.Type = "oneshot";
+
       # do not auto start
       wantedBy = [ ];
       after = [ "multi-user.target" ];

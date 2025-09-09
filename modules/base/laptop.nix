@@ -1,0 +1,7 @@
+{ ... }:
+
+{
+  imports = [
+    ./computer.nix
+  ];
+}

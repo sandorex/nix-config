@@ -73,7 +73,7 @@ let
 
           ${
             # format all filesystems defined within
-            lib.pipe v.fs [
+            lib.pipe v.fileSystems [
               # bind mounts should be ignored in this case
               (lib.filterAttrs (k: v: v.fsType != "none"))
 

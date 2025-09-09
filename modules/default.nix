@@ -1,4 +1,7 @@
-{ flake, config, lib, pkgs, hostname, repo, my, ... }:
+{ config, lib, repo, ... }:
+
+# imports all modules which do not enable anything by default!
+# so this file is imported by every configuration including installers
 
 {
   imports = [
@@ -16,6 +19,8 @@
     ./dotfiles.nix
     ./serial.nix
     ./mynix.nix
+    ./sshd.nix
+    ./disky.nix
   ];
 
   options = {
@@ -37,30 +42,12 @@
       description = "URL to the git repository";
       readOnly = true;
     };
-
-    services.sshd.autostart = lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Autostart SSH server";
-    };
   };
 
+  # common across all configurations
   config = {
-    networking.hostName = hostname;
-    networking.networkmanager.enable = true;
-
-    time.timeZone = "Europe/Belgrade";
-
-    # NOTE: use en_GB so dates are correctly formatted
-    i18n.defaultLocale = "en_GB.UTF-8";
-
-    # every keyboard is US
-    services.xserver.xkb = {
-      layout = "us";
-      variant = "";
-    };
-
-    my.gc.enable = true;
+    # all propriatery firmware
+    hardware.enableAllFirmware = true;
 
     # allows running binaries not built for nix
     programs.nix-ld.enable = true;
@@ -69,10 +56,6 @@
     programs.appimage.enable = true;
     programs.appimage.binfmt = true;
 
-    # disable sshd autostart if not requested
-    systemd.services.sshd.wantedBy = lib.mkIf (!config.services.sshd.autostart) (lib.mkForce []);
-    services.sshd.enable = true;
-
     # make SSD great again!
     services.fstrim.enable = true;
 
@@ -80,10 +63,6 @@
     systemd.extraConfig = ''
       DefaultTimeoutStopSec=15s
     '';
-
-    dotfiles.enabled = with config.dotfiles.configs; [
-      bin # contains scripts and stuff
-    ];
 
     # settings for build-vm
     virtualisation.vmVariant = {
