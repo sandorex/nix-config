@@ -29,6 +29,7 @@
     my = {
       packages = import ./packages { inherit repo flake pkgs; };
       overlays = import ./overlays { inherit repo flake; };
+      secrets = import ./secrets.nix "/etc/nix-secret";
     };
 
     # consistent arguments passed to all modules

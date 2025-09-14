@@ -32,15 +32,20 @@
       fonts.packages = with pkgs; (lib.optionals extraGui [
         nerd-fonts.fira-code # proper font for terminal
       ]);
-  
+
       environment.systemPackages = with pkgs; [
         git
         curl
         lm_sensors
         lsd
+        bat
         python3
         shellcheck
         bc # cli calculator
+
+        # encryption of secrets
+        age
+        sops
 
         # common linux commands
         usbutils # lsusb
