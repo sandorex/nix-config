@@ -61,7 +61,7 @@
       "thorium"
       # TODO update rest of configurations
       # "helium"
-      # "sshInstaller"
+      "sshInstaller"
     ];
 
     # creates package for each config that has an image type set, basically all
