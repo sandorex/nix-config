@@ -91,5 +91,4 @@ else
     build "${TARGET:?}"
 fi
 
-# NOTE nix develop requires a abs path to the derivation
-exec nix develop "$(readlink "$link_path")" "$@"
+exec nix develop "$link_path" "$@"

@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-# simple wrapper script to run nix develop using firejail
+# simple wrapper script to run command under firejail
 #
 # this script exists because
 # https://github.com/netblue30/firejail/issues/5713
@@ -32,6 +32,9 @@ whitelist=(
 
 # whitelisted RO paths
 whitelist_ro=(
+    # my scripts
+    "$HOME/.bin"
+
     "$HOME/.config/zellij"
     "$HOME/.config/tmux"
 
@@ -60,9 +63,14 @@ for path in "${whitelist_ro[@]}"; do
     )
 done
 
+if [[ -z "$*" ]]; then
+    echo "Usage: $0 <command...>"
+    exit 1
+fi
+
 if [[ "$PWD" == "/home/$USER" ]]; then
     echo "Running in HOME directory is unsafe"
     exit 66
 fi
 
-exec firejail "${args[@]}" -- nix develop "$@"
+exec firejail "${args[@]}" -- "$@"
