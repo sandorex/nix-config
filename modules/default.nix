@@ -13,7 +13,7 @@
     ./pipewire.nix
     ./garbage.nix
     ./gaming.nix
-    ./packages.nix
+    ./apps.nix
     ./desktop.nix
     ./ddcutil.nix
     ./dotfiles.nix

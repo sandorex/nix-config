@@ -30,7 +30,7 @@ pkgs.writeShellScriptBin "mynix" ''
           nix flake update
           ;;
       up-to-date)
-          diff="$(( $(date +'%s') - $(stat -c %Y flake.lock) ))"
+          diff="$(( $(date +'%s') - $(git log -1 --pretty="format:%ct" flake.lock) ))"
 
           # print human readable time
           T="$diff"

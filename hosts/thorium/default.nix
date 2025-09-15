@@ -35,8 +35,11 @@
     gaming.enable = true;
     flatpak.enable = true;
     apps = {
-      gui.enable = true;
-      editor.enable = true;
+      base.enable = true;
+      standard.enable = true;
+      terminal.enable = true;
+
+      dotfiles.enable = true;
     };
 
     update-reminder.enable = true;
