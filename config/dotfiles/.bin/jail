@@ -35,21 +35,22 @@ whitelist_ro=(
     # my scripts
     "$HOME/.bin"
 
-    "$HOME/.config/zellij"
-    "$HOME/.config/tmux"
-
-    # editors
-    "$HOME/.emacs.d"
-    "$HOME/.config/helix"
-    "$HOME/.config/nvim"
-
-    # shell stuff
-    "$HOME/.config/shell" # shell agnostic stufff
-    "$HOME/.config/bash"
     "$HOME/.inputrc" # needed for bash
     "$HOME/.bashrc"
-    "$HOME/.config/zsh"
     "$HOME/.zshrc"
+    "$HOME/.zcompdump"
+
+    # configs (explicit cause they are often symlinks)
+    "$HOME/.config/shell" # shell agnostic files
+    "$HOME/.config/zsh"
+    "$HOME/.config/bash"
+    "$HOME/.config/nano"
+    "$HOME/.config/helix"
+    "$HOME/.config/nvim"
+    "$HOME/.config/emacs"
+    "$HOME/.config/zellij"
+    "$HOME/.config/tmux"
+    "$HOME/.config/git"
 )
 
 for path in "${whitelist[@]}"; do

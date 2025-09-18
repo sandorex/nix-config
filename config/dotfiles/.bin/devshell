@@ -91,4 +91,4 @@ else
     build "${TARGET:?}"
 fi
 
-exec nix develop "$link_path" "$@"
+exec nix develop "$link_path" "$@" --command "$SHELL"
