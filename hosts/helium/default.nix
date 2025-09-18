@@ -1,24 +1,32 @@
-{ flake, config, pkgs, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [
-    ./configuration.nix
+    ../../modules/base/laptop.nix
 
-    "${flake}/modules"
+    ./hardware-configuration.nix
   ];
+
+  system.stateVersion = "24.05";
 
   users.users.${config.my.user} = {
     isNormalUser = true;
     description = "${config.my.user}";
-    extraGroups = [ "networkmanager" "wheel" ];
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
   };
 
   my = {
     podman.enable = true;
     bluetooth.enable = true;
+    flatpak.enable = true;
     apps = {
-      gui.enable = true;
-      editor.enable = true;
+      base.enable = true;
+      standard.enable = true;
+
+      dotfiles.enable = true;
     };
 
     cinnamon.enable = true;
