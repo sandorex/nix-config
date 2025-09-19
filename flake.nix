@@ -59,8 +59,7 @@
 
     configurations = [
       "thorium"
-      # TODO update rest of configurations
-      # "helium"
+      "helium"
       "sshInstaller"
     ];
 
