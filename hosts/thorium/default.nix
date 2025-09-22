@@ -47,6 +47,8 @@
     pipewire.enable = true;
     kde.enable = true;
     sddm.enable = true;
+
+    silent-boot.enable = true;
   };
 
   environment.systemPackages = with pkgs; [
