@@ -45,7 +45,15 @@
   };
 
   # common across all configurations
-  config = {
+  config =
+  let
+    dnsServers = [
+      "1.1.1.1" # cloudflare
+      "9.9.9.9" # quad9
+      "8.8.8.8" # google dns
+    ];
+  in
+  {
     # all propriatery firmware
     hardware.enableAllFirmware = true;
 
@@ -58,6 +66,10 @@
 
     # make SSD great again!
     services.fstrim.enable = true;
+
+    # use proper dns servers
+    networking.nameservers = lib.mkDefault dnsServers;
+    networking.networkmanager.insertNameservers = lib.mkDefault dnsServers;
 
     # reduce wait time for stop jobs
     systemd.extraConfig = ''
