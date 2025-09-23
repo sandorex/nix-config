@@ -1,4 +1,4 @@
-{ config, lib, ... }:
+{ config, lib, my, ... }:
 
 {
   options.my.silent-boot.enable = lib.mkOption {
@@ -9,8 +9,22 @@
 
   # TODO i do not know if this works on only with systemd-boot
   config = lib.mkIf config.my.silent-boot.enable {
-    boot.plymouth.enable = true;
-    boot.plymouth.theme = "bgrt";
+    assertions = [
+      {
+        assertion = config.boot.loader.systemd-boot.enable;
+        message = "Silent boot is not tested without systemd-boot";
+      }
+    ];
+
+    # boot.plymouth.enable = true;
+    boot.plymouth = {
+      enable = true;
+
+      # using custom theme
+      themePackages = [ my.packages.plymouth-mac-style ];
+      theme = "mac-style";
+    };
+
     boot.initrd.verbose = false;
     boot.consoleLogLevel = 0;
     boot.kernelParams = [ "quiet" "udev.log_level=0" ];

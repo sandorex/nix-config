@@ -6,4 +6,5 @@
   installer = pkgs.callPackage ./installer.nix inputs;
   disky = pkgs.callPackage ./disky.nix inputs;
   irscrutinizer = pkgs.callPackage ./irscrutinizer.nix inputs;
+  plymouth-mac-style = pkgs.callPackage ./plymouth-mac-style inputs;
 }
