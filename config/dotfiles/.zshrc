@@ -123,6 +123,9 @@ function cdalias() {
     fi
 }
 
+cdalias projects "$HOME/ws"
+cdalias ws "$HOME/ws"
+
 cdalias dotfiles "$HOME/.dotfiles"
 cdalias desktop "$HOME/Desktop"
 cdalias downloads "$HOME/Downloads"
@@ -130,7 +133,6 @@ cdalias documents "$HOME/Documents"
 cdalias videos "$HOME/Videos"
 cdalias music "$HOME/Music"
 cdalias notes "$HOME/Notes"
-cdalias ws "$HOME/ws"
 cdalias slowmf "/mnt/slowmf"
 
 unset cdalias

@@ -22,6 +22,7 @@
     ./sshd.nix
     ./disky.nix
     ./silent-boot.nix
+    ./syncthing.nix
   ];
 
   options = {
