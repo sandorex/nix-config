@@ -21,7 +21,7 @@
     ./mynix.nix
     ./sshd.nix
     ./disky.nix
-    ./silent-boot.nix
+    # ./silent-boot.nix
     ./syncthing.nix
   ];
 

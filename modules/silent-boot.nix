@@ -7,7 +7,7 @@
     description = "Enables pretty and silent boot";
   };
 
-  # TODO i do not know if this works on only with systemd-boot
+  # TODO currently broken just make it show logo and nothing more
   config = lib.mkIf config.my.silent-boot.enable {
     assertions = [
       {
