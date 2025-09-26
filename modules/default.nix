@@ -1,4 +1,4 @@
-{ config, lib, repo, ... }:
+{ config, lib, repo, inputs, ... }:
 
 # imports all modules which do not enable anything by default!
 # so this file is imported by every configuration including installers
@@ -56,6 +56,10 @@
     ];
   in
   {
+    # use same version of nixpkgs for `nix shell` and other commands
+    nix.registry.nixpkgs.flake = inputs.nixpkgs;
+    nix.registry.nixpkgs-unstable.flake = inputs.nixpkgs-unstable;
+
     # all propriatery firmware
     hardware.enableAllFirmware = true;
 

@@ -1,4 +1,4 @@
-{ config, lib, pkgs, my, ... }:
+{ config, lib, pkgs, pkgsUnstable, my, ... }:
 
 {
   imports = [
@@ -68,6 +68,8 @@
     buildah # container builder thingy
 
     rofi-wayland # for some scripts
+
+    pkgsUnstable.neovim # stable version has broken treesitter
   ];
 
   # manual sandboxing
