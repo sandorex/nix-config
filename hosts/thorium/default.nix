@@ -34,7 +34,6 @@
     printing.enable = true;
     gaming.enable = true;
     flatpak.enable = true;
-    syncthing.enable = true;
     apps = {
       base.enable = true;
       standard.enable = true;

@@ -37,7 +37,7 @@ setopt no_auto_cd       # no cd into a dir by typing in the path
 setopt no_notify        # report about background jobs only before prompt
 setopt long_list_jobs   # long format for jobs
 setopt globdots         # match dot files with globs implicitly
-setopt extendedglob
+# setopt extended_glob  # makes '#' '~' '^' special characters
 setopt no_caseglob
 setopt no_banghist      # disable !x history expansion
 setopt complete_in_word # complete from both ends of a word

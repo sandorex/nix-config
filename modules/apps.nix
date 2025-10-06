@@ -40,6 +40,9 @@ in
 
         # nice editor out of the box
         helix
+
+        # search packages, nicer cli for nixos commands
+        nh
       ]
       # it may pull in weird dependencies when i dont have a gui
       ++ (lib.optionals gui [
