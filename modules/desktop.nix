@@ -8,6 +8,7 @@
     ./desktop/cinnamon.nix
     # ./desktop/swaywm.nix # need to merge hyprland tweaks
     ./desktop/tuigreet.nix
+    ./desktop/gnome.nix
   ];
 
   options = {

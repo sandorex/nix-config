@@ -47,11 +47,11 @@
     pipewire.enable = true;
     kde.enable = true;
     sddm.enable = true;
-
   };
 
   environment.systemPackages = with pkgs; [
     librewolf
+    vivaldi
     libreoffice
     krita
     orca-slicer
@@ -84,7 +84,6 @@
 
     "org.freecad.FreeCAD"   # CAD software
     "org.kde.kdenlive"      # video editor
-    "com.vivaldi.Vivaldi"   # browser (nix package was borked)
   ];
 
   dotfiles.enabled = with config.dotfiles.configs; [

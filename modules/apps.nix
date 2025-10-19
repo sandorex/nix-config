@@ -88,6 +88,11 @@ in
         easyeffects
         # qalculate # TODO do i even have a rule for this?
       ];
+
+      xdg.mime.defaultApplications = {
+        # play all video in vlc
+        "video/*" = "vlc.desktop";
+      };
     })
 
     (lib.mkIf (terminal) {
@@ -102,6 +107,4 @@ in
       ];
     })
   ];
-
-  # TODO set mime types for VLC at least
 }
