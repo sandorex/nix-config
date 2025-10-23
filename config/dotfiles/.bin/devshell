@@ -86,6 +86,10 @@ link_path="$LINK_DIR/$(name_gen "${TARGET:?}")"
 # rebuild if requested or if the derivation is missing (invalid or missing link)
 if [[ -L "$link_path" && "$UPDATE" -eq 0 ]]; then
     echo "Reusing devshell derivation"
+    if [[ ! -e "$link_path" ]]; then
+        echo "Derivation link is invalid"
+        exit 1
+    fi
 else
     echo "Caching devshell derivation"
     build "${TARGET:?}"
