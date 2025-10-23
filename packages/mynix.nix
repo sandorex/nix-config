@@ -86,10 +86,11 @@ writeShellApplication {
                   fi
               fi
 
+              # shellcheck disable=SC2086
               if [[ "$cmd" == "build-vm" ]]; then
-                  nixos-rebuild build-vm --flake . "$arg" "$@"
+                  nixos-rebuild build-vm --flake . $arg "$@"
               else
-                  sudo nixos-rebuild "$cmd" --flake . "$arg" "$@"
+                  sudo nixos-rebuild "$cmd" --flake . $arg "$@"
               fi
               ;;
           boot)

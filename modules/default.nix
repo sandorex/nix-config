@@ -77,9 +77,9 @@
     networking.networkmanager.insertNameservers = lib.mkDefault dnsServers;
 
     # reduce wait time for stop jobs
-    systemd.extraConfig = ''
-      DefaultTimeoutStopSec=15s
-    '';
+    systemd.settings.Manager = {
+      DefaultTimeoutStopSec = "15s";
+    };
 
     # settings for build-vm
     virtualisation.vmVariant = {

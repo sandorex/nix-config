@@ -66,7 +66,7 @@
     nushell # the best shell
     buildah # container builder thingy
 
-    rofi-wayland # for some scripts
+    rofi # for some scripts
 
     pkgsUnstable.neovim # stable version has broken treesitter
   ];

@@ -18,5 +18,8 @@ in
     boot.kernelModules = ["i2c-dev"];
 
     environment.systemPackages = with pkgs; [ ddcutil ];
+
+    # allow user access to all i2c
+    users.groups.i2c.members = [ config.my.user ];
   };
 }
