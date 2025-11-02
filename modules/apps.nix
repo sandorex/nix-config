@@ -68,7 +68,7 @@ in
         librewolf # browser
         kitty # proper terminal
         gparted # partitioning
-        vlc # proper video player
+        celluloid # actually proper video player (vlc is flaky)
         # varia # downloader + torrent # NOTE: currently broken package use flatpak instead
         hardinfo2 # system information
         qalculate-qt # calculator
