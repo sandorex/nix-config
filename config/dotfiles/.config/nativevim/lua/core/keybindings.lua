@@ -38,10 +38,3 @@ vim.keymap.set('n', '<M-Down>', '<cmd>m .+1<cr>==', { desc = 'Move line down', s
 vim.keymap.set('v', '<M-Up>', ":m '<-2<cr>gv=gv", { desc = 'Move lines up', silent = true })
 vim.keymap.set('v', '<M-Down>', ":m '>+1<cr>gv=gv", { desc = 'move lines down', silent = true })
 
--- autocomplete paren and strings (TODO this may have to be set per ftype)
-vim.keymap.set("i", "'", "''")
-vim.keymap.set("i", '"', '""')
-vim.keymap.set("i", "(", "()")
-vim.keymap.set("i", "[", "[]")
-vim.keymap.set("i", "{", "{}")
-

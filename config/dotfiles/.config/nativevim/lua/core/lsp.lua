@@ -1,5 +1,4 @@
 -- show virtual lines
-vim.diagnostic.config({ virtual_lines = true })
 
 vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("UserLspAttach", { clear = true }),
