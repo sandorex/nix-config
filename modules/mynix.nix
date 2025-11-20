@@ -45,7 +45,7 @@ in
       script = ''
         # if not up to date just send a notification
         if ! last_update="$(${mynix}/bin/mynix up-to-date)"; then
-            ${pkgs.libnotify}/bin/notify-send -u critical -i update-low -a "mynix" "You should probably update" "Last update was $last_update"
+            ${pkgs.libnotify}/bin/notify-send -u critical -i update-low -a "mynix" "You should probably update" "Last update was on $last_update"
         fi
       '';
     };

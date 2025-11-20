@@ -9,6 +9,10 @@
 writeShellApplication {
     name = "mynix";
 
+    runtimeInputs = with pkgs; [
+      jq
+    ];
+
     text = ''
       ${ if localPath != null then "cd \"${localPath}\"" else "" }
 
@@ -29,22 +33,25 @@ writeShellApplication {
               nix repl --expr "builtins.getFlake \"$PWD\""
               ;;
           update)
-              nix flake update
+              shift
+              nix flake update --commit-lock-file "$@"
               ;;
           up-to-date)
-              # NOTE i tried many ways of getting the last update time this has been most reliable
-              # and the simplest
-              diff="$(( $(date +'%s') - $(stat -c %Y flake.lock) ))"
+              # nag based on build date of current generation
+              build_date="$(nixos-rebuild list-generations --json | jq -r ".[] | select(.current==true) | .date")"
+              diff="$(( $(date +'%s') - $(date --date="$build_date" +"%s") ))"
+
+              printf '%s' "$build_date ("
 
               # print human readable time
               T="$diff"
               D=$((T/60/60/24))
               H=$((T/60/60%24))
               M=$((T/60%60))
-              (( D > 0 )) && printf '%d days ' $D
-              (( H > 0 )) && printf '%d hours ' $H
-              (( M > 0 )) && printf '%d minutes ' $M
-              echo
+              (( D > 0 )) && printf '%dd' $D
+              (( H > 0 )) && printf ' %dh' $H
+              (( M > 0 )) && printf ' %dm' $M
+              echo ")"
 
               # exit with 1 when not up to date
               if [[ "$diff" -gt "$(( ${ toString thresholdDays } * 86400 ))" ]]; then
