@@ -33,7 +33,7 @@
     })
 
     {
-      services.xserver.displayManager.gdm.enable = config.my.gdm.enable;
+      services.displayManager.gdm.enable = config.my.gdm.enable;
     }
   ];
 }

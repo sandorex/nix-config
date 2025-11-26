@@ -9,6 +9,7 @@
     # ./desktop/swaywm.nix # need to merge hyprland tweaks
     ./desktop/tuigreet.nix
     ./desktop/gnome.nix
+    ./desktop/wayfire.nix
   ];
 
   options = {

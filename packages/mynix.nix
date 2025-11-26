@@ -41,14 +41,14 @@ writeShellApplication {
               build_date="$(nixos-rebuild list-generations --json | jq -r ".[] | select(.current==true) | .date")"
               diff="$(( $(date +'%s') - $(date --date="$build_date" +"%s") ))"
 
-              printf '%s' "$build_date ("
+              printf '%s' "$build_date"
 
               # print human readable time
               T="$diff"
               D=$((T/60/60/24))
               H=$((T/60/60%24))
               M=$((T/60%60))
-              (( D > 0 )) && printf '%dd' $D
+              (( D > 0 )) && printf ' %dd' $D
               (( H > 0 )) && printf ' %dh' $H
               (( M > 0 )) && printf ' %dm' $M
               echo ")"
@@ -86,7 +86,8 @@ writeShellApplication {
               arg=""
               if [[ "''${#spec[@]}" -ne 0 ]]; then
                   echo "Specialisations: ''${spec[*]}"
-                  read -pr "Selected (enter for none): " ans
+                  printf "%s" "Selected (enter for none): "
+                  read -r ans
 
                   if [[ -n "$ans" ]]; then
                     arg="--specialisation $ans"

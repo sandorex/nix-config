@@ -51,7 +51,9 @@
 
   environment.systemPackages = with pkgs; [
     librewolf
-    vivaldi
+    (vivaldi.override {
+      commandLineArgs = "--ignore-gpu-blocklist --enable-zero-copy";
+    })
     libreoffice
     krita
     orca-slicer
