@@ -9,7 +9,7 @@ PAT_VALUE = re.compile(r"current value =\s*(\d+)")
 def get_value(monitor):
     try:
         process = subprocess.run(["ddcutil", "--model", monitor, "getvcp", "10"], capture_output=True, check=True)
-    except subprocess.CalledProcessError:
+    except (subprocess.CalledProcessError, FileNotFoundError):
         # prevent failure as it messes with waybar
         return "?"
 

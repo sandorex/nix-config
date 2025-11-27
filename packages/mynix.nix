@@ -41,17 +41,16 @@ writeShellApplication {
               build_date="$(nixos-rebuild list-generations --json | jq -r ".[] | select(.current==true) | .date")"
               diff="$(( $(date +'%s') - $(date --date="$build_date" +"%s") ))"
 
-              printf '%s' "$build_date"
-
               # print human readable time
               T="$diff"
               D=$((T/60/60/24))
               H=$((T/60/60%24))
               M=$((T/60%60))
-              (( D > 0 )) && printf ' %dd' $D
-              (( H > 0 )) && printf ' %dh' $H
-              (( M > 0 )) && printf ' %dm' $M
-              echo ")"
+              rel_time=""
+              (( D > 0 )) && rel_time="$rel_time''${D}d "
+              (( H > 0 )) && rel_time="$rel_time''${H}h "
+              (( M > 0 )) && rel_time="$rel_time''${M}m "
+              printf '%s (%s ago)\n' "$build_date" "''${rel_time% }"
 
               # exit with 1 when not up to date
               if [[ "$diff" -gt "$(( ${ toString thresholdDays } * 86400 ))" ]]; then

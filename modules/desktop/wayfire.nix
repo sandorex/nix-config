@@ -26,7 +26,6 @@
         nwg-look
         kdePackages.qt6ct
         libsForQt5.qt5ct
-        wcm # config gui for wayfire
 
         kdePackages.kate # text editor
         kdePackages.dolphin # file manager
@@ -36,7 +35,12 @@
         rofi
       ];
 
-      # should make the qt apps have dark theme by default?
+      fonts.packages = with pkgs; [
+        # waybar
+        font-awesome
+        nerd-fonts.bigblue-terminal
+      ];
+
       qt = {
         enable = true;
         platformTheme = "gnome";

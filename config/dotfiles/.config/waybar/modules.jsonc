@@ -54,7 +54,7 @@
     "exec": "extras/brightness.py get 'VA249'",
     "exec-on-event": false,
     "on-scroll-up": "extras/brightness.py inc 5 'VA249' && pkill -RTMIN+1 waybar",
-    "on-scroll-down": "extras/brightness.py dec 5 'VA249' && pkill -RTMIN+1 waybar"
+    "on-scroll-down": "extras/brightness.py dec 5 'VA249' && pkill -RTMIN+1 waybar",
   },
   "mpris": {
     "format": "󰎇 {title} {player_icon} 󰎇",
@@ -160,6 +160,19 @@
     "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
     "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
     "on-click": "~/.bin/wm/bluetooth"
+  },
+  "custom/power#wayfire": {
+    "format" : " <span font='14'>󰤂</span> ",
+    "tooltip": false,
+    "menu": "on-click",
+    "menu-file": "power_menu.xml",
+    "menu-actions": {
+      "logout": "true", // TODO i do not know how to
+      "shutdown": "systemctl shutdown",
+      "reboot": "systemctl reboot",
+      "suspend": "systemctl suspend",
+      "hibernate": "systemctl hibernate"
+    }
   },
   "custom/power#sway": {
     "format" : " <span font='14'>󰤂</span> ",

@@ -16,6 +16,7 @@ alias a=arcam
 alias g='git'
 alias f="$FILE_MANAGER"
 alias mv='mv -i' # safe mv, ask on overwrite
+alias yeet=shred
 
 # intentionally different command so i know if i am trashing or deleting
 # NOTE: requires gvfs
