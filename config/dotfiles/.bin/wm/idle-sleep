@@ -1,0 +1,45 @@
+#!/usr/bin/env bash
+# checks if the user is really idle and then goes to sleep
+#
+# this is meant to prevent sleep while using the computer as the detection is
+# dumb on linux
+#
+# use in `Power Management > Other Settings > When inactive` in KDE Plasma 6
+
+set -eo pipefail
+
+notify_send_args=(
+    # notification is shown for 15s
+    -t 5000
+    -a idle-sleep
+    -i system-suspend
+    --action=Cancel
+    "Idle Sleep"
+    "The computer is going into sleep soon"
+)
+
+if ! command -v notify-send &>/dev/null; then
+    echo "This script requires notify-send"
+    exit 66
+fi
+
+# dont suspend if audio is playing
+# NOTE: for some reason `... | grep -qi ...` did not work
+if pw-dump --no-colors | grep -i "running" &>/dev/null; then
+    echo "Audio is playing"
+    exit
+fi
+
+# finally warn user before suspending
+ans="$(notify-send "${notify_send_args[@]}" 2>/dev/null)"
+if [[ "$ans" == "0" ]]; then
+    echo "Sleep was cancelled"
+    exit
+fi
+
+echo "System is truly idle, suspending in few seconds (Ctrl+C to stop)"
+sleep 5
+
+if [[ -z "$*" ]]; then
+    systemctl suspend
+fi

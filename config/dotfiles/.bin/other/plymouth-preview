@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+
+set -eo pipefail
+
+if [[ "$(id -u)" -ne 0 ]]; then
+  echo "Must be run as root!"
+  exit 1
+fi
+
+DURATION=$1
+if [[ $# -ne 1 ]]; then
+    DURATION=5
+fi
+
+plymouthd
+plymouth --show-splash
+for ((i=0; i<$DURATION; i++)); do
+    plymouth --update="test$i"
+    sleep 1s
+done
+plymouth quit
+# plymouthd; plymouth --show-splash; sleep $DURATION; plymouth quit
+# plymouthd; plymouth --show-splash; sleep $DURATION; plymouth quit

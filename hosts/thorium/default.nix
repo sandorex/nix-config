@@ -1,33 +1,101 @@
-{ flake, stable, ... }:
+{ config, lib, pkgs, pkgsUnstable, my, ... }:
 
 {
   imports = [
-    ./configuration.nix
-    ./apps.nix
-    ./terminal.nix
+    ../../modules/base/workstation.nix
 
-    "${flake}/modules/base.nix"
-    "${flake}/modules/flatpak.nix"
-    "${flake}/modules/printing.nix"
-    "${flake}/modules/virtualization.nix"
-    "${flake}/modules/gaming.nix"
-    "${flake}/modules/bluetooth.nix"
-    "${flake}/modules/desktop/apps.nix"
-
-    "${flake}/modules/desktop/plasma6.nix"
-    "${flake}/modules/desktop/hyprland.nix"
-    "${flake}/modules/desktop/tuigreet.nix"
+    ./hardware-configuration.nix
+    ./disks.nix
   ];
 
-  users.users.sandorex = {
+  system.stateVersion = "25.05";
+
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
+  users.users.${config.my.user} = {
     isNormalUser = true;
-    description = "Sandorex";
-    extraGroups = [ "networkmanager" "wheel" ];
+    description = "${config.my.user}";
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+      "dialout" # for arduino
+    ];
   };
 
   # use zsh by default
-  users.defaultUserShell = stable.zsh;
+  users.defaultUserShell = pkgs.zsh;
   programs.zsh.enable = true;
 
-  system.stateVersion = "25.05";
+  my = {
+    libvirtd.enable = true;
+    podman.enable = true;
+    bluetooth.enable = true;
+    printing.enable = true;
+    gaming.enable = true;
+    flatpak.enable = true;
+    apps = {
+      base.enable = true;
+      standard.enable = true;
+      terminal.enable = true;
+
+      dotfiles.enable = true;
+    };
+
+    update-reminder.enable = true;
+
+    pipewire.enable = true;
+    kde.enable = true;
+    sddm.enable = true;
+  };
+
+  environment.systemPackages = with pkgs; [
+    librewolf
+    (vivaldi.override {
+      commandLineArgs = "--ignore-gpu-blocklist --enable-zero-copy";
+    })
+    libreoffice
+    krita
+    orca-slicer
+    cura-appimage
+    qbittorrent
+    my.packages.irscrutinizer
+    arduino-ide
+
+    zellij # terminal multiplexer
+
+    yt-dlp # youtube downloader
+    nushell # the best shell
+    buildah # container builder thingy
+
+    rofi # for some scripts
+
+    pkgsUnstable.neovim # stable version has broken treesitter
+  ];
+
+  # manual sandboxing
+  programs.firejail.enable = true;
+
+  # ext. monitor brightness control
+  my.ddcutil.enable = true;
+
+  my.flatpak.install = [
+    "com.obsproject.Studio"
+    "md.obsidian.Obsidian"  # notes
+    "com.stremio.Stremio"
+
+    "org.freecad.FreeCAD"   # CAD software
+    "org.kde.kdenlive"      # video editor
+  ];
+
+  dotfiles.enabled = with config.dotfiles.configs; [
+    zsh
+    helix
+  ];
+
+  # make 'nixos-rebuild build-vm' a lot faster
+  virtualisation.vmVariant.virtualisation = {
+    memorySize = 8192;
+    cores = 6;
+  };
 }

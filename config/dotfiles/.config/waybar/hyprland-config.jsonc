@@ -1,0 +1,32 @@
+{
+  "output": [
+    "HDMI-A-1", // main monitor
+    "Virtual-1" // qemu for nixos-rebuild build-vm
+  ],
+  "height": 32,
+  "spacing": 4,
+  // "reload_style_on_change": true, // used for tweaking
+  "modules-left": [
+    "custom/start",
+    "hyprland/workspaces",
+    "custom/task"
+  ],
+  "modules-center": [
+    "mpris"
+  ],
+  "modules-right": [
+    "temperature",
+    "idle_inhibitor",
+    "group/brightness",
+    "bluetooth",
+    // "pulseaudio",
+    "group/tray",
+    // "privacy",
+    "clock",
+    "custom/power#hyprland"
+  ],
+  "include": [
+    "modules.jsonc",
+    "hyprland.jsonc"
+  ],
+}

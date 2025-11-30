@@ -1,0 +1,98 @@
+#!/usr/bin/env bash
+# simple wrapper around nix develop that makes gc roots for each shell
+
+set -eo pipefail
+
+GCROOTS="/nix/var/nix/gcroots/per-user/$USER"
+LINK_DIR=.devshell
+TARGET_DEFAULT="default"
+TARGET_PREFIX=".#devShells.x86_64-linux"
+
+if [[ ! -d "$GCROOTS" ]]; then
+    echo "Please create '$GCROOTS'"
+    exit 1
+fi
+
+if [[ ! -w "$GCROOTS" ]]; then
+    echo "Error cannot write to '$GCROOTS', please make sure you have permissions set"
+    exit 1
+fi
+
+# generates 16 char suffix from the target
+function name_gen() {
+    # im using sha256 cause base64 creates huge strings and i dont need to
+    # reverse the process, it still means it will be the same if the input is
+    # the same
+    echo -n "${1:?}" | sha256sum | head -c 16
+}
+
+# TODO this function relies on PWD, go upwards and find the flake.nix automatically
+# aka root of the project
+function build() {
+    local drv_path
+
+    # print the eval output to console just in case of errors
+    # NOTE: `.drvPath` is necessary as `nix eval` does not evaluate to a
+    # derivation if `--raw` is passed
+    exec 5>&1
+    drv_path=$(nix eval --raw "${1:?}.drvPath" | tee /dev/fd/5)
+
+    # newline cause nix eval does not print a newline
+    echo
+
+    mkdir -p "./$LINK_DIR"
+
+    local obf_target
+    obf_target="$(name_gen "${1:?}")"
+
+    # link the derivation in the link dir
+    ln -sfT "$drv_path" "$PWD/$LINK_DIR/$obf_target"
+
+    # link the link so if its deleted then gc will clean everything up
+    ln -sfT "$PWD/$LINK_DIR/$obf_target" "$GCROOTS/$(name_gen "$PWD")-$obf_target"
+}
+
+UPDATE=0
+if [[ "$1" == "--update" ]]; then
+    shift || true
+    UPDATE=1
+fi
+
+if [[ "$1" == "--list" ]]; then
+    echo "Listing devshell roots"
+    find "$GCROOTS" -type l -lname "*/$LINK_DIR/*" -exec readlink {} +
+    exit
+fi
+
+cmd="$1"
+shift || true
+
+case "$cmd" in
+    '') # default just start the default shell
+        TARGET="${TARGET_PREFIX}.${TARGET_DEFAULT}"
+        ;;
+    .#*) # pass the flake specifier
+        TARGET="$cmd"
+        # echo "devshell $cmd (explicit installable)"
+        ;;
+    *) # use the argument as devShells name
+        TARGET="${TARGET_PREFIX}.$cmd"
+        ;;
+esac
+
+# link for this particular target
+link_path="$LINK_DIR/$(name_gen "${TARGET:?}")"
+
+# rebuild if requested or if the derivation is missing (invalid or missing link)
+if [[ -L "$link_path" && "$UPDATE" -eq 0 ]]; then
+    echo "Reusing devshell derivation"
+    if [[ ! -e "$link_path" ]]; then
+        echo "Derivation link is invalid"
+        exit 1
+    fi
+else
+    echo "Caching devshell derivation"
+    build "${TARGET:?}"
+fi
+
+exec nix develop "$link_path" "$@" --command "$SHELL"

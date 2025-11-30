@@ -1,0 +1,13 @@
+@theme "spotlight-dark.rasi"
+
+configuration {
+    /* focus on hover */
+    hover-select: true;
+
+    /* accept using single left click */
+    me-select-entry: "";
+    me-accept-entry: [ MousePrimary, MouseDPrimary ];
+
+    /* cancel using escape or mouse right click */
+    kb-cancel: [ MouseSecondary, Escape ];
+}

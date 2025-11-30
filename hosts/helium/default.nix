@@ -1,16 +1,46 @@
-{ flake, ... }:
+{ config, pkgs, ... }:
 
 {
   imports = [
-    ./configuration.nix
-    "${flake}/modules/base.nix"
-    "${flake}/modules/flatpak.nix"
-    "${flake}/modules/printing.nix"
-    "${flake}/modules/bluetooth.nix"
-    "${flake}/modules/desktop/apps.nix"
-    "${flake}/modules/desktop/cinnamon.nix"
+    ../../modules/base/laptop.nix
+
+    ./hardware-configuration.nix
   ];
 
-  # leave this be
   system.stateVersion = "24.05";
+
+  users.users.${config.my.user} = {
+    isNormalUser = true;
+    description = "${config.my.user}";
+    extraGroups = [
+      "networkmanager"
+      "wheel"
+    ];
+  };
+
+  my = {
+    podman.enable = true;
+    bluetooth.enable = true;
+    flatpak.enable = true;
+    apps = {
+      base.enable = true;
+      standard.enable = true;
+
+      dotfiles.enable = true;
+    };
+
+    cinnamon.enable = true;
+    lightdm.enable = true;
+  };
+
+  environment.systemPackages = with pkgs; [
+    emacs
+    librewolf
+  ];
+
+  my.flatpak.install = [
+    "com.stremio.Stremio"
+  ];
+
+  programs.firefox.enable = true;
 }

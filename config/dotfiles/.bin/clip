@@ -1,0 +1,23 @@
+#!/usr/bin/env bash
+#
+# https://github.com/sandorex/config
+# wrapper script to easily copy/paste in bot xorg and wayland
+#
+# requires wl-clipboard xclip
+
+if [[ -n "$WAYLAND_DISPLAY" ]]; then
+    clip-in() { wl-copy; }
+    clip-out() { wl-paste; }
+else
+    clip-in() { xclip -sel clip; }
+    clip-out() { xclip -sel clip -out; }
+fi
+
+if [ -p /dev/stdin ]; then # check if there is any data piped in
+    cat | clip-in
+elif [[ -n "$*" ]]; then # if args provided then put into clipboard
+    echo "$*" | clip-in
+else # otherwise just print content
+    clip-out
+fi
+

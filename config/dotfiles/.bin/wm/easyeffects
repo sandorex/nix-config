@@ -1,0 +1,108 @@
+#!/usr/bin/env python3
+# rofi script for setting easyeffects presets
+
+import sys
+import subprocess
+
+def get_presets():
+    OUTPUT_PREFIX = "Output Presets: "
+    INPUT_PREFIX = "Input Presets: "
+
+    process = subprocess.run(["easyeffects", "--presets"], capture_output=True, check=True)
+    presets = process.stdout.decode("utf-8").split("\n")
+
+    p_out = presets[0]
+    p_in = presets[1]
+    if not p_out.startswith(OUTPUT_PREFIX) or not p_in.startswith(INPUT_PREFIX):
+        raise RuntimeError("Error prefix not found in easyeffects input")
+
+    # trim the prefix
+    p_out = p_out[len(OUTPUT_PREFIX):]
+    p_in = p_in[len(INPUT_PREFIX):]
+
+    presets_output = [ x for x in p_out.split(",") if x ]
+    presets_input = [ x for x in p_in.split(",") if x ]
+
+    return (presets_output, presets_input)
+
+def get_current_presets():
+    OUTPUT_PREFIX = "Output Preset: "
+    INPUT_PREFIX = "Input Preset: "
+
+    process = subprocess.run(["easyeffects", "--active-presets"], capture_output=True, check=True)
+    presets = process.stdout.decode("utf-8").split("\n")
+
+    p_out = presets[0]
+    p_in = presets[1]
+    if not p_out.startswith(OUTPUT_PREFIX) or not p_in.startswith(INPUT_PREFIX):
+        raise RuntimeError("Error prefix not found in easyeffects input")
+
+    # trim the prefix
+    p_out = p_out[len(OUTPUT_PREFIX):]
+    p_in = p_in[len(INPUT_PREFIX):]
+
+    return (p_out, p_in)
+
+# NOTE there is no way to set specificly input or output preset
+def set_preset(preset):
+    subprocess.run(["easyeffects", "--load-preset", preset], check=True)
+
+def rofi(data, title="EasyEffects Presets", timeout=None, rofi_args=[]):
+    args = [
+        "rofi",
+        "-dmenu",
+
+        # use markup
+        "-markup-rows",
+
+        # case insensitive search
+        "-i",
+
+        # return the index of item selected
+        "-format", "i",
+
+        # do not accept custom input
+        "-no-custom",
+
+        "-p", title
+    ] + rofi_args
+
+    process = subprocess.run(args, input=bytes(data, "utf-8"), timeout=timeout, capture_output=True)
+    stdout = process.stdout.decode("utf-8")
+
+    # user cancelled
+    if process.returncode == 1:
+        return None
+
+    return int(stdout)
+
+def main():
+    p_output, p_input = get_presets()
+    curr_output, curr_input = get_current_presets()
+    names = []
+    data = []
+    for i in p_output:
+        names.append(i)
+        if i == curr_output:
+            data.append(f"<span foreground=\"#AAAAC8\"><b>{i}</b></span>")
+        else:
+            data.append(f"<span foreground=\"#AAAAC8\">{i}</span>")
+
+    for i in p_input:
+        names.append(i)
+        if i == curr_input:
+            data.append(f"<span foreground=\"#D1A0A0\"><b>{i}</b></span>")
+        else:
+            data.append(f"<span foreground=\"#D1A0A0\">{i}</span>")
+
+    index = rofi("\n".join(data))
+
+    # user cancelled
+    if index is None:
+        sys.exit(0)
+
+    preset_name = names[index]
+
+    set_preset(preset_name)
+
+main()

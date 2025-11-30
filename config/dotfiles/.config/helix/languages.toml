@@ -1,0 +1,25 @@
+[[language]]
+name = "css"
+indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "javascript"
+indent = { tab-width = 4, unit = "    " }
+
+[[language]]
+name = "bash"
+indent = { tab-width = 4, unit = "    " }
+
+## LSP ##
+[language-server.godot]
+command = "nc"
+args = [ "127.0.0.1", "6005"]
+
+[[language]]
+name = "gdscript"
+language-servers = ["godot"]
+
+# [[language]]
+# name = "hyprlang"
+# scope = "source.hyprlang"
+# indent = { tab-width = 4, unit = " " }

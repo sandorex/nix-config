@@ -1,0 +1,216 @@
+{
+  "custom/start": {
+    "format": "  <span font='12'> </span>",
+    "tooltip": false,
+    "on-click": "rofi -show drun -show-icons"
+  },
+  "custom/task": {
+    "format": " <span font='14'>{icon}</span> {text} ",
+    "tooltip": false,
+    "exec": "extras/task.sh get",
+    "interval": "once",
+    "signal": 2,
+    "format-icons": {
+      "inactive": "󱌟 ",
+      "active": "󰳷 ",
+    },
+    "return-type": "json",
+    "on-click": "extras/task.sh set && pkill -RTMIN+2 waybar",
+    "on-click-right": "extras/task.sh reset && pkill -RTMIN+2 waybar",
+  },
+  "group/brightness": {
+    "orientation": "horizontal",
+    "drawer": {
+      "transition-left-to-right": false,
+      "click-to-reveal": true,
+    },
+    "modules": [
+      "custom/brightness",
+      "custom/brightness-1",
+      "custom/brightness-0"
+    ]
+  },
+  "custom/brightness": {
+    "format": "  <span font='12'>󰃟 </span> ",
+    "tooltip": false,
+    "on-scroll-up": "extras/brightness.py inc 5 'DELL U2414H' 'VA249' && pkill -RTMIN+1 waybar",
+    "on-scroll-down": "extras/brightness.py dec 5 'DELL U2414H' 'VA249' && pkill -RTMIN+1 waybar"
+  },
+  "custom/brightness-0": {
+    "format": " D {}% ",
+    "tooltip": false,
+    "interval": "once",
+    "signal": 1,
+    "exec": "extras/brightness.py get 'DELL U2414H'",
+    "exec-on-event": false,
+    "on-scroll-up": "extras/brightness.py inc 5 'DELL U2414H' && pkill -RTMIN+1 waybar",
+    "on-scroll-down": "extras/brightness.py dec 5 'DELL U2414H' && pkill -RTMIN+1 waybar"
+  },
+  "custom/brightness-1": {
+    "format": " A {}% ",
+    "tooltip": false,
+    "interval": "once",
+    "signal": 1,
+    "exec": "extras/brightness.py get 'VA249'",
+    "exec-on-event": false,
+    "on-scroll-up": "extras/brightness.py inc 5 'VA249' && pkill -RTMIN+1 waybar",
+    "on-scroll-down": "extras/brightness.py dec 5 'VA249' && pkill -RTMIN+1 waybar",
+  },
+  "mpris": {
+    "format": "󰎇 {title} {player_icon} 󰎇",
+    "format-paused": "{title} {player_icon}",
+    "max-length": 45,
+    "player-icons": {
+      "default": "",
+      "chromium": " ",
+    },
+    "ignored-players": [
+      "firefox",
+      "chromium"
+    ]
+  },
+  "idle_inhibitor": {
+    "format": "{icon}",
+    "format-icons": {
+      "activated": "",
+      "deactivated": ""
+    }
+  },
+  "group/tray": {
+    "orientation": "horizontal",
+    "drawer": {
+      "transition-left-to-right": false,
+    },
+    "modules": [
+      "pulseaudio",
+      // "network",
+      "tray"
+    ]
+  },
+  "network": {
+    "format-wifi": "{essid} ({signalStrength}%)  ",
+    "format-ethernet": "<span font='11'>󰈀 </span>",
+    "format-disconnected": " Disconnected ⚠ ",
+    "tooltip-format": "{ifname} {ipaddr}/{cidr}",
+    "tooltip-format-wifi": "{ifname } {essid} {frequency}",
+    "tooltip-format-disconnected": "Disconnected",
+    "on-click": "nmtui connect"
+  },
+  "tray": {
+    "icon-size": 20,
+    "spacing": 10
+  },
+  "clock": {
+    "format": " {:%d/%m %H:%M} ",
+    "tooltip-format": "<tt>{calendar}</tt>",
+    "calendar": {
+      "mode": "year",
+      "mode-mon-col": 3,
+      "weeks-pos": "right",
+      "on-scroll": 1,
+      "format": {
+        "months": "<span color='#ffead3'><b>{}</b></span>",
+        "days": "<span color='#ecc6d9'><b>{}</b></span>",
+        "weeks": "<span color='#99ffdd'><b>W{}</b></span>",
+        "weekdays": "<span color='#ffcc66'><b>{}</b></span>",
+        "today": "<span color='#ff6699'><b><u>{}</u></b></span>"
+      }
+    },
+    "actions": {
+      "on-click-right": "mode",
+      "on-scroll-up": "shift_up",
+      "on-scroll-down": "shift_down"
+    }
+  },
+  "temperature": {
+    "interval": 15,
+    "hwmon-path": "/sys/class/hwmon/hwmon2/temp3_input",
+    "format": "",
+    "format-critical": "{temperatureC}°C",
+    "critical-threshold": 50
+  },
+  "pulseaudio": {
+    "format": "<span font='12'>{icon}</span>{volume}%",
+    "format-bluetooth": "<span font='12'>󰂰 </span>{volume}%",
+    "format-bluetooth-muted": "<span font='12'>󰂰 󰖁 </span>",
+    "format-muted": "<span font='12'>󰖁 </span>",
+    "format-icons": {
+      // use `pactl list sinks` to find names
+      "alsa_output.pci-0000_0a_00.1.hdmi-stereo": "󰡁 ",
+      "alsa_output.pci-0000_0a_00.6.analog-stereo": " ",
+      "default": ["", " ", " "]
+    },
+    "max-volume": 120,
+    "ignored-sinks": [
+      "Easy Effects Sink"
+    ],
+    "on-click": "pactl set-sink-mute @DEFAULT_SINK@ toggle",
+    "on-click-right": "extras/sink-switcher.py",
+    "on-click-middle": "pavucontrol"
+  },
+  "bluetooth": {
+    "format-on": "<span font='12' color='#00BFFF'>  </span>",
+    "format-disabled": "<span font='12' color='#FFFFFF77'> 󰂲 </span>",
+    "format-off": "<span font='12' color='#FFFFFF77'> 󰂲 </span>",
+    "format-no-controller": "",
+    "format-connected": "<span font='12' color='#00BFFF'>  </span>",
+    "format-connected-battery": "<span font='12' color='#00BFFF'>  </span>{device_battery_percentage}%",
+    "tooltip-format": "{controller_alias}\t{controller_address}\n\n{num_connections} connected",
+    "tooltip-format-connected": "{controller_alias}\t{controller_address}\n\n{num_connections} connected\n\n{device_enumerate}",
+    "tooltip-format-enumerate-connected": "{device_alias}\t{device_address}",
+    "tooltip-format-enumerate-connected-battery": "{device_alias}\t{device_address}\t{device_battery_percentage}%",
+    "on-click": "~/.bin/wm/bluetooth"
+  },
+  "custom/power#wayfire": {
+    "format" : " <span font='14'>󰤂</span> ",
+    "tooltip": false,
+    "menu": "on-click",
+    "menu-file": "power_menu.xml",
+    "menu-actions": {
+      "logout": "true", // TODO i do not know how to
+      "shutdown": "systemctl shutdown",
+      "reboot": "systemctl reboot",
+      "suspend": "systemctl suspend",
+      "hibernate": "systemctl hibernate"
+    }
+  },
+  "custom/power#sway": {
+    "format" : " <span font='14'>󰤂</span> ",
+    "tooltip": false,
+    "menu": "on-click",
+    "menu-file": "power_menu.xml",
+    "menu-actions": {
+      "logout": "swaymsg exit",
+      "shutdown": "systemctl shutdown",
+      "reboot": "systemctl reboot",
+      "suspend": "systemctl suspend",
+      "hibernate": "systemctl hibernate"
+    }
+  },
+  "custom/power#hyprland": {
+    "format" : " <span font='14'>󰤂</span> ",
+    "tooltip": false,
+    "menu": "on-click",
+    "menu-file": "power_menu.xml",
+    "menu-actions": {
+      "reload": "hyprctl reload",
+      "logout": "hyprctl dispatch exit",
+      "shutdown": "systemctl shutdown",
+      "reboot": "systemctl reboot",
+      "suspend": "systemctl suspend",
+      "hibernate": "systemctl hibernate"
+    }
+  },
+  "hyprland/workspaces": {
+    // show workspaces active on all monitors
+    "active-only": true,
+    "all-outputs": true,
+    "sort-by": "name"
+  },
+  "sway/workspaces": {
+    // show workspaces active on all monitors
+    "format": "{name}",
+    "all-outputs": true,
+    "disable-scroll": true
+  }
+}

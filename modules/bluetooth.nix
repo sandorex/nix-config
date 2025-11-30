@@ -1,25 +1,41 @@
-{ stable, ... }:
+{ config, lib, pkgs, ... }:
 
 {
-  # enable bluetooth
-  hardware.bluetooth.enable = true;
-  hardware.bluetooth.powerOnBoot = true;
+  options = {
+    my.bluetooth.enable = lib.mkOption {
+      default = false;
+      type = lib.types.bool;
+      description = "Enable bluetooth support";
+    };
+    
+    my.bluetooth.disableHeadsetProfile = lib.mkOption {
+      default = true;
+      type = lib.types.bool;
+      description = "Disables headset profile which disables microphone usage but improves reliablility when connecting to cheap earbuds";
+    };
+  };
+
+  config = lib.mkIf config.my.bluetooth.enable {
+    # enable bluetooth
+    hardware.bluetooth.enable = true;
+    hardware.bluetooth.powerOnBoot = true;
  
-  environment.systemPackages = with stable; [
-    # for some reason this is needed for bluetooth even when pipewire is used
-    pulseaudioFull
-  ];
+    environment.systemPackages = with pkgs; [
+      # for some reason this is needed for bluetooth even when pipewire is used
+      pulseaudioFull
+    ];
 
-  # NOTE: this prevents use of headset microphones but fixes issues with cheap earbuds
-  services.pipewire.wireplumber.configPackages = [
-    (stable.writeTextDir "share/wireplumber/wireplumber.conf.d/10-bluez.conf" ''
-    wireplumber.settings = {
-      bluetooth.autoswitch-to-headset-profile = false
-    }
+    # NOTE: this prevents use of headset microphones but fixes issues with cheap earbuds
+    services.pipewire.wireplumber.configPackages = lib.optionals (config.my.bluetooth.disableHeadsetProfile && config.my.pipewire.enable) [
+      (pkgs.writeTextDir "share/wireplumber/wireplumber.conf.d/10-bluez.conf" ''
+      wireplumber.settings = {
+        bluetooth.autoswitch-to-headset-profile = false
+      }
 
-    monitor.bluez.properties = {
-      bluez5.roles = [ a2dp_sink a2dp_source ]
-    }
-    '')
-  ];
+      monitor.bluez.properties = {
+        bluez5.roles = [ a2dp_sink a2dp_source ]
+      }
+      '')
+    ];
+  };
 }

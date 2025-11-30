@@ -1,0 +1,77 @@
+#!/usr/bin/env bash
+# simple wrapper script to run command under firejail
+#
+# this script exists because
+# https://github.com/netblue30/firejail/issues/5713
+
+set -eo pipefail
+
+args=(
+    --quiet
+
+    # keep tab completions
+    --tab
+    --keep-shell-rc
+
+    --blacklist=/mnt
+    --blacklist=/media
+
+    # disable default profile
+    --noprofile
+
+    # mount tmpfs on ~/.cache
+    --private-cache
+
+    --private-dev
+)
+
+# whitelisted RW paths
+whitelist=(
+  "$PWD"
+)
+
+# whitelisted RO paths
+whitelist_ro=(
+    # my scripts
+    "$HOME/.bin"
+
+    "$HOME/.inputrc" # needed for bash
+    "$HOME/.bashrc"
+    "$HOME/.zshrc"
+    "$HOME/.zcompdump"
+
+    # configs (explicit cause they are often symlinks)
+    "$HOME/.config/shell" # shell agnostic files
+    "$HOME/.config/zsh"
+    "$HOME/.config/bash"
+    "$HOME/.config/nano"
+    "$HOME/.config/helix"
+    "$HOME/.config/nvim"
+    "$HOME/.config/emacs"
+    "$HOME/.config/zellij"
+    "$HOME/.config/tmux"
+    "$HOME/.config/git"
+)
+
+for path in "${whitelist[@]}"; do
+    args+=("--whitelist=$path")
+done
+
+for path in "${whitelist_ro[@]}"; do
+    args+=(
+        "--whitelist=$path"
+        "--read-only=$path"
+    )
+done
+
+if [[ -z "$*" ]]; then
+    echo "Usage: $0 <command...>"
+    exit 1
+fi
+
+if [[ "$PWD" == "/home/$USER" ]]; then
+    echo "Running in HOME directory is unsafe"
+    exit 66
+fi
+
+exec firejail "${args[@]}" -- "$@"

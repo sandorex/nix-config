@@ -1,0 +1,10 @@
+# EMACS WHITELIST
+*
+!.gitignore
+!*.el
+!themes/
+!themes/*
+!config/
+!config/*
+!plugins/
+!plugins/*

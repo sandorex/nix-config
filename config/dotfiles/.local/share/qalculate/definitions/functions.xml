@@ -1,0 +1,74 @@
+<?xml version="1.0"?>
+<QALCULATE version="5.5.2">
+  <function>
+    <title>Gear Module</title>
+    <names>gearModule</names>
+    <description>Calculate gear module (mm) from outer gear diameter (mm) and number of teeth</description>
+    <expression>\x / (2 + \y)</expression>
+    <argument type="number" index="1">
+      <title>OD</title>
+      <zero_forbidden>true</zero_forbidden>
+    </argument>
+    <argument type="number" index="2">
+      <title>Teeth</title>
+      <zero_forbidden>true</zero_forbidden>
+    </argument>
+  </function>
+  <function>
+    <title>Gear Root Diameter</title>
+    <names>r:gearRootDiameter</names>
+    <description>Calculate gear root diameter from module (mm) and number of teeth, can be used to see if the math is correct and everything checks out</description>
+    <expression>(\x * \y) - 2.5 * \x</expression>
+    <argument type="number" index="1">
+      <title>Module</title>
+      <zero_forbidden>true</zero_forbidden>
+    </argument>
+    <argument type="number" index="2">
+      <title>Teeth</title>
+      <zero_forbidden>true</zero_forbidden>
+    </argument>
+  </function>
+  <function>
+    <title>Color Luminosity</title>
+    <names>colorLuminosity</names>
+    <subfunction precalculate="false">colorToSRGB(\x)</subfunction>
+    <subfunction precalculate="false">colorToSRGB(\y)</subfunction>
+    <subfunction precalculate="false">colorToSRGB(\z)</subfunction>
+    <expression>0.2126 * \1 + 0.7152 * \2 + 0.0722 * \3</expression>
+    <argument type="number" index="1">
+      <title>r</title>
+    </argument>
+    <argument type="number" index="2">
+      <title>g</title>
+      <handle_vector>true</handle_vector>
+      <test>false</test>
+      <alert>false</alert>
+    </argument>
+    <argument type="number" index="3">
+      <title>b</title>
+      <handle_vector>true</handle_vector>
+      <test>false</test>
+      <alert>false</alert>
+    </argument>
+  </function>
+  <function>
+    <title>Color To SRGB</title>
+    <names>colorToSRGB</names>
+    <subfunction precalculate="true">if(\x &gt; 1, \x / 255, \x)</subfunction>
+    <expression>if(\1 &lt;= 0.03928, \1 / 12.92, ((\1 + 0.055) / 1.055) ^ 2.4)</expression>
+    <argument type="number" index="1">
+      <title>color</title>
+    </argument>
+  </function>
+  <function>
+    <title>Color Contrast</title>
+    <names>r:colorContrast</names>
+    <expression>(\x + 0.05) / (\y + 0.05)</expression>
+    <argument type="number" index="1">
+      <title>color1luminosity</title>
+    </argument>
+    <argument type="number" index="2">
+      <title>color2luminosity</title>
+    </argument>
+  </function>
+</QALCULATE>
