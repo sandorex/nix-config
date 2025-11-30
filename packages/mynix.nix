@@ -2,110 +2,168 @@
 , cfgHostname ? null
 , thresholdDays ? 5
 , writeShellApplication
+, symlinkJoin
 , pkgs
 , ...
 }:
 
-writeShellApplication {
-    name = "mynix";
+# writeShellApplication {
+#     name = "ns";
+#     runtimeInputs = with pkgs; [
+#         fzf
+#         nix-search-tv
+#     ];
+#     # prevent IFD, thanks @Michael-C-Buckley
+#     text = ''exec "${pkgs.nix-search-tv.src}/nixpkgs.sh" "$@"'';
+# };
 
-    runtimeInputs = with pkgs; [
-      jq
-    ];
+let
+  cd = if localPath != null then "cd \"cd ${localPath}\"" else "";
+
+  mn-run = writeShellApplication {
+    name = "mn-run";
+    runtimeInputs = with pkgs; [ nix ];
 
     text = ''
-      ${ if localPath != null then "cd \"${localPath}\"" else "" }
+      ${cd}
+      name="$1"
+      shift
+      nix run ".#packages.x86_64-linux.$name" "$@"
+    '';
+  };
 
-      host="${ if cfgHostname != null then cfgHostname else "$HOSTNAME" }"
+  mn-repl = writeShellApplication {
+    name = "mn-repl";
+    runtimeInputs = with pkgs; [ nix ];
 
-      function get_spec() {
-          # basically get all specialisation attributes for specified host
-          nix eval --apply 'x: builtins.concatStringsSep "\n" (builtins.attrNames x)' ".#nixosConfigurations.''${1:?}.config.specialisation" --raw 2>/dev/null
-      }
+    # NOTE: im using assigning the flake to the flake cause its easier to use
+    # as you don't need to know what is defined in the repl itself
+    text = ''
+      ${cd}
+      nix repl --expr "{ flake = builtins.getFlake \"$PWD\"; }"
+    '';
+  };
 
-      case "''${1:-}" in
-          run)
-              name="$2"
-              shift 2
-              nix run ".#packages.x86_64-linux.$name" "$@"
-              ;;
-          repl)
-              nix repl --expr "builtins.getFlake \"$PWD\""
-              ;;
-          update)
-              shift
-              nix flake update --commit-lock-file "$@"
-              ;;
-          up-to-date)
-              # nag based on build date of current generation
-              build_date="$(nixos-rebuild list-generations --json | jq -r ".[] | select(.current==true) | .date")"
-              diff="$(( $(date +'%s') - $(date --date="$build_date" +"%s") ))"
+  mn-update = writeShellApplication {
+    name = "mn-update";
+    runtimeInputs = with pkgs; [ nix ];
 
-              # print human readable time
-              T="$diff"
-              D=$((T/60/60/24))
-              H=$((T/60/60%24))
-              M=$((T/60%60))
-              rel_time=""
-              (( D > 0 )) && rel_time="$rel_time''${D}d "
-              (( H > 0 )) && rel_time="$rel_time''${H}h "
-              (( M > 0 )) && rel_time="$rel_time''${M}m "
-              printf '%s (%s ago)\n' "$build_date" "''${rel_time% }"
+    text = ''
+      ${cd}
+      nix flake update --commit-lock-file "$@"
+    '';
+  };
 
-              # exit with 1 when not up to date
-              if [[ "$diff" -gt "$(( ${ toString thresholdDays } * 86400 ))" ]]; then
-                  exit 1
-              else
-                  exit 0
-              fi
-              ;;
-          check)
-              nix flake check
-              ;;
-          spec)
-              shift
-              host="''${1:-$host}"
+  mn-last-update = writeShellApplication {
+    name = "mn-last-update";
+    runtimeInputs = with pkgs; [ nix jq ];
 
-              echo "Getting specialisations for host '$host'"
-              mapfile -t spec < <(get_spec "$host")
-              echo "''${spec[*]}"
-              ;;
+    text = ''
+      # nag based on build date of current generation
+      build_date="$(nixos-rebuild list-generations --json | jq -r ".[] | select(.current==true) | .date")"
+      diff="$(( $(date +'%s') - $(date --date="$build_date" +"%s") ))"
 
-          # nixos-rebuild
-          list)
-              nixos-rebuild list-generations
-              ;;
-          switch|test|build-vm)
-              cmd="$1"
-              shift
+      # print human readable time
+      T="$diff"
+      D=$((T/60/60/24))
+      H=$((T/60/60%24))
+      M=$((T/60%60))
+      rel_time=""
+      (( D > 0 )) && rel_time="$rel_time''${D}d "
+      (( H > 0 )) && rel_time="$rel_time''${H}h "
+      (( M > 0 )) && rel_time="$rel_time''${M}m "
+      printf '%s (%s ago)\n' "$build_date" "''${rel_time% }"
 
-              # ask for specialisation if there are any defined to prevent freezes
-              # caused by erasing running desktop environment
-              mapfile -t spec < <(get_spec "$host")
-              arg=""
-              if [[ "''${#spec[@]}" -ne 0 ]]; then
-                  echo "Specialisations: ''${spec[*]}"
-                  printf "%s" "Selected (enter for none): "
-                  read -r ans
+      # exit with 1 when not up to date
+      if [[ "$diff" -gt "$(( ${ toString thresholdDays } * 86400 ))" ]]; then
+          exit 1
+      else
+          exit 0
+      fi
+    '';
+  };
 
-                  if [[ -n "$ans" ]]; then
-                    arg="--specialisation $ans"
-                  fi
-              fi
+  mn-check = writeShellApplication {
+    name = "mn-check";
+    runtimeInputs = with pkgs; [ nix ];
 
-              # shellcheck disable=SC2086
-              if [[ "$cmd" == "build-vm" ]]; then
-                  nixos-rebuild build-vm --flake . $arg "$@"
-              else
-                  sudo nixos-rebuild "$cmd" --flake . $arg "$@"
-              fi
-              ;;
-          boot)
-              shift
-              sudo nixos-rebuild boot --flake . "$@"
-              ;;
-          ''')
-              cat <<EOF
+    text = ''
+      ${cd}
+      nix flake check
+    '';
+  };
+
+  mn-list = writeShellApplication {
+    name = "mn-list";
+    runtimeInputs = with pkgs; [ nix ];
+
+    text = ''
+      nixos-rebuild list-generations
+    '';
+  };
+
+  mn-boot = writeShellApplication {
+    name = "mn-boot";
+    runtimeInputs = with pkgs; [ nix ];
+
+    text = ''
+      ${cd}
+      sudo nixos-rebuild boot --flake . "$@"
+    '';
+  };
+
+  mn-switch = writeShellApplication {
+    name = "mn-switch";
+    runtimeInputs = with pkgs; [ nix ];
+
+    text = ''
+      ${cd}
+      sudo nixos-rebuild switch --flake .  "$@"
+    '';
+  };
+
+  mn-test = writeShellApplication {
+    name = "mn-test";
+    runtimeInputs = with pkgs; [ nix ];
+
+    text = ''
+      ${cd}
+      sudo nixos-rebuild test --flake . "$@"
+    '';
+  };
+
+  mn-build-vm = writeShellApplication {
+    name = "mn-build-vm";
+    runtimeInputs = with pkgs; [ nix ];
+
+    text = ''
+      ${cd}
+      nixos-rebuild build-vm --flake . "$@"
+    '';
+  };
+
+  # stolen from @vimjoyer discord
+  mn-pkgs = writeShellApplication {
+    name = "mn-pkgs";
+    runtimeInputs = with pkgs; [
+      fzf
+      nix-search-tv
+    ];
+    text = ''exec "${pkgs.nix-search-tv.src}/nixpkgs.sh" "$@"'';
+  };
+
+  mn-opts = writeShellApplication {
+    name = "mn-opts";
+    runtimeInputs = with pkgs; [
+      fzf
+      manix
+    ];
+    text = ''
+      manix "" | grep '^# ' | sed 's/^# \(.*\) (.*/\1/;s/ (.*//;s/^# //' | fzf --preview="manix '{}'" | xargs manix
+    '';
+  };
+
+  mn_help = ''
     Usage: $0 <command>
 
     Just a wrapper to run with proper path to flake without specifying it each time
@@ -114,17 +172,88 @@ writeShellApplication {
       run           - nix run using the flake
       repl          - start repl using flake
       update        - update the flake (does not rebuild)
-      up-to-date    - checks for updates and prints how long ago
-                      was last update
+      last-update   - prints if current generation is out of date, and when
+                      was it built
       check         - checks flake for errors
+      nixopts|opts  - search options using manix
+      nixpkgs|pkgs  - search pkgs using nix-search-tv
 
-      # these are basically passed raw to nixos-rebuild
-      list
-      switch
-      test
-      boot
-      build-vm
+      list          - nixos-rebuild --list-generations
+      switch        - nixos-rebuild switch
+      test          - nixos-rebuild test
+      boot          - nixos-rebuild boot
+      build-vm      - nixos-rebuild build-vm
+  '';
+  mn_scripts = [
+    mn-run
+    mn-repl
+    mn-last-update
+    mn-update
+    mn-check
+    mn-list
+    mn-switch
+    mn-test
+    mn-build-vm
+    mn-opts
+    mn-pkgs
+  ];
+  mn = writeShellApplication {
+    name = "mn";
+    runtimeInputs = mn_scripts;
 
+    text = ''
+      case "''${1:-}" in
+          run)
+              shift
+              mn-run "$@"
+              ;;
+          repl)
+              shift
+              mn-repl "$@"
+              ;;
+          update)
+              shift
+              mn-update "$@"
+              ;;
+          last-update)
+              shift
+              mn-last-update "$@"
+              ;;
+          check)
+              shift
+              mn-check "$@"
+              ;;
+          list)
+              shift
+              mn-list "$@"
+              ;;
+          switch)
+              shift
+              mn-switch "$@"
+              ;;
+          test)
+              shift
+              mn-test "$@"
+              ;;
+          build-vm)
+              shift
+              mn-build-vm "$@"
+              ;;
+          boot)
+              shift
+              mn-boot "$@"
+              ;;
+          nixpkgs|pkgs)
+              shift
+              mn-pkgs "$@"
+              ;;
+          nixopts|opts)
+              shift
+              mn-opts "$@"
+              ;;
+          ''')
+              cat <<EOF
+    ${mn_help}
     EOF
               ;;
           *)
@@ -133,4 +262,10 @@ writeShellApplication {
               ;;
       esac
     '';
+  };
+in
+# make it a single package
+symlinkJoin {
+  name = mn.name;
+  paths = mn_scripts ++ [ mn ];
 }

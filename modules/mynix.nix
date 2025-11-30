@@ -1,5 +1,7 @@
 { config, pkgs, lib, my, hostname, ... }:
 
+# TODO this file probably shouldnt be called mynix
+
 # enables the helper script and update notifications
 let
   # override the script so it has proper localPath
@@ -44,7 +46,7 @@ in
       enableStrictShellChecks = true;
       script = ''
         # if not up to date just send a notification
-        if ! last_update="$(${mynix}/bin/mynix up-to-date)"; then
+        if ! last_update="$(${mynix}/bin/mn last-update)"; then
             ${pkgs.libnotify}/bin/notify-send -u critical -i update-low -a "mynix" "You should probably update" "Last update was on $last_update"
         fi
       '';

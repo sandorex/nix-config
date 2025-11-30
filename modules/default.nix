@@ -21,7 +21,6 @@
     ./mynix.nix
     ./sshd.nix
     ./disky.nix
-    # ./silent-boot.nix
   ];
 
   options = {
