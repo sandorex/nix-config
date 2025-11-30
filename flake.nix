@@ -13,7 +13,7 @@
       name = "nix-config";
       owner = "sandorex";
       url = "https://github.com/${owner}/${name}";
-      branch = "dev";
+      branch = "main";
 
       # name of local dotfiles, appended to user's home
       localName = "${name}";
