@@ -7,18 +7,8 @@
 , ...
 }:
 
-# writeShellApplication {
-#     name = "ns";
-#     runtimeInputs = with pkgs; [
-#         fzf
-#         nix-search-tv
-#     ];
-#     # prevent IFD, thanks @Michael-C-Buckley
-#     text = ''exec "${pkgs.nix-search-tv.src}/nixpkgs.sh" "$@"'';
-# };
-
 let
-  cd = if localPath != null then "cd \"cd ${localPath}\"" else "";
+  cd = if localPath != null then "cd \"${localPath}\"" else "";
 
   mn-run = writeShellApplication {
     name = "mn-run";
