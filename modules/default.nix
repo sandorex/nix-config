@@ -21,6 +21,7 @@
     ./mynix.nix
     ./sshd.nix
     ./disky.nix
+    ./zsh.nix
   ];
 
   options = {
@@ -35,13 +36,6 @@
       type = lib.types.str;
       description = "Path on host where dotfiles are stored";
     };
-
-    my.repoURL = lib.mkOption {
-      default = repo.url;
-      type = lib.types.str;
-      description = "URL to the git repository";
-      readOnly = true;
-    };
   };
 
   # common across all configurations
@@ -54,6 +48,11 @@
     ];
   in
   {
+    nix.settings = {
+      # hide warning when git repository is dirty
+      warn-dirty = false;
+    };
+
     # use same version of nixpkgs for `nix shell` and other commands
     nix.registry.nixpkgs.flake = inputs.nixpkgs;
     nix.registry.nixpkgs-unstable.flake = inputs.nixpkgs-unstable;

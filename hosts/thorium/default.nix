@@ -19,15 +19,17 @@
     extraGroups = [
       "networkmanager"
       "wheel"
-      "dialout" # for arduino
+      "dialout" # arduino
     ];
   };
 
-  # use zsh by default
-  users.defaultUserShell = pkgs.zsh;
-  programs.zsh.enable = true;
+  # # use zsh by default
+  # users.defaultUserShell = pkgs.zsh;
+  # programs.zsh.enable = true;
+  # programs.zsh.syntaxHighlighting.enable = true;
 
   my = {
+    zsh.enable = true;
     libvirtd.enable = true;
     podman.enable = true;
     bluetooth.enable = true;
@@ -45,14 +47,13 @@
     update-reminder.enable = true;
 
     pipewire.enable = true;
-    kde.enable = true;
-    sddm.enable = true;
+    cosmic.enable = true;
   };
 
   environment.systemPackages = with pkgs; [
     librewolf
     (vivaldi.override {
-      commandLineArgs = "--ignore-gpu-blocklist --enable-zero-copy";
+      commandLineArgs = "--ignore-gpu-blocklist --enable-zero-copy --password-store=kwallet6";
     })
     libreoffice
     krita
@@ -71,6 +72,9 @@
     rofi # for some scripts
 
     pkgsUnstable.neovim # stable version has broken treesitter
+
+    kdePackages.kwallet # vivaldi still uses it
+    mate.mate-system-monitor # cosmic does not have a system monitor
   ];
 
   # manual sandboxing
@@ -91,6 +95,7 @@
   dotfiles.enabled = with config.dotfiles.configs; [
     zsh
     helix
+    rofi
   ];
 
   # make 'nixos-rebuild build-vm' a lot faster

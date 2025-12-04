@@ -10,6 +10,7 @@
     ./desktop/tuigreet.nix
     ./desktop/gnome.nix
     ./desktop/wayfire.nix
+    ./desktop/cosmic.nix
   ];
 
   options = {
