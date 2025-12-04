@@ -183,6 +183,7 @@ let
     mn-list
     mn-switch
     mn-test
+    mn-boot
     mn-build-vm
     mn-opts
     mn-pkgs
