@@ -22,10 +22,18 @@
       pkgs.cosmic-edit
     ];
 
+    environment.systemPackages = with pkgs; [
+      # all for that sweet breeze cursor
+      kdePackages.breeze
+    ];
+
     environment.variables = rec {
       # fixes QT app theming
       QT_QPA_PLATFORMTHEME = "xdgdesktopportal";
       QT_QPA_PLATFORMTHEME_QT6 = QT_QPA_PLATFORMTHEME;
+
+      XCURSOR_SIZE = 24;
+      XCURSOR_THEME = "Breeze_Light";
     };
 
     programs.dconf.enable = true;

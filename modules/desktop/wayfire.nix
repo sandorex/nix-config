@@ -21,44 +21,20 @@
 
     environment.systemPackages = with pkgs; [
       # theming
-      gnome-tweaks
       adwaita-icon-theme
-      nwg-look
-      kdePackages.qt6ct
-      libsForQt5.qt5ct
-
-      kdePackages.kate # text editor
-
-      # file manager
-      kdePackages.dolphin
-      kdePackages.dolphin-plugins
-      kdePackages.qtsvg
-      kdePackages.kio-fuse
-      kdePackages.kio-extras
-      kdePackages.kio-admin
-      kdePackages.kservice
+      kdePackages.breeze # breeze cursor
 
       waybar
       mako
       rofi
+
+      thunar # file manager
+      xviewer # image viewer
+      mate.pluma # notepad
+      mate.mate-system-monitor # system monitor
     ];
 
     programs.dconf.enable = true;
-
-    # fixes dolphin mime types outside kde
-    environment.etc."/xdg/menus/applications.menu".text =
-    ''
-      <!DOCTYPE Menu PUBLIC "-//freedesktop//DTD Menu 1.0//EN"
-      "http://www.freedesktop.org/standards/menu-spec/1.0/menu.dtd">
-      <Menu>
-      <Name>Applications</Name>
-      <DefaultAppDirs/>
-      <DefaultDirectoryDirs/>
-      <DefaultMergeDirs/>
-      </Menu>
-    '';
-    # alternatively if the above breaks
-    # builtins.readFile "${pkgs.kdePackages.plasma-workspace}/etc/xdg/menus/plasma-applications.menu";
 
     fonts.packages = with pkgs; [
       # waybar
@@ -72,9 +48,27 @@
       style = "adwaita-dark";
     };
 
+    programs.dconf = {
+      enable = true;
+      profiles.user.databases = [{
+        lockAll = true;
+        settings = {
+          "org/gnome/desktop/interface" = {
+            color-scheme = "prefer-dark";
+          };
+        };
+      }];
+    };
+
+    environment.variables = rec {
+      XCURSOR_SIZE = 24;
+      XCURSOR_THEME = "Breeze_Light";
+    };
+
     dotfiles.enabled = with config.dotfiles.configs; [
       wayfire
       waybar
+      rofi
     ];
   };
 }

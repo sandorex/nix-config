@@ -7,6 +7,7 @@ let
     hyprland-uwsm = "uwsm start hyprland-uwsm.desktop";
     kde6 = "startplasma-wayland";
     sway = "sway";
+    wayfire = "wayfire";
   };
 in
 {
