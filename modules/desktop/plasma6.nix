@@ -30,6 +30,7 @@
         kolourpaint
         akregator
         neochat
+        plasma-systemmonitor
       ];
 
       programs.dconf.enable = true;

@@ -74,6 +74,7 @@ in
         qalculate-qt # calculator
         audacious # music player
         easyeffects # mostly cause of volume normalization
+        mate.mate-system-monitor # the best system monitor
       ];
 
       # NOTE: localsend needs ports open so use this syntax

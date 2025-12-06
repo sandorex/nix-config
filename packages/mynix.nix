@@ -49,9 +49,9 @@ let
     runtimeInputs = with pkgs; [ nix jq ];
 
     text = ''
-      # nag based on build date of current generation
-      build_date="$(nixos-rebuild list-generations --json | jq -r ".[] | select(.current==true) | .date")"
-      diff="$(( $(date +'%s') - $(date --date="$build_date" +"%s") ))"
+      ${cd}
+      nixpkgs_lastModified="$(nix eval --impure --raw --expr "toString (builtins.getFlake (toString ./.)).inputs.nixpkgs.lastModified")"
+      diff="$(( $(date +'%s') - nixpkgs_lastModified ))"
 
       # print human readable time
       T="$diff"
@@ -62,7 +62,7 @@ let
       (( D > 0 )) && rel_time="$rel_time''${D}d "
       (( H > 0 )) && rel_time="$rel_time''${H}h "
       (( M > 0 )) && rel_time="$rel_time''${M}m "
-      printf '%s (%s ago)\n' "$build_date" "''${rel_time% }"
+      printf '%s ago\n' "''${rel_time% }"
 
       # exit with 1 when not up to date
       if [[ "$diff" -gt "$(( ${ toString thresholdDays } * 86400 ))" ]]; then
@@ -79,7 +79,7 @@ let
 
     text = ''
       ${cd}
-      nix flake check
+      nix flake check "$@"
     '';
   };
 

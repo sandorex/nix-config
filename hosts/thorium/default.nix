@@ -23,11 +23,6 @@
     ];
   };
 
-  # # use zsh by default
-  # users.defaultUserShell = pkgs.zsh;
-  # programs.zsh.enable = true;
-  # programs.zsh.syntaxHighlighting.enable = true;
-
   my = {
     zsh.enable = true;
     libvirtd.enable = true;
@@ -47,7 +42,8 @@
     update-reminder.enable = true;
 
     pipewire.enable = true;
-    cosmic.enable = true;
+    kde.enable = true;
+    sddm.enable = true;
   };
 
   environment.systemPackages = with pkgs; [
@@ -72,9 +68,6 @@
     rofi # for some scripts
 
     pkgsUnstable.neovim # stable version has broken treesitter
-
-    kdePackages.kwallet # vivaldi still uses it
-    mate.mate-system-monitor # cosmic does not have a system monitor
   ];
 
   # manual sandboxing
