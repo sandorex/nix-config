@@ -1,11 +1,24 @@
-{ config, pkgs, lib, ... }:
+{ config, pkgs, lib, my, ... }:
 
+let
+  cursorName = "Breeze_Light";
+  cursorSize = 24;
+  cursorPkgs = with pkgs; [
+      kdePackages.breeze
+  ];
+in
 {
-  options = {
-    my.wayfire.enable = lib.mkOption {
+  options.my.wayfire = {
+    enable = lib.mkOption {
       default = false;
       type = lib.types.bool;
       description = "Enable Wayfire window manager";
+    };
+
+    python.enable = lib.mkOption {
+      default = true;
+      type = lib.types.bool;
+      description = "Enable pywayfire for user python installation";
     };
   };
 
@@ -19,22 +32,25 @@
       wayfire-plugins-extra
     ];
 
-    environment.systemPackages = with pkgs; [
-      # theming
+    # add pywayfire globally for scripts
+    users.users.${config.my.user}.packages = lib.mkIf config.my.wayfire.python.enable [
+      (pkgs.python3.withPackages (_: [
+        my.packages.pywayfire
+      ]))
+    ];
+
+    environment.systemPackages = with pkgs; cursorPkgs ++ [
       adwaita-icon-theme
-      kdePackages.breeze # breeze cursor
 
       waybar
       mako
       rofi
 
-      thunar # file manager
+      xfce.thunar # file manager
       xviewer # image viewer
       mate.pluma # notepad
       mate.mate-system-monitor # system monitor
     ];
-
-    programs.dconf.enable = true;
 
     fonts.packages = with pkgs; [
       # waybar
@@ -54,15 +70,18 @@
         lockAll = true;
         settings = {
           "org/gnome/desktop/interface" = {
+            gtk-theme = "default";
             color-scheme = "prefer-dark";
+            cursor-size = lib.gvariant.mkUint32 cursorSize;
+            cursor-theme = cursorName;
           };
         };
       }];
     };
 
     environment.variables = rec {
-      XCURSOR_SIZE = 24;
-      XCURSOR_THEME = "Breeze_Light";
+      XCURSOR_SIZE = cursorSize;
+      XCURSOR_THEME = cursorName;
     };
 
     dotfiles.enabled = with config.dotfiles.configs; [
