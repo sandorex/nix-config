@@ -76,6 +76,7 @@ _job-switch() {
 }
 zle -N _job-switch
 bindkey '^Z' _job-switch
+bindkey '\x1f' _job-switch
 
 _go_back() {
     # save buffer

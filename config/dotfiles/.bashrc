@@ -41,21 +41,8 @@ HISTTIMEFORMAT="[%F %T %Z]"
 # ignore duplicate commands and those that start with space
 HISTCONTROL='ignoreboth'
 
-# map Ctrl+Z to fg
-bind '"\C-z":"fg\n"' # switch to foreground (requires `stty susp undef`)
-
-before_command() {
-  # re-enable ^Z so you can suspend commands that are not smart like sleep, cat etc
-  stty susp ^Z
-}
-after_command() {
-  # disable ^Z so the keybinding can be used
-  stty susp undef
-}
-
-# run in PS0 which is shown before the actual command
-PS0='$(before_command)'
-PROMPT_COMMAND="$PROMPT_COMMAND after_command ;"
+# map Ctrl+/ to fg
+bind -x '"\x1f": "fg"'
 
 # as bash cant really do right aligned prompt im just printing next line with center alignment
 __center_align_printf() {

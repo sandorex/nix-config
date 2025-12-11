@@ -3,39 +3,56 @@
 
 import sys
 import subprocess
+import re
 
+# updated for easyeffects 8.0.4
+RE_PRESET = re.compile(r"\d\s+([^\s]+)")
 def get_presets():
-    OUTPUT_PREFIX = "Output Presets: "
-    INPUT_PREFIX = "Input Presets: "
-
     process = subprocess.run(["easyeffects", "--presets"], capture_output=True, check=True)
-    presets = process.stdout.decode("utf-8").split("\n")
+    raw = process.stdout.decode("utf-8").split("\n")
 
-    p_out = presets[0]
-    p_in = presets[1]
-    if not p_out.startswith(OUTPUT_PREFIX) or not p_in.startswith(INPUT_PREFIX):
-        raise RuntimeError("Error prefix not found in easyeffects input")
+    out = []
+    inp = []
 
-    # trim the prefix
-    p_out = p_out[len(OUTPUT_PREFIX):]
-    p_in = p_in[len(INPUT_PREFIX):]
+    if raw[0] != "Output presets:":
+        raise RuntimeError("Error invalid response from 'easyeffects --presets'")
 
-    presets_output = [ x for x in p_out.split(",") if x ]
-    presets_input = [ x for x in p_in.split(",") if x ]
+    is_inputs = False
 
-    return (presets_output, presets_input)
+    for line in raw:
+        if line == "Input presets:":
+            is_inputs = True
+            continue
+
+        if m := RE_PRESET.match(line):
+            if is_inputs:
+                inp.append(m.group(1))
+            else:
+                out.append(m.group(1))
+        else:
+            continue
+
+    if len(out) == 0 and len(inp) == 0:
+        raise RuntimeError("Error no presets found, the parsing may be broken?")
+
+    return (out, inp)
 
 def get_current_presets():
-    OUTPUT_PREFIX = "Output Preset: "
-    INPUT_PREFIX = "Input Preset: "
+    OUTPUT_PREFIX = "Output: "
+    INPUT_PREFIX = "Input: "
 
     process = subprocess.run(["easyeffects", "--active-presets"], capture_output=True, check=True)
     presets = process.stdout.decode("utf-8").split("\n")
 
-    p_out = presets[0]
-    p_in = presets[1]
+    if presets[0].startswith(OUTPUT_PREFIX):
+        p_out = presets[0]
+        p_in = presets[1]
+    elif presets[1].startswith(OUTPUT_PREFIX):
+        p_out = presets[1]
+        p_in = presets[0]
+
     if not p_out.startswith(OUTPUT_PREFIX) or not p_in.startswith(INPUT_PREFIX):
-        raise RuntimeError("Error prefix not found in easyeffects input")
+        raise RuntimeError("Error invalid prefix from 'easyeffects --active-presets'")
 
     # trim the prefix
     p_out = p_out[len(OUTPUT_PREFIX):]

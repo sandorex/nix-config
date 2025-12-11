@@ -92,7 +92,7 @@ source "$SHELLDIR/keybindings.zsh"
 source "$SHELLDIR/plugins/execution-time.zsh"
 
 # load last
-source "$SHELLDIR/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
+# source "$SHELLDIR/plugins/zsh-syntax-highlighting/zsh-syntax-highlighting.zsh"
 
 # remove duplicates from path just in case
 typeset -U path
