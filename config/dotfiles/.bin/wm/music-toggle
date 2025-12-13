@@ -1,0 +1,106 @@
+#!/usr/bin/env bash
+# simple script that plays music in background, or pauses if already running
+#
+# requires mpv
+
+set -e
+
+MUSIC_DIR="$HOME/slowmf/YoutubeMusic"
+MPV_SOCKET="${XDG_RUNTIME_DIR:-/run/user/${UID:-1000}}/music-toggle"
+
+function is_alive() {
+    if [[ ! -e "$MPV_SOCKET" ]]; then
+        echo "No socket found"
+        return 1
+    fi
+
+    output="$(echo '{ "command": ["get_version"] }' | socat - "$MPV_SOCKET")"
+    case "$output" in
+        *\"success\"*)
+            ;;
+        *)
+            echo "Error pinging mpv socket"
+            return 1
+            ;;
+    esac
+}
+
+function control() {
+    case "$1" in
+        play)
+            echo cycle pause | socat - "$MPV_SOCKET"
+            ;;
+        vol-up)
+            echo add volume +5 | socat - "$MPV_SOCKET"
+            ;;
+        vol-down)
+            echo add volume -5 | socat - "$MPV_SOCKET"
+            ;;
+        next)
+            echo playlist-next | socat - "$MPV_SOCKET"
+            ;;
+        prev)
+            echo playlist-prev | socat - "$MPV_SOCKET"
+            ;;
+        quit)
+            echo quit | socat - "$MPV_SOCKET"
+            ;;
+        *)
+            echo "Invalid command '$1'"
+            exit 1
+            ;;
+    esac
+}
+
+POSITIONAL_ARGS=()
+
+while [ $# -gt 0 ]; do
+    case "$1" in
+        -h|--help)
+            cat <<EOF
+Usage: $0 [<command>]
+
+By default toggles pause, plays music from "$MUSIC_DIR"
+Starts playing yotube playlist using mpv and yt-dlp or controls it using IPC
+
+Commands:
+    play       - cycle play/pause
+    vol-up     - volume up
+    vol-down   - volume donw
+    next       - next playlist entry
+    prev       - previous playlist entry
+    quit       - quit player
+
+EOF
+            exit
+            ;;
+        *)
+            is_alive
+            control "$@"
+            exit
+            ;;
+    esac
+done
+
+# restore positional parameters
+set -- "${POSITIONAL_ARGS[@]}"
+
+if is_alive &>/dev/null; then
+    # toggle play/pause if already running
+    control play
+else # otherwise start it
+    rm -f "$MPV_SOCKET"
+
+    echo "Starting mpv"
+
+    mpv \
+        "${MUSIC_DIR:?}" \
+        --volume=60 \
+        --shuffle \
+        --input-ipc-server="$MPV_SOCKET" \
+        --no-video \
+        "$@"
+
+    # cleanup
+    rm -f "$MPV_SOCKET"
+fi
