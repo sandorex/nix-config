@@ -62,6 +62,7 @@ in
       # fonts enabled if gui extras are
       fonts.packages = with pkgs; [
         nerd-fonts.fira-code # proper font for terminal
+        noto-fonts-cjk-sans  # showing japanese and chinese
       ];
 
       environment.systemPackages = with pkgs; [
