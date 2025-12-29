@@ -32,6 +32,7 @@ in
         # common preinstalled linux commands
         python3 # for scripting
         bc # cli calculator
+        pciutils # lspci
         usbutils # lsusb
         bind.dnsutils # dig
         file # file
@@ -72,6 +73,7 @@ in
         celluloid # actually proper video player (vlc is flaky)
         # varia # downloader + torrent # NOTE: currently broken package use flatpak instead
         hardinfo2 # system information
+        kdePackages.filelight # file usage analyzer
         qalculate-qt # calculator
         audacious # music player
         easyeffects # mostly cause of volume normalization

@@ -14,13 +14,13 @@
 
       pyproject = builtins.fromTOML ./pyproject.toml;
 
-      pname = project_cfg.project.name;
-      version = project_cfg.project.version;
+      pname = projectConfig.project.name;
+      version = projectConfig.project.version;
     in
     rec {
       packages.${system}.default = buildPythonPackage rec {
-        pname = pyproject.project.name;
-        version = pyproject.project.version;
+        pname = projectConfig.project.name;
+        version = projectConfig.project.version;
 
         src = ./.;
 
@@ -45,6 +45,7 @@
               root = "$REPO_ROOT"
             )
             pytest
+            python-lsp-server
           ]))
         ];
       };

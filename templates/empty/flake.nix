@@ -13,7 +13,7 @@
       pkgs = import nixpkgs { inherit system; };
     in
     {
-      devShells.default = pkgs.mkShellNoCC {
+      devShells.${system}.default = pkgs.mkShellNoCC {
         packages = with pkgs; [
           # TODO add your packages here!
           git

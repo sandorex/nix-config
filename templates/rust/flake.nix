@@ -16,7 +16,7 @@
       # using musl
       # pkgs = (import nixpkgs { inherit system; }).pkgsStatic;
 
-      cargo_cfg = (builtins.fromTOML ./Cargo.toml);
+      cargoConfig = (builtins.fromTOML ./Cargo.toml);
 
       # for vergen_git2
       VERGEN_IDEMPOTENT = "1";
@@ -24,8 +24,8 @@
     in
     rec {
       packages.${system}.default = pkgs.rustPlatform.buildRustPackage rec {
-        pname = argo_cfg.package.name;
-        version = cargo_cfg.package.version;
+        pname = cargoConfig.package.name;
+        version = cargoConfig.package.version;
 
         src = ./.;
         cargoLock = {
@@ -35,10 +35,11 @@
         inherit VERGEN_IDEMPOTENT VERGEN_GIT_SHA;
       };
 
-      devShells.default = pkgs.mkShell {
+      devShells.${system}.default = pkgs.mkShell {
         nativeBuildInputs = with pkgs; [
           git
           cargo
+          rust-analyzer # lsp
         ];
 
         inherit VERGEN_IDEMPOTENT VERGEN_GIT_SHA;

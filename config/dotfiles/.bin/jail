@@ -23,6 +23,9 @@ args=(
     --private-cache
 
     --private-dev
+
+    # die when first child dies
+    --deterministic-shutdown
 )
 
 # whitelisted RW paths
