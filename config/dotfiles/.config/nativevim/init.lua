@@ -3,6 +3,9 @@ if vim.fn.has("nvim-0.11") == 0 then
     return
 end
 
+-- load catppuccin at start
+vim.cmd("colorscheme catppuccin_macchiato")
+
 require("core.options")
 require("core.treesitter")
 require("core.lsp")

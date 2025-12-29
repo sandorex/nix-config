@@ -84,5 +84,7 @@
     packages.${system} = my.packages // packageImageAliases;
 
     overlays = my.overlays;
+
+    templates = import ./templates;
   };
 }

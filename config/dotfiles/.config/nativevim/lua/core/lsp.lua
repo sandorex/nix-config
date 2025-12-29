@@ -1,5 +1,3 @@
--- show virtual lines
-
 vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("UserLspAttach", { clear = true }),
     callback = function(ev)
@@ -22,7 +20,8 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
 -- all enabled lsp configurations lsp/*.lua
 vim.lsp.enable {
-    'lua_ls',
-    'godot',
+    "lua_ls",
+    "godot", -- requires nc
+    "rust_analyzer"
 }
 

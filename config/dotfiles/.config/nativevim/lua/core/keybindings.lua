@@ -12,8 +12,10 @@ vim.keymap.set("n", "<leader>F", "<cmd>e %:p:h<cr>", { desc = "netrw cur buf dir
 vim.keymap.set("n", "<leader>d", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
 vim.keymap.set("n", "<leader>D", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
-vim.keymap.set("i", "<c-space>", vim.lsp.completion.get, { silent = true, desc = "Trigger autocompletion" })
-vim.keymap.set("i", "<c-w>", vim.lsp.buf.hover, { silent = true, desc = "Trigger hover in insert mode" })
+vim.keymap.set("n", "<leader>g", vim.lsp.buf.declaration, { desc = "Goto declaration (LSP)" })
+vim.keymap.set("n", "<leader>G", vim.lsp.buf.definition, { desc = "Goto definition (LSP)" })
+vim.keymap.set("i", "<c-space>", vim.lsp.completion.get, { silent = true, desc = "Trigger autocompletion (LSP)" })
+vim.keymap.set("i", "<c-w>", vim.lsp.buf.hover, { silent = true, desc = "Trigger hover in insert mode (LSP)" })
 
 vim.keymap.set("n", "<c-x>", "<cmd>bprev<cr>", { desc = "Goto prev buffer" })
 vim.keymap.set("n", "<c-c>", "<cmd>bnext<cr>", { desc = "Goto next buffer" })
