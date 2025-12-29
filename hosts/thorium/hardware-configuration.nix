@@ -43,7 +43,7 @@
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
-  boot.kernelModules = [ "kvm-amd" ];
+  boot.kernelModules = [ "kvm-amd", "drivetemp" ];
   boot.extraModulePackages = with config.boot.kernelPackages; [ ];
 
   # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
