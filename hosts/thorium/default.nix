@@ -56,8 +56,9 @@
     orca-slicer
     cura-appimage
     qbittorrent
-    my.packages.irscrutinizer
     arduino-ide
+    my.packages.irscrutinizer
+    my.packages.alass
 
     zellij # terminal multiplexer
 

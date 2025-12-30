@@ -19,10 +19,9 @@ let
       runtimeInputs = with pkgs; [ nix ];
 
       text = ''
-        ${cd}
         name="$1"
         shift
-        nix run ".#$name" "$@"
+        nix run "${localPath}#$name" "$@"
       '';
     })
 
@@ -33,8 +32,7 @@ let
       # NOTE: im using assigning the flake to the flake cause its easier to use
       # as you don't need to know what is defined in the repl itself
       text = ''
-        ${cd}
-        nix repl --expr "{ flake = builtins.getFlake \"$PWD\"; }"
+        nix repl --expr "{ flake = builtins.getFlake \"${localPath}\"; }"
       '';
     })
 
