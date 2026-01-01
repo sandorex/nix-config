@@ -21,7 +21,8 @@ map('n', '<C-Up>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 -------------------------------------------------------------------------------
 map("n", "<leader>f", "<cmd>e .<cr>", { desc = "netrw cwd" })
 map("n", "<leader>F", "<cmd>e %:p:h<cr>", { desc = "netrw cur buf dir" })
-map("n", "<leader>w", "<cmd>w<cr>", { desc = ":w" })
+map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write" })
+map("n", "<leader>Q", "<cmd>q<cr>", { desc = "Quit" })
 -- map("n", "<leader>q", "<cmd>q<cr>", { desc = ":q" })
 
 -- easy clipboard copy / paste by prefixing with <leader>
@@ -33,7 +34,7 @@ map({"n", "v"}, "<leader>p", '"+p')
 map({"n", "v"}, "<leader>P", '"+P')
 
 -- buffer management
-map("n", "<leader>b", ":buffer<space><tab>", { desc = "Select buffer shorthand", silent = false })
+map("n", "<leader>b", ":buffer<space>", { desc = "Select buffer", silent = false })
 map("n", "<c-x>", "<cmd>bprev<cr>", { desc = "Goto prev buffer" })
 map("n", "<c-c>", "<cmd>bnext<cr>", { desc = "Goto next buffer" })
 map("n", "<c-b>", "<cmd>bdelete<cr>", { desc = "Delete current buffer" })

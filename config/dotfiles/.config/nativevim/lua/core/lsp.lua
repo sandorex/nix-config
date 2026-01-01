@@ -15,6 +15,15 @@ vim.api.nvim_create_autocmd("LspAttach", {
         if client.server_capabilities.inlayHintProvider then
             vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
         end
+
+        -- add lsp dirs to path
+        local lsp_folders = vim.lsp.buf.list_workspace_folders()
+        if lsp_folders ~= nil then
+            -- limit to depth of 3
+            for _, path in ipairs(lsp_folders) do
+                vim.opt.path:prepend(path .. "/**3")
+            end
+        end
     end,
 })
 

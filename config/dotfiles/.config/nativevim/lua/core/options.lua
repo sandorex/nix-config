@@ -42,6 +42,8 @@ vim.o.undolevels = 10000 -- 10x more undo levels
 
 vim.o.scrolloff = 3
 
+vim.opt.laststatus = 3 -- show statusline for focused window only
+
 -- define <leader> and <localleader> keys
 vim.g.mapleader = vim.keycode("<space>")
 vim.g.maplocalleader = vim.keycode("<cr>")
@@ -52,11 +54,13 @@ vim.g.netrw_banner = 0
 -- smart filtering for directories
 vim.opt.wildignore:append {
     "*.pyc",
-    "node_modules",
+    "*.bak",
+    "*~",
+    "*/venv/*",
+    "*/\\.venv/*",
+    "*/node_modules/*",
+    "*/build/*",
 }
-vim.opt.path:append {
-    "src/**",
-    "config/",
-    "cmake/",
-}
+-- recursive but with limited depth of 2
+vim.opt.path:append { "**2" }
 
