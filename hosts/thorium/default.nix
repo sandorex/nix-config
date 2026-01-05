@@ -44,6 +44,18 @@
     pipewire.enable = true;
     kde.enable = true;
     sddm.enable = true;
+
+    hardware.rdna3."/sys/devices/pci0000:00/0000:00:01.1/0000:01:00.0/0000:02:00.0/0000:03:00.0" = {
+      # zero-rpm is awful
+      zero-rpm = false;
+      fan-curve = [
+        "0 40 33"
+        "1 50 35"
+        "2 60 50"
+        "3 70 70"
+        "4 85 99"
+      ];
+    };
   };
 
   environment.systemPackages = with pkgs; [
