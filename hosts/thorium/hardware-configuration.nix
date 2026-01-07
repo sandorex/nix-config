@@ -7,7 +7,8 @@
 
   # RDNA3 zero rpm options are in 6.13+
   boot.kernelPackages = pkgs.linuxPackages_6_18;
-
+  hardware.amdgpu.overdrive.enable = true; # enable overclocking and fan control
+  services.lact.enable = true; # fan curve gui
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
