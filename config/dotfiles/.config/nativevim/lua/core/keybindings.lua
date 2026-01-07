@@ -67,7 +67,7 @@ map("n", "<leader>d", vim.diagnostic.open_float, { desc = "Open floating diagnos
 map("n", "<leader>D", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
 -- remap autocompletion to Ctrl+Enter
-map("i", "<C-CR>", "<C-Y>")
+-- map("i", "<C-CR>", "<C-Y>") -- lets stick to defaults
 
 vim.api.nvim_create_autocmd('LspAttach', {
     callback = function(args)
@@ -75,7 +75,13 @@ vim.api.nvim_create_autocmd('LspAttach', {
         map("n", "<leader>G", vim.lsp.buf.definition, { desc = "Goto definition (LSP)" })
         map("n", "<leader>a", vim.lsp.buf.code_action, { desc = "Code action (LSP)" })
 
-        map("i", "<c-w>", vim.lsp.buf.hover, { silent = true, desc = "Trigger hover in insert mode (LSP)" })
+        map("i", "<c-k>", vim.lsp.buf.hover, { silent = true, desc = "Trigger hover in insert mode (LSP)" })
         map("i", "<c-space>", vim.lsp.completion.get, { silent = true, desc = "Trigger autocompletion (LSP)" })
+
+        map("n", "<leader>ti", function()
+            -- toggle inlay for current buffer
+            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(), 0)
+        end, { desc = "Toggle inlay hints (LSP)" })
     end,
 })
+
