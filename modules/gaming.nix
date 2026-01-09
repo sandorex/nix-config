@@ -15,6 +15,11 @@
       mangohud
     ];
 
+    dotfiles.enabled = with config.dotfiles.configs; [
+      # add mangohud config
+      mangohud
+    ];
+
     # changes scheduling should fix audio crackling
     security.rtkit.enable = true;
 
