@@ -39,8 +39,9 @@ export EDITOR1
 export EDITOR2
 export EDITOR3
 
-export EDITOR="$EDITOR1"
-export SUDO_EDITOR="$EDITOR1"
+export VISUAL="$EDITOR2"
+export EDITOR="$EDITOR2"
+export SUDO_EDITOR="$EDITOR2"
 export FILE_MANAGER=ranger
 
 # options for less
