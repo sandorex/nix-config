@@ -39,8 +39,9 @@ in
         unzip
         unrar
 
-        # nice editor out of the box
+        # editor
         helix
+        neovim
 
         # search packages, nicer cli for nixos commands
         nh
@@ -56,6 +57,7 @@ in
         bin
         bash
         helix
+        neovim
       ];
     })
 

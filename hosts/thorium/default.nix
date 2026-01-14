@@ -4,14 +4,12 @@
   imports = [
     ../../modules/base/workstation.nix
 
+    ./networking.nix
     ./hardware-configuration.nix
     ./disks.nix
   ];
 
   system.stateVersion = "25.05";
-
-  boot.loader.systemd-boot.enable = true;
-  boot.loader.efi.canTouchEfiVariables = true;
 
   users.users.${config.my.user} = {
     isNormalUser = true;
@@ -44,18 +42,6 @@
     pipewire.enable = true;
     kde.enable = true;
     sddm.enable = true;
-
-    hardware.rdna3."/sys/devices/pci0000:00/0000:00:01.1/0000:01:00.0/0000:02:00.0/0000:03:00.0" = {
-      # zero-rpm is awful
-      zero-rpm = false;
-      fan-curve = [
-        "0 40 33"
-        "1 50 35"
-        "2 60 50"
-        "3 70 70"
-        "4 85 99"
-      ];
-    };
   };
 
   environment.systemPackages = with pkgs; [
@@ -74,6 +60,7 @@
 
     zellij # terminal multiplexer
 
+    ffmpeg
     yt-dlp # youtube downloader
     nushell # the best shell
     buildah # container builder thingy

@@ -34,7 +34,6 @@
   };
 
   environment.systemPackages = with pkgs; [
-    emacs
     librewolf
   ];
 

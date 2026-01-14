@@ -1,6 +1,9 @@
 { config, ... }:
 
 {
+  boot.loader.systemd-boot.enable = true;
+  boot.loader.efi.canTouchEfiVariables = true;
+
   # TOSHIBA NVME SSD
   disky."/dev/disk/by-id/nvme-eui.00080d02000a64f3" = {
     fileSystems."/" ={

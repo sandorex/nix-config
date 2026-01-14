@@ -1,0 +1,1 @@
+{"gpus":{"1002:7480-1458:242B-0000:03:00.0":{"fan_control_enabled":true,"fan_control_settings":{"mode":"curve","static_speed":0.5,"temperature_key":"edge","interval_ms":500,"curve":{"40":0.3332213,"50":0.35,"60":0.5,"70":0.75,"85":0.9960784},"spindown_delay_ms":5000,"change_threshold":2},"pmfw_options":{"zero_rpm":false},"performance_level":"auto"}}}

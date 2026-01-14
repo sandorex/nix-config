@@ -5,22 +5,18 @@
     (modulesPath + "/installer/scan/not-detected.nix")
   ];
 
-  # RDNA3 zero rpm options are in 6.13+
-  boot.kernelPackages = pkgs.linuxPackages_6_18;
-  hardware.amdgpu.overdrive.enable = true; # enable overclocking and fan control
+  boot.kernelPackages = pkgs.linuxPackages_6_18; # RDNA3 fan control req 6.13+
+
+  # enable gpu overclocking and fan control
+  hardware.amdgpu.overdrive.enable = true;
+
+  # gpu fan control
   services.lact.enable = true; # fan curve gui
 
   boot.initrd.availableKernelModules = [ "xhci_pci" "ahci" "nvme" "usb_storage" "usbhid" "sd_mod" ];
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-amd" "drivetemp" ];
   boot.extraModulePackages = with config.boot.kernelPackages; [ ];
-
-  # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
-  # (the default) this is the recommended approach. When using systemd-networkd it's
-  # still possible to use this option, but it's recommended to use it in conjunction
-  # with explicit per-interface declarations with `networking.interfaces.<interface>.useDHCP`.
-  networking.useDHCP = lib.mkDefault true;
-  # networking.interfaces.enp8s0.useDHCP = lib.mkDefault true;
 
   nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
   hardware.cpu.amd.updateMicrocode = lib.mkDefault config.hardware.enableRedistributableFirmware;
