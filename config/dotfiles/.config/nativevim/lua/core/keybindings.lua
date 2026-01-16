@@ -22,8 +22,7 @@ map('n', '<C-Up>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 map("n", "<leader>f", "<cmd>e .<cr>", { desc = "netrw cwd" })
 map("n", "<leader>F", "<cmd>e %:p:h<cr>", { desc = "netrw cur buf dir" })
 map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write" })
-map("n", "<leader>Q", "<cmd>q<cr>", { desc = "Quit" })
--- map("n", "<leader>q", "<cmd>q<cr>", { desc = ":q" })
+map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit" })
 
 -- easy clipboard copy / paste by prefixing with <leader>
 map({"n", "v"}, "<leader>y", '"+y')
@@ -42,6 +41,8 @@ map("n", "<c-b>", "<cmd>bdelete<cr>", { desc = "Delete current buffer" })
 map("v", "p", "\"_dP", { desc = "Paste without yanking", silent = true })
 map("n", "<s-u>", "<cmd>redo<cr>", { desc = "Redo" })
 
+map("n", "<leader>tw", "<cmd>set wrap!<cr>", { desc = "Toggle word wrap" })
+
 -- make <Up>/<Down> respect word wrap
 map("i", "<Up>", "v:count == 0 ? '<C-o>gk' : '<C-o>k'", { expr = true, silent = true })
 map("i", "<Down>", "v:count == 0 ? '<C-o>gj' : '<C-o>j'", { expr = true, silent = true })
@@ -57,8 +58,8 @@ map('v', '<M-Down>', ":m '>+1<cr>gv=gv", { desc = 'move lines down', silent = tr
 -------------------------------------------------------------------------------
 -- Quickfix list                                                             --
 -------------------------------------------------------------------------------
-map("n", "<leader>q", "<cmd>copen<cr>", { desc = "Open quickfix list" })
-map("n", "<leader>e", "<cmd>cnext<cr>", { desc = "Next error in quickfix list" })
+-- map("n", "<leader>q", "<cmd>copen<cr>", { desc = "Open quickfix list" })
+-- map("n", "<leader>e", "<cmd>cnext<cr>", { desc = "Next error in quickfix list" })
 
 -------------------------------------------------------------------------------
 -- LSP and autocompletion related                                            --

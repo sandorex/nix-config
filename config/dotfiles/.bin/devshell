@@ -3,13 +3,11 @@
 
 set -eo pipefail
 
-LINK_DIR=.devshell
 TARGET_DEFAULT="default"
 TARGET_PREFIX=".#devShells.x86_64-linux"
 
 
 
-# generates 16 char suffix from the target
 function name_gen() {
     # im using sha256 cause base64 creates huge strings and i dont need to
     # reverse the process, it still means it will be the same if the input is
@@ -18,17 +16,11 @@ function name_gen() {
 }
 
 
-UPDATE=0
-if [[ "$1" == "--update" ]]; then
-    shift || true
-    UPDATE=1
-fi
 
-if [[ "$1" == "--list" ]]; then
-    echo "Listing devshell roots"
-    find "$GCROOTS" -type l -lname "*/$LINK_DIR/*" -exec readlink {} +
-    exit
-fi
+function nix_flake_inputs() {
+    # TODO idk if the last path of the source should be preserved?
+    nix flake archive --dry-run --json | grep -Po '"path":"\K[^"]*' | head -n -1
+}
 
 cmd="$1"
 shift || true
@@ -45,12 +37,23 @@ case "$cmd" in
         ;;
 esac
 
+link_dir="$LINK_DIR/$(name_gen "${TARGET:?}")"
+
+nix_inputs=($(nix_flake_inputs))
+
 # link for this particular target
-link_path="$LINK_DIR/$(name_gen "${TARGET:?}")"
 
 # rebuild if requested or if the derivation is missing (invalid or missing link)
 
+# create indirect root for each input
+i=0
+for input in "${nix_inputs[@]}"; do
+    # create root for each input
+    nix-store --add-root "$link_dir/$i" --indirect --realise "$input" &>/dev/null
+    i=$(( i + 1 ))
+done
+
 # build the devshell input derivation which creates a gc root
-nix build -o "$link_path" "$TARGET.inputDerivation"
+nix build -o "$link_dir/devshell" "$TARGET.inputDerivation"
 
 exec nix develop "$TARGET" --offline --command "$SHELL"
