@@ -6,5 +6,5 @@
 # requires ffmpeg
 
 [[ -z "$2" ]] && echo "Warning this will extract only the first subtitle, you may manually provide which subtitle to extract"
-ffmpeg -i "$1" -map "0:s:${2:-0}" "${1%.*}.srt"
+ffmpeg -i "${1:?Please provide input file}" -map "0:s:${2:-0}" "${1%.*}.srt"
 

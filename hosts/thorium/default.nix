@@ -70,6 +70,9 @@
     pkgsUnstable.neovim # stable version has broken treesitter
   ];
 
+  # zerotier
+  services.zerotierone.enable = true;
+
   # manual sandboxing
   programs.firejail.enable = true;
 
