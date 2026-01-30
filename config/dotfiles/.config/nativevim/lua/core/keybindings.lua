@@ -3,9 +3,7 @@
 -- make wildchar trigger autocompletion in command mode (<tab> by default)
 vim.o.wildcharm = vim.o.wildchar
 
-local function map(modes, lhs, rhs, args)
-    vim.keymap.set(modes, lhs, rhs, args or {})
-end
+local map = vim.keymap.set
 
 -------------------------------------------------------------------------------
 -- Movement keybindings                                                      --
@@ -24,7 +22,7 @@ map("n", "<leader>F", "<cmd>e %:p:h<cr>", { desc = "netrw cur buf dir" })
 map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write" })
 map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit" })
 
--- easy clipboard copy / paste by prefixing with <leader>
+-- easy system clipboard copy / paste by prefixing with <leader>
 map({"n", "v"}, "<leader>y", '"+y')
 map("n", "<leader>Y", '"+yg_')
 map("n", "<leader>y", '"+y')
@@ -33,9 +31,10 @@ map({"n", "v"}, "<leader>p", '"+p')
 map({"n", "v"}, "<leader>P", '"+P')
 
 -- buffer management
-map("n", "<leader>b", ":buffer<space>", { desc = "Select buffer", silent = false })
-map("n", "<c-x>", "<cmd>bprev<cr>", { desc = "Goto prev buffer" })
-map("n", "<c-c>", "<cmd>bnext<cr>", { desc = "Goto next buffer" })
+map("n", "<leader>b", ":ls<cr>:b<space>", { desc = "Macro to list buffers" })
+map("n", "<BS>", "<cmd>b#<cr>", { desc = "Switch to previous buffer" })
+map("n", "<c-x>", "<cmd>tabnext<cr>", { desc = "Goto next tab" })
+map("n", "<c-c>", "<cmd>tabprevious<cr>", { desc = "Goto previous tab" })
 map("n", "<c-b>", "<cmd>bdelete<cr>", { desc = "Delete current buffer" })
 
 map("v", "p", "\"_dP", { desc = "Paste without yanking", silent = true })

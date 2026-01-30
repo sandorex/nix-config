@@ -11,5 +11,14 @@ return {
             serverStatusNotification = true,
         },
     },
+    settings = {
+        ["rust-analyzer"] = {
+            cargo = {
+                -- use separate directory for rust-analyzer to prevent stalls
+                -- or clobbering of cache
+                targetDir = true,
+            },
+        },
+    },
 }
 

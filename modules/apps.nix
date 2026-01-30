@@ -43,6 +43,10 @@ in
         helix
         neovim
 
+        # neovim utils
+        ripgrep
+        fzy # fuzzy search
+
         # search packages, nicer cli for nixos commands
         nh
       ]
