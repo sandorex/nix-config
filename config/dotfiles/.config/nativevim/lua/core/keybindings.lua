@@ -30,7 +30,7 @@ map("n", "<leader>y", '"+y')
 map({"n", "v"}, "<leader>p", '"+p')
 map({"n", "v"}, "<leader>P", '"+P')
 
--- buffer management
+-- buffer stuff
 map("n", "<leader>b", ":ls<cr>:b<space>", { desc = "Macro to list buffers" })
 map("n", "<BS>", "<cmd>b#<cr>", { desc = "Switch to previous buffer" })
 map("n", "<c-x>", "<cmd>tabnext<cr>", { desc = "Goto next tab" })
@@ -55,10 +55,14 @@ map('v', '<M-Up>', ":m '<-2<cr>gv=gv", { desc = 'Move lines up', silent = true }
 map('v', '<M-Down>', ":m '>+1<cr>gv=gv", { desc = 'move lines down', silent = true })
 
 -------------------------------------------------------------------------------
--- Quickfix list                                                             --
+-- Fuzzy related (requires fzy and rg)                                       --
 -------------------------------------------------------------------------------
--- map("n", "<leader>q", "<cmd>copen<cr>", { desc = "Open quickfix list" })
--- map("n", "<leader>e", "<cmd>cnext<cr>", { desc = "Next error in quickfix list" })
+--- TODO the fuzzy plugin should check for its dependencies itself
+if vim.fn.executable("fzy") == 1 and vim.fn.executable("rg") == 1 then
+    map("n", "<leader>b", "<cmd>:FuzzyBuffers<cr>", { desc = "Fuzzy buffer selection" })
+    map("n", "<M-f>", "<cmd>:FuzzyFiles<cr>", { desc = "Fuzzy file selection" })
+    map("n", "<M-F>", "<cmd>:FuzzyFiles %:p:h<cr>", { desc = "Fuzzy file selection (cwd)" })
+end
 
 -------------------------------------------------------------------------------
 -- LSP and autocompletion related                                            --
