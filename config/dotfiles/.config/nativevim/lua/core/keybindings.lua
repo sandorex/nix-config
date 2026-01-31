@@ -22,6 +22,9 @@ map("n", "<leader>F", "<cmd>e %:p:h<cr>", { desc = "netrw cur buf dir" })
 map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write" })
 map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit" })
 
+map("v", "p", "\"_dP", { desc = "Paste without yanking", silent = true })
+map("n", "<s-u>", "<cmd>redo<cr>", { desc = "Redo" })
+
 -- easy system clipboard copy / paste by prefixing with <leader>
 map({"n", "v"}, "<leader>y", '"+y')
 map("n", "<leader>Y", '"+yg_')
@@ -33,12 +36,12 @@ map({"n", "v"}, "<leader>P", '"+P')
 -- buffer stuff
 map("n", "<leader>b", ":ls<cr>:b<space>", { desc = "Macro to list buffers" })
 map("n", "<BS>", "<cmd>b#<cr>", { desc = "Switch to previous buffer" })
-map("n", "<c-x>", "<cmd>tabnext<cr>", { desc = "Goto next tab" })
-map("n", "<c-c>", "<cmd>tabprevious<cr>", { desc = "Goto previous tab" })
 map("n", "<c-b>", "<cmd>bdelete<cr>", { desc = "Delete current buffer" })
 
-map("v", "p", "\"_dP", { desc = "Paste without yanking", silent = true })
-map("n", "<s-u>", "<cmd>redo<cr>", { desc = "Redo" })
+-- tab stuff
+-- imitate ]b [b for switching buffers
+map("n", "]t", "<cmd>tabnext<cr>", { desc = "Goto next tab" })
+map("n", "[t", "<cmd>tabprevious<cr>", { desc = "Goto previous tab" })
 
 map("n", "<leader>tw", "<cmd>set wrap!<cr>", { desc = "Toggle word wrap" })
 
@@ -58,11 +61,11 @@ map('v', '<M-Down>', ":m '>+1<cr>gv=gv", { desc = 'move lines down', silent = tr
 -- Fuzzy related (requires fzy and rg)                                       --
 -------------------------------------------------------------------------------
 --- TODO the fuzzy plugin should check for its dependencies itself
-if vim.fn.executable("fzy") == 1 and vim.fn.executable("rg") == 1 then
     map("n", "<leader>b", "<cmd>:FuzzyBuffers<cr>", { desc = "Fuzzy buffer selection" })
-    map("n", "<M-f>", "<cmd>:FuzzyFiles<cr>", { desc = "Fuzzy file selection" })
-    map("n", "<M-F>", "<cmd>:FuzzyFiles %:p:h<cr>", { desc = "Fuzzy file selection (cwd)" })
-end
+    map("n", "<M-f>", "<cmd>:FuzzyFile:s<cr>", { desc = "Fuzzy file selection" })
+    map("n", '<M-F>', function ()
+        return "<cmd>:FuzzyFile " .. vim.fn.expand("%:p:h") .. "<cr>"
+    end, { expr = true, desc = "Fuzzy file selection (cwd)" })
 
 -------------------------------------------------------------------------------
 -- LSP and autocompletion related                                            --

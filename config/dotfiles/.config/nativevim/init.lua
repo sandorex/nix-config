@@ -15,3 +15,5 @@ require("core.keybindings")
 require("core.functions")
 require("core.tabline")
 require("plugins")
+
+require("fuzzy")
