@@ -2,6 +2,7 @@
 , rustPlatform
 , fetchFromGitHub
 , makeWrapper
+, autoPatchelfHook
 , ffmpeg-full
 , ffmpegPackage ? ffmpeg-full
 , ...
@@ -20,16 +21,19 @@ rustPlatform.buildRustPackage (finalAttrs: rec {
 
   cargoHash = "sha256-U1rwktvRSr34V0lNQrrxg8fdchVpeSbyPClnZHRUpQs=";
 
-  nativeBuildInputs = [ makeWrapper ];
+  nativeBuildInputs = [
+    makeWrapper
+    autoPatchelfHook
+  ];
 
   postFixup = ''
-    mv $out/bin/alass-cli $out/bin/alass
-    wrapProgram $out/bin/alass \
+    mv $out/bin/alass-cli $out/bin/pname
+    wrapProgram $out/bin/${pname} \
       --prefix PATH : ${lib.makeBinPath [ ffmpegPackage ]}
   '';
 
   meta = {
-    mainProgram = "alass";
+    mainProgram = pname;
     description = "Automatic Language-Agnostic Subtitle Synchronization Utility";
     homepage = "https://github.com/sandorex/alass";
     license = lib.licenses.gpl3Only;

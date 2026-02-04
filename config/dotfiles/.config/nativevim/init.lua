@@ -16,4 +16,4 @@ require("core.functions")
 require("core.tabline")
 require("plugins")
 
-require("fuzzy")
+require("fuzzy").setup({})

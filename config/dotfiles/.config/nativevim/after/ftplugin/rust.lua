@@ -1,7 +1,7 @@
 local core = require("core")
 
 -- autocomplete pairs
-core.map_autopairs({ '""', "''", "{}", "[]", "()", "<>" })
+core.map_autopairs({ '""', "{}", "[]", "()", "<>" })
 
 core.snippet("testmod", [[
 #[cfg(tests)]

@@ -6,7 +6,7 @@ opt.tabstop = 2
 opt.expandtab = true
 
 -- autocomplete pairs
-core.map_autopairs({ '""', "''", "{}", "[]", "()", "</>" })
+core.map_autopairs({ '""', "''", "{}", "[]", "()", "<>" })
 
 -- snippets
 core.snippet("html", [[

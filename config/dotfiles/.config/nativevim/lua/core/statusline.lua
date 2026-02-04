@@ -31,7 +31,7 @@ end
 
 function _G.statusline()
     return table.concat({
-        "%Y",               -- show filetype
+        vim.bo.filetype,    -- show filetype (%Y is uppercase)
         "%t",               -- show only the filename
         "%w" ..             -- preview window flag [Preview]
         "%m" ..             -- modified flag [+] / [-]

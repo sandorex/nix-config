@@ -8,16 +8,4 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
--- autoclose netrw buffers after leaving
--- this sometimes happen i do not know why but its not consistent
-vim.api.nvim_create_autocmd("BufLeave", {
-    callback = function(ev)
-        local ftype = vim.bo[ev.buf].filetype
-        if ftype == "netrw" then
-            vim.schedule(function()
-                vim.api.nvim_buf_delete(ev.buf, {})
-            end)
-        end
-    end,
-})
 
