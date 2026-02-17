@@ -66,8 +66,6 @@
     buildah # container builder thingy
 
     rofi # for some scripts
-
-    pkgsUnstable.neovim # stable version has broken treesitter
   ];
 
   # zerotier

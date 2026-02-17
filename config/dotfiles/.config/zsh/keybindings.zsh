@@ -67,7 +67,8 @@ autoload -z edit-command-line
 zle -N _edit-command-fixed
 bindkey '^E' _edit-command-fixed
 
-# makes ctrl z run fg
+# makes alt z run fg
+# NOTE changed to alt+z from ctrl+z to allow parity with bash
 _job-switch() {
     emulate -LR zsh
 
@@ -75,8 +76,17 @@ _job-switch() {
     zle redisplay
 }
 zle -N _job-switch
-bindkey '^Z' _job-switch
-bindkey '\x1f' _job-switch
+bindkey '^[z' _job-switch
+
+# TODO temporary reminder until it sticks
+_job-switch-reminder() {
+    emulate -LR zsh
+
+    echo -e "\n\n----------------------------------\njob-switch was remapped to 'alt+z'\n----------------------------------\n"
+    zle redisplay
+}
+zle -N _job-switch-reminder
+bindkey '^z' _job-switch-reminder
 
 _go_back() {
     # save buffer

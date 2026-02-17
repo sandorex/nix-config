@@ -2,7 +2,7 @@
 , rustPlatform
 , fetchFromGitHub
 , makeWrapper
-, autoPatchelfHook
+, glibc
 , ffmpeg-full
 , ffmpegPackage ? ffmpeg-full
 , ...
@@ -23,11 +23,10 @@ rustPlatform.buildRustPackage (finalAttrs: rec {
 
   nativeBuildInputs = [
     makeWrapper
-    autoPatchelfHook
   ];
 
   postFixup = ''
-    mv $out/bin/alass-cli $out/bin/pname
+    mv $out/bin/alass-cli $out/bin/${pname}
     wrapProgram $out/bin/${pname} \
       --prefix PATH : ${lib.makeBinPath [ ffmpegPackage ]}
   '';

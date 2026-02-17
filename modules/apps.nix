@@ -77,7 +77,6 @@ in
         kitty # proper terminal
         gparted # partitioning
         celluloid # actually proper video player (vlc is flaky)
-        # varia # downloader + torrent # NOTE: currently broken package use flatpak instead
         hardinfo2 # system information
         kdePackages.filelight # file usage analyzer
         qalculate-qt # calculator
@@ -89,9 +88,7 @@ in
       # NOTE: localsend needs ports open so use this syntax
       programs.localsend.enable = true; # replacement for kdeconnect
 
-      my.flatpak.install = [
-        "io.github.giantpinkrobots.varia" # torrent + downloader
-      ];
+      my.flatpak.install = [];
 
       dotfiles.enabled = with config.dotfiles.configs; lib.optionals (dotfiles) [
         kitty

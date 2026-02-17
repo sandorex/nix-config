@@ -18,10 +18,11 @@
     ./ddcutil.nix
     ./dotfiles.nix
     ./serial.nix
-    ./mynix.nix
+    ./update-reminder.nix
     ./sshd.nix
     ./disky.nix
     ./zsh.nix
+    ./auto-updater.nix
   ];
 
   options = {

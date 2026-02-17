@@ -41,8 +41,9 @@ HISTTIMEFORMAT="[%F %T %Z]"
 # ignore duplicate commands and those that start with space
 HISTCONTROL='ignoreboth'
 
-# map Ctrl+/ to fg
-bind -x '"\x1f": "fg"'
+# map alt+z to fg
+bind '"\x99": "fg\n"' # intermediate "macro"
+bind '"\x1b\x7a": "\C-a\C-k\x99\C-y"'
 
 # as bash cant really do right aligned prompt im just printing next line with center alignment
 __center_align_printf() {

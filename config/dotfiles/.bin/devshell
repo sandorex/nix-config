@@ -3,6 +3,7 @@
 
 set -eo pipefail
 
+LINK_DIR=.devshell2
 TARGET_DEFAULT="default"
 TARGET_PREFIX=".#devShells.x86_64-linux"
 
@@ -39,6 +40,8 @@ esac
 
 link_dir="$LINK_DIR/$(name_gen "${TARGET:?}")"
 
+mkdir -p "$link_dir"
+
 nix_inputs=($(nix_flake_inputs))
 
 # link for this particular target
@@ -48,12 +51,13 @@ nix_inputs=($(nix_flake_inputs))
 # create indirect root for each input
 i=0
 for input in "${nix_inputs[@]}"; do
+    # TODO turns out inputs are left in lockfile so just ignore failure here
     # create root for each input
-    nix-store --add-root "$link_dir/$i" --indirect --realise "$input" &>/dev/null
+    nix-store --add-root "$link_dir/$i" --indirect --realise "$input" &>/dev/null || true
     i=$(( i + 1 ))
 done
 
 # build the devshell input derivation which creates a gc root
 nix build -o "$link_dir/devshell" "$TARGET.inputDerivation"
 
-exec nix develop "$TARGET" --offline --command "$SHELL"
+exec nix develop "$TARGET"
