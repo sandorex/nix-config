@@ -74,13 +74,15 @@ map("n", "<leader>d", vim.diagnostic.open_float, { desc = "Open floating diagnos
 map("n", "<leader>D", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
 
 -- remap autocompletion to Ctrl+Enter
--- map("i", "<C-CR>", "<C-Y>") -- lets stick to defaults
+map("i", "<C-CR>", "<C-Y>")
 
 vim.api.nvim_create_autocmd('LspAttach', {
     callback = function(args)
-        map("n", "<leader>g", vim.lsp.buf.declaration, { desc = "Goto declaration (LSP)" })
-        map("n", "<leader>G", vim.lsp.buf.definition, { desc = "Goto definition (LSP)" })
-        map("n", "<leader>a", vim.lsp.buf.code_action, { desc = "Code action (LSP)" })
+        map("n", "<leader>ld", vim.lsp.buf.declaration, { desc = "Goto declaration (LSP)" })
+        map("n", "<leader>lD", vim.lsp.buf.definition, { desc = "Goto definition (LSP)" })
+        map("n", "<leader>la", vim.lsp.buf.code_action, { desc = "Code action (LSP)" })
+        map("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format file (LSP)" })
+        map("n", "<leader>lr", vim.lsp.buf.rename, { desc = "Rename symbol (LSP)" })
 
         map("i", "<c-k>", vim.lsp.buf.hover, { silent = true, desc = "Trigger hover in insert mode (LSP)" })
         map("i", "<c-space>", vim.lsp.completion.get, { silent = true, desc = "Trigger autocompletion (LSP)" })
