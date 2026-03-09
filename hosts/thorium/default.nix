@@ -66,10 +66,13 @@
     buildah # container builder thingy
 
     rofi # for some scripts
+
+    mpv # scriptable media player
   ];
 
+  # TODO make it not start automatically
   # zerotier
-  services.zerotierone.enable = true;
+  # services.zerotierone.enable = true;
 
   # manual sandboxing
   programs.firejail.enable = true;

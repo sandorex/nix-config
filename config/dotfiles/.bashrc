@@ -42,8 +42,11 @@ HISTTIMEFORMAT="[%F %T %Z]"
 HISTCONTROL='ignoreboth'
 
 # map alt+z to fg
+# \C-a goto start of line
+# \C-k delete whole line from cursor
+# '\x1b\x7a' sequence for alt+z
 bind '"\x99": "fg\n"' # intermediate "macro"
-bind '"\x1b\x7a": "\C-a\C-k\x99\C-y"'
+bind '"\x1b\x7a": "\C-a\C-k\x99"'
 
 # as bash cant really do right aligned prompt im just printing next line with center alignment
 __center_align_printf() {
