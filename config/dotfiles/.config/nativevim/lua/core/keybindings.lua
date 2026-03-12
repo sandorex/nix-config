@@ -22,7 +22,8 @@ map("n", "<leader>F", "<cmd>e %:p:h<cr>", { desc = "netrw cur buf dir" })
 map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write" })
 map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit" })
 
-map("v", "p", "\"_dP", { desc = "Paste without yanking", silent = true })
+-- TODO i think this is messing up paste without deleting selected
+-- map("v", "p", "\"_dP", { desc = "Paste without yanking", silent = true })
 map("n", "<s-u>", "<cmd>redo<cr>", { desc = "Redo" })
 
 -- easy system clipboard copy / paste by prefixing with <leader>

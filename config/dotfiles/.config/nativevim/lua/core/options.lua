@@ -31,7 +31,8 @@ vim.o.updatetime = 200   -- save swap file with 200ms debouncing
 vim.o.ignorecase = true  -- case-insensitive search
 vim.o.smartcase = true   -- , until search pattern contains upper case characters
 
-vim.o.smartindent = true -- auto-indenting when starting a new line
+-- NOTE smartindent prevents indenting lines that start with '#'
+vim.o.smartindent = false
 vim.o.shiftround = true  -- round indent to multiple of 'shiftwidth'
 vim.o.shiftwidth = 0     -- 0 to follow the 'tabstop' value
 vim.o.tabstop = 4        -- tab width
