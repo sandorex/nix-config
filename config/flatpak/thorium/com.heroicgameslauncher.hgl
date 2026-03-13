@@ -1,0 +1,2 @@
+[Context]
+filesystems=!/media;!/mnt;!/run/media;!xdg-desktop;!xdg-documents;!~/.steam;!~/.steam/steam;~/slowmf/HeroicLauncher;~/slowmf/Torrent:ro;~/.local/share/steam;

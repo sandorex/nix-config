@@ -1,0 +1,2 @@
+[Context]
+filesystems=!home;!/media;!/run/media;~/Torrent:ro;xdg-download:ro;~/slowmf/Lutris;

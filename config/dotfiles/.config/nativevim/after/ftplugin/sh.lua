@@ -1,7 +1,7 @@
 local core = require("core")
 
 -- autocomplete pairs
-core.map_autopairs({ '""', "''", "()", "``" })
+core.map_autopairs({ '""', "''", "()", "[]", "{}", "``" })
 
 -- snippets
 core.snippet("shebang", "#!/usr/bin/env bash")

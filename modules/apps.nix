@@ -49,6 +49,8 @@ in
 
         # search packages, nicer cli for nixos commands
         nh
+
+        my.packages.nix-index # find nix files from index
       ]
       # it may pull in weird dependencies when i dont have a gui
       ++ (lib.optionals gui [
