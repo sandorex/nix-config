@@ -8,5 +8,6 @@
     ./dotfiles.nix
     ./serial.nix
     ./garbage.nix
+    ./flatpak.nix
   ];
 }

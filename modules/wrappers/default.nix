@@ -2,7 +2,6 @@
 
 {
   imports = [
-    ./flatpak.nix
     ./printing.nix
     ./virtualization.nix
     ./gaming.nix

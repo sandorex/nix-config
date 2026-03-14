@@ -1,24 +1,73 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, flake, my, pkgs, ... }:
 
 let
+  inherit (builtins) filter attrNames attrValues readDir readFile map mapAttrs concatStringsSep;
+  inherit (lib) filterAttrs;
+
   enabled = config.my.flatpak.enable;
   flatpaks = config.my.flatpak.install;
+  overrides = config.my.flatpak.overrides;
 
   flathubRemote = "flathub";
   serviceName = "mynix-flatpak";
+
+  rulesDir = "config/flatpak";
+  flakeRulesDir = "${flake}/${rulesDir}";
+
+  getRules = path: lib.pipe path [
+    readDir
+
+    # allow only files
+    (filterAttrs (k: v: v == "regular"))
+
+    # get only file names
+    attrNames
+
+    # filter only conf files
+    (filter (name: !(builtins.elem name [ "apply.sh" "README.md" ])))
+
+    # read the file and convert into attrs
+    (map (x: { name = x; value = "${config.my.localPath}/${rulesDir}${ lib.strings.removePrefix flakeRulesDir path}/${x}"; }))
+
+    # convert to single attrs
+    builtins.listToAttrs
+  ];
+
+  # TODO idk what happens if host directory does not exist
+  # NOTE this also makes host rules have priority
+  # attrs of rules and path to the file
+  ruleAttrs = lib.pipe ((getRules flakeRulesDir) // (getRules "${flakeRulesDir}/${my.hostname}")) [
+    # convert to attrs
+    (mapAttrs (k: v: {
+      name = k;
+      path = v;
+    }))
+  ];
 in
 {
-  options = {
-    my.flatpak.enable = lib.mkOption {
+  options.my.flatpak = {
+    enable = lib.mkOption {
       default = false;
       type = lib.types.bool;
       description = "Enable flatpak support";
     };
 
-    my.flatpak.install = lib.mkOption {
+    install = lib.mkOption {
       default = [];
       type = with lib.types; listOf str;
       description = "Automatically install flatpak apps using a systemd service";
+    };
+
+    overridePresets = lib.mkOption {
+      default = ruleAttrs;
+      readOnly = true;
+      description = "Flatpak permission override presets";
+    };
+
+    overrides = lib.mkOption {
+      default = [];
+      type = with lib.types; listOf attrs; # TODO this could be typed better?
+      description = "Flatpak permission overrides";
     };
   };
 
@@ -71,6 +120,9 @@ in
       wantedBy = [ ];
       after = [ "multi-user.target" ];
     };
+
+    # link the override files if they dont exist
+    systemd.user.tmpfiles.users.${config.my.user}.rules = (map (x: "L$ %h/.local/share/flatpak/overrides/${x.name} - - - - ${x.path}") overrides);
   };
 }
 
