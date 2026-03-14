@@ -2,7 +2,7 @@
 
 {
   imports = [
-    ../../modules/base/workstation.nix
+    my.nixosModules.workstation
 
     ./networking.nix
     ./hardware-configuration.nix

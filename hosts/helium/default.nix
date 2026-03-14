@@ -1,8 +1,8 @@
-{ config, pkgs, ... }:
+{ config, pkgs, my, ... }:
 
 {
   imports = [
-    ../../modules/base/laptop.nix
+    my.nixosModules.laptop
 
     ./hardware-configuration.nix
   ];

@@ -1,6 +1,5 @@
 { config, lib, pkgs, ... }:
 
-# basically setups ddcutil to work properly
 let
   cfg = config.my.zsh;
 in
@@ -9,7 +8,7 @@ in
     enable = lib.mkOption {
       default = false;
       type = lib.types.bool;
-      description = "Enable ddcutil for ext. monitor brightness control";
+      description = "Enable Z shell";
     };
 
     isDefault = lib.mkOption {

@@ -1,9 +1,9 @@
-{ config, lib, ... }:
+{ config, lib, flake, ... }:
 
 let
   inherit (builtins) map attrNames readDir readFile isString filter split replaceStrings concatStringsSep;
 
-  rulesDir = ../config/rules;
+  rulesDir = "${flake}/config/rules";
 
   # used in the rules to make the dotfiles directory dynamic
   placeholder = "@dotfiles@";
@@ -29,7 +29,7 @@ in
       default = (lib.genAttrs ruleList
         (rule: lib.pipe "${rulesDir}/${rule}.conf" [
           readFile
-        
+
           # split into lines
           (split "\n")
 

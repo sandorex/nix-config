@@ -1,39 +1,24 @@
-{ config, lib, repo, inputs, ... }:
+{ config, lib, flake, inputs, my, ... }:
 
-# imports all modules which do not enable anything by default!
-# so this file is imported by every configuration including installers
+# NOTE file is imported by every configuration including installers
 
 {
   imports = [
-    ./flatpak.nix
-    ./printing.nix
-    ./virtualization.nix
-    ./gaming.nix
-    ./bluetooth.nix
-    ./pipewire.nix
-    ./garbage.nix
-    ./gaming.nix
+    ./wrappers
+    ./utilities
+
     ./apps.nix
-    ./desktop.nix
-    ./ddcutil.nix
-    ./dotfiles.nix
-    ./serial.nix
-    ./update-reminder.nix
-    ./sshd.nix
-    ./disky.nix
-    ./zsh.nix
-    ./auto-updater.nix
   ];
 
   options = {
     my.user = lib.mkOption {
-      default = repo.owner;
+      default = my.repo.owner;
       type = lib.types.str;
       description = "Main user of the system";
     };
 
     my.localPath = lib.mkOption {
-      default = "/home/${config.my.user}/${repo.localName}";
+      default = "/home/${config.my.user}/${my.repo.localName}";
       type = lib.types.str;
       description = "Path on host where dotfiles are stored";
     };
@@ -55,6 +40,7 @@
     };
 
     # use same version of nixpkgs for `nix shell` and other commands
+    nix.registry.my.flake = flake;
     nix.registry.nixpkgs.flake = inputs.nixpkgs;
     nix.registry.nixpkgs-unstable.flake = inputs.nixpkgs-unstable;
 

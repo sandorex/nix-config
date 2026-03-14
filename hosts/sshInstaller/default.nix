@@ -1,10 +1,10 @@
-{ inputs, pkgs, lib, ... }:
+{ inputs, pkgs, lib, my, ... }:
 
 {
   imports = [
     "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
 
-    ../../modules/base/installer.nix
+    my.nixosModules.installer
   ];
 
   users.users.nixos = {

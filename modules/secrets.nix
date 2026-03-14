@@ -18,5 +18,5 @@ in
 {
   inherit found;
 
-  valOr = x: y: if found then x else y;
+  valOr = if found (x: y: x) else (x: y: y);
 } // (if found then secrets else {})

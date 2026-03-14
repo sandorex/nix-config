@@ -1,4 +1,4 @@
-{ repo
+{ repo ? null
 , localPath ? ("~/" + repo.localName)
 , cfgHostname ? null
 , thresholdDays ? 5

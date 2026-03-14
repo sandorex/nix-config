@@ -12,7 +12,7 @@
     };
 
     my.gc.keep-generations = lib.mkOption {
-      default = 10;
+      default = 5;
       type = lib.types.ints.positive;
       description = "Keep this number of generations from being garbage collected";
     };

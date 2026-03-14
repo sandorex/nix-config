@@ -27,15 +27,30 @@
 
     # this is a shortcut so i dont have to use flake.outputs.packages.x86_64-linux.something
     my = {
+      inherit repo;
+
       packages = import ./packages { inherit repo flake pkgs; };
       overlays = import ./overlays { inherit repo flake; };
-      secrets = import ./secrets.nix "/etc/nix-secret";
+      secrets = import ./modules/secrets.nix "/nix-secret";
+
+      # NOTE these are shortcuts to the base modules
+      nixosModules = {
+        workstation = ./modules/base/workstation.nix;
+        laptop = ./modules/base/laptop.nix;
+        server = ./modules/base/server.nix;
+        installer = ./modules/base/installer.nix;
+      };
     };
 
     # consistent arguments passed to all modules
     createConfiguration = hostname: nixpkgs.lib.nixosSystem {
       specialArgs = {
-        inherit pkgsUnstable inputs hostname repo my flake;
+        inherit pkgsUnstable inputs flake;
+
+        my = my // {
+          # NOTE reducing number of arguments in the modules
+          hostname = hostname;
+        };
       };
 
       inherit system;
@@ -80,6 +95,8 @@
     ];
   in {
     nixosConfigurations = nixpkgs.lib.genAttrs configurations createConfiguration;
+
+    nixosModules = my.nixosModules;
 
     packages.${system} = my.packages // packageImageAliases;
 

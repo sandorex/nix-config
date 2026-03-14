@@ -6,8 +6,8 @@ set -eo pipefail
 
 cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1
 
-DOTFILES="$PWD/dotfiles"
-CONFIGS_PATH="$PWD/rules"
+DOTFILES=$(realpath "$PWD/../dotfiles")
+CONFIGS_PATH="$PWD"
 
 if ! command -v systemd-tmpfiles &>/dev/null; then
     echo "systemd-tmpfiles is required for this script to function!"

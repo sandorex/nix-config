@@ -1,4 +1,4 @@
-{ config, pkgs, lib, my, hostname, ... }:
+{ config, pkgs, lib, my, ... }:
 
 # enables the helper script and update notifications
 let
@@ -6,7 +6,7 @@ let
   # override the script so it has proper localPath
   mynix = (my.packages.mynix.override {
     localPath = config.my.localPath;
-    cfgHostname = hostname;
+    cfgHostname = my.hostname;
     thresholdDays = config.my.update-reminder.threshold;
   });
 

@@ -5,7 +5,6 @@ let
   base = config.my.apps.base.enable;
   standard = config.my.apps.standard.enable;
   terminal = config.my.apps.terminal.enable;
-
   dotfiles = config.my.apps.dotfiles.enable;
 in
 {
@@ -20,6 +19,9 @@ in
 
   config = lib.mkMerge [
     (lib.mkIf (base) {
+      # for hdd temps
+      boot.kernelModules = [ "drivetemp" ];
+
       environment.systemPackages = with pkgs; [
         git
         curl
