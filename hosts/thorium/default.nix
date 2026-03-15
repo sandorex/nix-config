@@ -70,9 +70,9 @@
     mpv # scriptable media player
   ];
 
-  # TODO make it not start automatically
-  # zerotier
+  # # install zerotier but do not autostart it
   # services.zerotierone.enable = true;
+  # systemd.services.zerotierone.wantedBy = lib.mkForce [];
 
   # manual sandboxing
   programs.firejail.enable = true;
@@ -87,6 +87,15 @@
 
     "org.freecad.FreeCAD"   # CAD software
     "org.kde.kdenlive"      # video editor
+  ];
+
+  # apply flatpak permission overrides
+  my.flatpak.overrides = [
+    "global"
+    "com.heroicgameslauncher.hgl"
+    "com.usebottles.bottles"
+    "io.github.Faugus.faugus-launcher"
+    "net.lutris.Lutris"
   ];
 
   dotfiles.enabled = with config.dotfiles.configs; [

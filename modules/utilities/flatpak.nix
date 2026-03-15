@@ -33,10 +33,10 @@ let
     builtins.listToAttrs
   ];
 
-  # TODO idk what happens if host directory does not exist
-  # NOTE this also makes host rules have priority
-  # attrs of rules and path to the file
-  ruleAttrs = lib.pipe ((getRules flakeRulesDir) // (getRules "${flakeRulesDir}/${my.hostname}")) [
+  flakeHostRulesDir = "${flakeRulesDir}/${my.hostname}";
+
+  # NOTE this makes host rules have priority
+  ruleAttrs = lib.pipe ((getRules flakeRulesDir) // (if builtins.pathExists flakeHostRulesDir then (getRules flakeHostRulesDir) else {})) [
     # convert to attrs
     (mapAttrs (k: v: {
       name = k;
@@ -58,15 +58,9 @@ in
       description = "Automatically install flatpak apps using a systemd service";
     };
 
-    overridePresets = lib.mkOption {
-      default = ruleAttrs;
-      readOnly = true;
-      description = "Flatpak permission override presets";
-    };
-
     overrides = lib.mkOption {
       default = [];
-      type = with lib.types; listOf attrs; # TODO this could be typed better?
+      type = with lib.types; listOf str;
       description = "Flatpak permission overrides";
     };
   };
@@ -122,7 +116,14 @@ in
     };
 
     # link the override files if they dont exist
-    systemd.user.tmpfiles.users.${config.my.user}.rules = (map (x: "L$ %h/.local/share/flatpak/overrides/${x.name} - - - - ${x.path}") overrides);
+    systemd.user.tmpfiles.users.${config.my.user}.rules = lib.pipe overrides [
+      # access ruleAttrs using the name
+      (map (x: ruleAttrs.${x} or (throw "Invalid flatpak override '${x}'")))
+
+      # convert into tmpfiles syntax
+      # NOTE does not clobber
+      (map (x: "L$ %h/.local/share/flatpak/overrides/${x.name} - - - - ${x.path}"))
+    ];
   };
 }
 
