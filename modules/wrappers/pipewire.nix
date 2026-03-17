@@ -10,7 +10,6 @@
   };
 
   config = lib.mkIf config.my.pipewire.enable {
-    # audio stuff (use pipewire not pulseaudio)
     security.rtkit.enable = true;
     services.pulseaudio.enable = false;
     services.pipewire = {
@@ -19,6 +18,19 @@
       alsa.support32Bit = true;
       pulse.enable = true;
       wireplumber.enable = true;
+
+      # fixes crackling sound (games running through proton often have it)
+      extraConfig.pipewire = {
+        # https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/3190
+        # https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/3198
+        quantum-fix = {
+          "context.properties" = {
+            "default.clock.quantum" = 1024;      # default 1024
+            "default.clock.min-quantum" = 1024;  # default 32
+            "default.clock.max-quantum" = 1024;  # default 8192
+          };
+        };
+      };
     };
   };
 }
