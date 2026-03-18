@@ -1,0 +1,10 @@
+[General]
+count=1
+rules=b5f519a3-64da-48d3-8b1c-57a38caf550f
+
+[b5f519a3-64da-48d3-8b1c-57a38caf550f]
+Description=Settings for qemu
+disableglobalshortcuts=true
+disableglobalshortcutsrule=2
+wmclass=qemu
+wmclassmatch=1

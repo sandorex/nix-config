@@ -1,0 +1,17 @@
+[Keyboard]
+RepeatDelay=400
+
+[Libinput][1133][16418][Logitech Wireless Mouse PID:4022]
+PointerAcceleration=-0.400
+PointerAccelerationProfile=1
+
+[Libinput][1241][41119][E-Signal USB Gaming Mouse]
+PointerAcceleration=-0.400
+PointerAccelerationProfile=1
+
+[Libinput][1241][64514][USB Laser Game Mouse]
+PointerAcceleration=0.000
+PointerAccelerationProfile=1
+
+[Mouse]
+cursorTheme=Breeze_Light

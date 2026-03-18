@@ -8,6 +8,7 @@
 section = [
     "$Version",
     "Xwayland",
+    "Effect-colorblindnesscorrection",
 ]
 
 regex.section = [ "Tiling.*" ]
@@ -36,12 +37,17 @@ key = [
     ["KFileDialog Settings", "Speedbar Width"],
 ]
 
+# NOTE make sure you copy the desktop files as well
+# ~/.local/share/applications/net.local.*.desktop
 [kglobalshortcutsrc]
 section = [
     "ActivityManager",
 ]
 
-["TrollTech.conf"]
+# TODO removing custom keybindings as the desktop files are not saved
+regex.section = [ 'services\]\[net.local.*' ]
+
+["Trolltech.conf"]
 key = [
     ["Qt", "filedialog"],
 ]
@@ -51,3 +57,26 @@ key = [
 key = [
     ["Settings", "gtk-xft-dpi"],
 ]
+
+[kcminputrc]
+regex.section = [
+    # ignore wacom settings
+    "Libinput.*Wacom"
+]
+
+[katerc]
+section = [
+    "MainWindow"
+]
+
+# listing other files that are important even though there is nothing to clean
+[breezerc]
+[kwinrulesrc]
+[kscreenlockerrc]
+[ksmserverrc]
+[kded5rc]
+[kded6rc]
+[plasmashellrc]
+[plasma-localerc]
+["plasma-org.kde.plasma.desktop-appletsrc"]
+

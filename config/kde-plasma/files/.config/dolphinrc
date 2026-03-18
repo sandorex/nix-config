@@ -1,0 +1,21 @@
+MenuBar=Disabled
+
+[DetailsMode]
+PreviewSize=22
+
+[ExtractDialog]
+2 screens: Height=480
+2 screens: Width=858
+
+[General]
+Version=202
+
+[IconsMode]
+IconSize=64
+
+[KFileDialog Settings]
+Places Icons Auto-resize=false
+Places Icons Static Size=22
+
+[PreviewSettings]
+Plugins=appimagethumbnail,audiothumbnail,blenderthumbnail,comicbookthumbnail,cursorthumbnail,djvuthumbnail,ebookthumbnail,exrthumbnail,directorythumbnail,fontthumbnail,imagethumbnail,jpegthumbnail,kraorathumbnail,windowsexethumbnail,windowsimagethumbnail,mobithumbnail,opendocumentthumbnail,gsthumbnail,svgthumbnail

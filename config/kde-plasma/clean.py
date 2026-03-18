@@ -28,11 +28,7 @@ def dprint(*args, **kwargs):
 try:
     file = os.path.expanduser(sys.argv[1])
 except IndexError:
-    print("No file is provided", file=sys.stderr)
-    sys.exit(1)
-
-if not os.path.exists(file):
-    print(f"File {file} does not exist", file=sys.stderr)
+    print("No argument is provided", file=sys.stderr)
     sys.exit(1)
 
 try:
@@ -42,16 +38,23 @@ except FileNotFoundError:
     print(f"Could not find config {CFG_PATH}")
     sys.exit(1)
 
-filename = os.path.basename(file)
-if not filename in cfg:
-    # if it is not defined then just print it out verbatim
-    print(f"Warning file '{file}' is not configured", file=sys.stderr)
-
+def verbatim():
+    """Just read the file verbatim to stdout and quits"""
     # just write it to the stdout
     with open(file, "r") as f:
         shutil.copyfileobj(f, sys.stdout)
 
     sys.exit(0)
+
+if not os.path.exists(file):
+    print(f"File {file} does not exist", file=sys.stderr)
+    sys.exit(1)
+
+filename = os.path.basename(file)
+if not filename in cfg:
+    # if it is not defined then just print it out verbatim
+    print(f"Warning file '{file}' is not configured", file=sys.stderr)
+    verbatim()
 
 cfg = cfg[filename]
 
@@ -59,6 +62,10 @@ sections_exact = cfg.get("section", [])
 keys_exact = cfg.get("key", [])
 sections_regex = cfg.get("regex", {}).get("section", [])
 keys_regex = cfg.get("regex", {}).get("key", [])
+
+# do not waste time processing if nothing is to be removed
+if not any([sections_exact, keys_exact, sections_regex, keys_regex]):
+    verbatim()
 
 # options to emulate KDE INI style
 ini = configparser.ConfigParser(
@@ -77,7 +84,6 @@ ini.read(file)
 
 # remove exact sections
 for section in sections_exact:
-# for section in cfg.get("section", []):
     try:
         dprint(f"E '{section}'")
         ini.remove_section(section)
@@ -87,7 +93,6 @@ for section in sections_exact:
 
 # remove exact keys
 for key_raw in keys_exact:
-# for key_raw in cfg.get("key", []):
     try:
         section = key_raw[0]
         key = key_raw[1]
@@ -105,8 +110,6 @@ for key_raw in keys_exact:
 # compile regexes in advance
 section_regexes = [ re.compile(x) for x in sections_regex ]
 key_regexes = [ re.compile(x) for x in keys_regex ]
-# section_regexes = [ re.compile(x) for x in cfg.get("section_regex", []) ]
-# key_regexes = [ re.compile(x) for x in cfg.get("key_regex", []) ]
 
 for name, section in list(ini.items()):
     for r in section_regexes:
