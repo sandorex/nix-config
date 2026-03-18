@@ -1,0 +1,53 @@
+# [<file_name>]
+# section = [ "Section" ]
+# key = [ [ "Section", "Key" ] ]
+# regex.section = [ "^Section" ]
+# regex.key = [ "^Key" ]
+
+[kwinrc]
+section = [
+    "$Version",
+    "Xwayland",
+]
+
+regex.section = [ "Tiling.*" ]
+regex.key = [ '^Id_\d+' ]
+
+[dolphinrc]
+section = [
+    "MainWindow",
+    "KPropertiesDialog",
+]
+
+key = [
+    ["General", "ViewPropsTimestamp"],
+    ["Open-with settings", "History"],
+]
+
+[kdeglobals]
+section = [
+    "DirSelect Dialog",
+]
+
+key = [
+    ["General", "ColorSchemeHash"],
+    ["KFileDialog Settings", "Show hidden files"],
+    ["KFileDialog Settings", "Show Inline Previews"],
+    ["KFileDialog Settings", "Speedbar Width"],
+]
+
+[kglobalshortcutsrc]
+section = [
+    "ActivityManager",
+]
+
+["TrollTech.conf"]
+key = [
+    ["Qt", "filedialog"],
+]
+
+# GTK settings.ini
+["settings.ini"]
+key = [
+    ["Settings", "gtk-xft-dpi"],
+]
