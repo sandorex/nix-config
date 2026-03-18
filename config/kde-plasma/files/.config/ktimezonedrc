@@ -1,0 +1,4 @@
+[TimeZones]
+LocalZone=Europe/Belgrade
+ZoneinfoDir=/etc/zoneinfo
+Zonetab=/etc/zoneinfo/zone.tab

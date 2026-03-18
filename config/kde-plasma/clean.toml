@@ -79,4 +79,10 @@ section = [
 [plasmashellrc]
 [plasma-localerc]
 ["plasma-org.kde.plasma.desktop-appletsrc"]
-
+[baloofilerc]
+[kiorc]
+[ktimezonedrc]
+[kxkbrc]
+[plasmaparc]
+[powerdevilrc]
+[powermanagementprofilesrc]
