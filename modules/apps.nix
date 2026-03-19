@@ -69,6 +69,13 @@ in
       ];
     })
 
+    (lib.mkIf (standard) {
+      environment.systemPackages = with pkgs; [
+        nixd # nix lsp
+        pkgsUnstable.devenv # devenv 2.0 is not in stable
+      ];
+    })
+
     (lib.mkIf (standard && gui) {
       # fonts enabled if gui extras are
       fonts.packages = with pkgs; [
