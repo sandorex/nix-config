@@ -2,6 +2,12 @@
 #
 # keybindings.zsh - keybindings for zsh
 
+# zsh decided it would be a good idea to default to vi-mode if vim is default
+# $EDITOR and that made me pull out my hair quite a number of times
+#
+# FORCE EMACS MODE!
+bindkey -e
+
 # these read the terminfo and allow the keybindings to work across terminals
 # but they may not work in all of them, especially control options
 typeset -A KEYS

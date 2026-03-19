@@ -32,8 +32,10 @@
 
 [alias]
     s = status
-    ss = status -sb # less detailed short stats
+    ss = status .
+    sss = status -sb # less detailed short stats
     d = diff
+    dd = diff .
     ds = diff --staged # show only files to be commited
     ll = "log --graph --all --pretty=format:\"%C(magenta)%h %C(white) %an  %ar%C(blue)  %D%n%s%n\""
     l = "log --date=iso --format='%C(auto) %h %d %s %Cgreen [%ad]'"
@@ -41,6 +43,8 @@
     i = add --interactive
 
     graph = log --oneline --decorate --all --graph
+
+    attributes = "!git ls-files | git check-attr -a --stdin"
 
     # auto commit with hostname
     autocommit = "!git commit --message=\"#A $(hostname)\" --edit"
