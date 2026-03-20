@@ -69,6 +69,13 @@ section = [
     "MainWindow"
 ]
 
+# launchers need to use 'applications:x.desktop' format
+["plasma-org.kde.plasma.desktop-appletsrc"]
+regex.key = [
+    # on nixos its versioned so it will change every update
+    "^SlidePaths$",
+]
+
 # listing other files that are important even though there is nothing to clean
 [breezerc]
 [kwinrulesrc]
@@ -78,11 +85,11 @@ section = [
 [kded6rc]
 [plasmashellrc]
 [plasma-localerc]
-["plasma-org.kde.plasma.desktop-appletsrc"]
 [baloofilerc]
 [kiorc]
 [ktimezonedrc]
 [kxkbrc]
+[plasmarc]
 [plasmaparc]
 [powerdevilrc]
 [powermanagementprofilesrc]
