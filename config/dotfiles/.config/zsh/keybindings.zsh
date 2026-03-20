@@ -28,8 +28,6 @@ KEYS[C_BACKSPACE]=${terminfo[cub1]} # !!
 KEYS[DELETE]=${terminfo[kdch1]}
 KEYS[C_DELETE]=${terminfo[kDC5]} # !!
 
-# TODO add ALT + , and ALT + .
-
 # ctr + left / right arrow keys
 bindkey "${KEYS[C_LEFT]}" backward-word
 bindkey "${KEYS[C_RIGHT]}" forward-word
@@ -62,16 +60,9 @@ bindkey "${KEYS[C_BACKSPACE]}" backward-delete-word
 # push current buffer into stack which pops back up after execution of anything
 bindkey '^Q' push-input
 
-# edit the command line command in the editor (does not execute automatically)
-# regular edit-command-line does not refresh so can mess up the screen
-_edit-command-fixed() {
-    emulate -LR zsh
-    zle edit-command-line
-    zle redisplay
-}
-autoload -z edit-command-line
-zle -N _edit-command-fixed
-bindkey '^E' _edit-command-fixed
+autoload -Uz edit-command-line
+zle -N edit-command-line
+bindkey '^X^E' edit-command-line
 
 # makes alt z run fg
 # NOTE changed to alt+z from ctrl+z to allow parity with bash
