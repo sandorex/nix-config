@@ -19,8 +19,8 @@
       pulse.enable = true;
       wireplumber.enable = true;
 
-      # fixes crackling sound (games running through proton often have it)
       extraConfig.pipewire = {
+        # fixes crackling sound (games running through proton often have it)
         # https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/3190
         # https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/3198
         quantum-fix = {
@@ -30,6 +30,28 @@
             "default.clock.max-quantum" = 1024;  # default 8192
           };
         };
+
+      };
+    };
+
+    services.pipewire.wireplumber.extraConfig = {
+      # increase suspend timeout
+      timeout-increase = {
+        "monitor.alsa.rules" = [
+          {
+            matches = [
+              {
+                node.name = "~alsa_output.*";
+              }
+            ];
+            actions = {
+              update-props = {
+                # suspend after 1 minute
+                session.suspend-timeout-seconds = (1 * 60);
+              };
+            };
+          }
+        ];
       };
     };
   };
