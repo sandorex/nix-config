@@ -68,7 +68,7 @@
         }
 
         # default.nix imports wanted modules or nothing if desired
-        ./hosts/${hostname}
+        ./modules/hosts/${hostname}
       ];
     };
 

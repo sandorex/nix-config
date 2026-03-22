@@ -58,15 +58,15 @@
     my.packages.irscrutinizer
     my.packages.alass
 
-    zellij # terminal multiplexer
-
     ffmpeg
-    yt-dlp # youtube downloader
+    yt-dlp  # youtube downloader
     nushell # the best shell
     buildah # container builder thingy
+    gvisor  # container runtime thingy
+
+    pkgsUnstable.mindustry # unstable is more recent
 
     rofi # for some scripts
-
     mpv # scriptable media player
   ];
 
