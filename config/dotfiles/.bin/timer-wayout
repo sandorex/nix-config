@@ -1,0 +1,84 @@
+#!/usr/bin/env bash
+# basic wayout widget timer
+
+set -eo pipefail
+
+TIMER_FILE="$HOME/.timer"
+
+wayout_cmd=""
+if command -v wayout &>/dev/null; then
+    wayout_cmd="wayout"
+elif command -v proycon-wayout &>/dev/null; then
+    wayout_cmd="proycon-wayout"
+else
+    echo "wayout not found in PATH!"
+    exit 1
+fi
+
+# update the new timer file
+if [[ -n "$*" ]]; then
+    # print unix timestamp to the file
+    date --date="$*" +'%s' > "$TIMER_FILE"
+fi
+
+if [[ ! -f "$TIMER_FILE" ]]; then
+    echo "$TIMER_FILE does not exit, please provide time for the timer"
+    exit 1
+fi
+
+timer_time="$(cat "$TIMER_FILE")"
+
+function display() {
+    passed=0
+    diff="$(( timer_time - $(date +'%s') ))"
+
+    if (( diff < 0 )); then
+        diff=$(( diff * -1 ))
+        passed=1
+    fi
+
+    # print human readable time
+    T="$diff"
+    D=$((T/60/60/24))
+    H=$((T/60/60%24))
+    M=$((T/60%60))
+    S=$((T%60))
+    rel_time=""
+    (( D > 0 )) && rel_time="$rel_time${D}d "
+    (( H > 0 )) && rel_time="$rel_time${H}h "
+    (( M > 0 )) && rel_time="$rel_time${M}m "
+
+    if [[ -z "$rel_time" ]]; then
+        rel_time="$rel_time${S}s "
+    fi
+
+    if [[ "$passed" -eq 1 ]]; then
+        printf '%s\n' "<span foreground=\"red\">${rel_time% }</span>"
+    else
+        printf '%s\n' "${rel_time% }"
+    fi
+
+    # quit timer 10 minutes after the set time
+    if [[ "$passed" -eq 1 && "$diff" -gt 600 ]]; then
+        echo "The timer has passed" >&2
+        exit 0
+    fi
+}
+
+# display to null so it quits before starting wayout
+display &>/dev/null
+
+while :; do
+    display
+    echo "<BREAK>"
+    sleep 5s
+done | "$wayout_cmd" \
+    --feed-delimiter "<BREAK>" \
+    --font "Noto Sans 11" \
+    --height 30 \
+    --width 50 \
+    --text-color "#FFFFFF5E" \
+    --layer overlay \
+    --position bottom-left \
+
+rm "$TIMER_FILE"
