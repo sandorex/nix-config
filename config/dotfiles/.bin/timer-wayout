@@ -1,36 +1,54 @@
 #!/usr/bin/env bash
 # basic wayout widget timer
 
-set -eo pipefail
+set -euo pipefail
 
-TIMER_FILE="$HOME/.timer"
+# file used to store PID of running wayout widget
+TIMER_FILE="/tmp/.timer-wayout"
+
+# how often to update wayout widget
+UPDATE_INTERVAL=10
+
+# time after set timer to just quit (in seconds)
+OVERTIME=600 # 10 minutes
 
 wayout_cmd=""
 if command -v wayout &>/dev/null; then
     wayout_cmd="wayout"
-elif command -v proycon-wayout &>/dev/null; then
+elif command -v proycon-wayout &>/dev/null; then # nixos
     wayout_cmd="proycon-wayout"
 else
     echo "wayout not found in PATH!"
     exit 1
 fi
 
-# update the new timer file
-if [[ -n "$*" ]]; then
-    # print unix timestamp to the file
-    date --date="$*" +'%s' > "$TIMER_FILE"
+# kill old timer if its running
+if [[ -f "$TIMER_FILE" ]]; then
+    echo "Killing old timer.."
+    pid="$(cat "$TIMER_FILE")"
+    kill -INT "-$pid" &>/dev/null || true
 fi
 
-if [[ ! -f "$TIMER_FILE" ]]; then
-    echo "$TIMER_FILE does not exit, please provide time for the timer"
-    exit 1
+# if no arguments just quit after killing old timer
+if [[ "$#" -eq 0 ]]; then
+    echo "No time specified.. quitting.."
+    exit 0
 fi
 
-timer_time="$(cat "$TIMER_FILE")"
+# write current pid into timer file
+echo "$$" > "$TIMER_FILE"
+
+# convert human time to unix timestamp using `date` command
+end_time="$(date --date="$*" +'%s')"
+
+function cleanup() {
+    rm -f "$TIMER_FILE"
+}
+trap cleanup EXIT INT
 
 function display() {
     passed=0
-    diff="$(( timer_time - $(date +'%s') ))"
+    diff="$(( end_time - $(date +'%s') ))"
 
     if (( diff < 0 )); then
         diff=$(( diff * -1 ))
@@ -53,13 +71,14 @@ function display() {
     fi
 
     if [[ "$passed" -eq 1 ]]; then
+        # turn red when time has passed
         printf '%s\n' "<span foreground=\"red\">${rel_time% }</span>"
     else
         printf '%s\n' "${rel_time% }"
     fi
 
     # quit timer 10 minutes after the set time
-    if [[ "$passed" -eq 1 && "$diff" -gt 600 ]]; then
+    if [[ "$passed" -eq 1 && "$diff" -gt "$OVERTIME" ]]; then
         echo "The timer has passed" >&2
         exit 0
     fi
@@ -71,14 +90,12 @@ display &>/dev/null
 while :; do
     display
     echo "<BREAK>"
-    sleep 5s
+    sleep "$UPDATE_INTERVAL"
 done | "$wayout_cmd" \
     --feed-delimiter "<BREAK>" \
-    --font "Noto Sans 11" \
+    --font "Noto Sans 9" \
     --height 30 \
     --width 50 \
     --text-color "#FFFFFF5E" \
     --layer overlay \
-    --position bottom-left \
-
-rm "$TIMER_FILE"
+    --position bottom-left
