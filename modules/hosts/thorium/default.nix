@@ -66,8 +66,9 @@
 
     pkgsUnstable.mindustry # unstable is more recent
 
-    rofi # for some scripts
-    mpv # scriptable media player
+    rofi           # for some scripts
+    mpv            # scriptable media player
+    proycon-wayout # wayland text widget thingy
   ];
 
   # # install zerotier but do not autostart it
