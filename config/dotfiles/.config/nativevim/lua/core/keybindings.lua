@@ -22,8 +22,6 @@ map("n", "<leader>F", "<cmd>e %:p:h<cr>", { desc = "netrw cur buf dir" })
 map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write" })
 map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit" })
 
--- TODO i think this is messing up paste without deleting selected
--- map("v", "p", "\"_dP", { desc = "Paste without yanking", silent = true })
 map("n", "<s-u>", "<cmd>redo<cr>", { desc = "Redo" })
 
 -- easy system clipboard copy / paste by prefixing with <leader>
@@ -33,6 +31,13 @@ map("n", "<leader>y", '"+y')
 
 map({"n", "v"}, "<leader>p", '"+p')
 map({"n", "v"}, "<leader>P", '"+P')
+
+-- paste without yanking in visual mode
+map('v', 'p', function()
+    vim.fn.setreg('x', vim.fn.getreg('"'))
+    vim.api.nvim_paste(vim.fn.getreg('"'), {}, -1)
+    vim.fn.setreg('"', vim.fn.getreg('x'))
+end, { silent = true })
 
 -- buffer stuff
 map("n", "<leader>b", ":ls<cr>:b<space>", { desc = "Macro to list buffers" })
@@ -58,15 +63,26 @@ map('n', '<M-Down>', '<cmd>m .+1<cr>==', { desc = 'Move line down', silent = tru
 map('v', '<M-Up>', ":m '<-2<cr>gv=gv", { desc = 'Move lines up', silent = true })
 map('v', '<M-Down>', ":m '>+1<cr>gv=gv", { desc = 'move lines down', silent = true })
 
+-- surround selection
+map("v", '<leader>s"', 'c"<c-r>""', { desc = "Surround with quotes" })
+map("v", "<leader>s'", "c'<c-r>\"'", { desc = "Surround with s. quotes" })
+map("v", "<leader>s(", 'c(<c-r>")', { desc = "Surround with paren" })
+map("v", "<leader>s[", 'c[<c-r>"]', { desc = "Surround with sq. brackets" })
+map("v", "<leader>s{", 'c{<c-r>"}', { desc = "Surround with curly brackets" })
+map("v", "<leader>s<", 'c<<c-r>">', { desc = "Surround with ?" })
+map("v", "<leader>s`", 'c`<c-r>"`', { desc = "Surround with backticks" })
+
 -------------------------------------------------------------------------------
 -- Fuzzy related (requires fzy and rg)                                       --
 -------------------------------------------------------------------------------
 --- TODO the fuzzy plugin should check for its dependencies itself
+if vim.fn.executable("fzy") == 1 and vim.fn.executable("rg") == 1 then
     map("n", "<leader>b", "<cmd>:FuzzyBuffers<cr>", { desc = "Fuzzy buffer selection" })
     map("n", "<M-f>", "<cmd>:FuzzyFile:s<cr>", { desc = "Fuzzy file selection" })
     map("n", '<M-F>', function ()
         return "<cmd>:FuzzyFile " .. vim.fn.expand("%:p:h") .. "<cr>"
     end, { expr = true, desc = "Fuzzy file selection (cwd)" })
+end
 
 -------------------------------------------------------------------------------
 -- LSP and autocompletion related                                            --

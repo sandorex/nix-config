@@ -33,5 +33,6 @@ vim.lsp.enable {
     "godot", -- requires nc
     "rust_analyzer",
     "basedpyright",
+    "nixd",
 }
 
