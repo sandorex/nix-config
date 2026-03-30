@@ -12,7 +12,7 @@ require("core.lsp")
 require("core.netrw")
 require("core.statusline")
 require("core.keybindings")
-require("core.functions")
+require("core.extras")
 require("core.tabline")
 require("plugins")
 
