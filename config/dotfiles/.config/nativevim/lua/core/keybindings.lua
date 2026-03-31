@@ -40,9 +40,11 @@ map('v', 'p', function()
 end, { silent = true })
 
 -- buffer stuff
-map("n", "<leader>b", ":ls<cr>:b<space>", { desc = "Macro to list buffers" })
-map("n", "<BS>", "<cmd>b#<cr>", { desc = "Switch to previous buffer" })
-map("n", "<c-b>", "<cmd>bdelete<cr>", { desc = "Delete current buffer" })
+map("n", "<leader>b", "<cmd>ChooseBuffer<cr>", { desc = "Choose buffer interactively" })
+map("n", "<C-b>", "<cmd>ChooseBuffer<cr>", { desc = "Choose buffer interactively" })
+-- map("n", "<leader>b", ":ls<cr>:b<space>", { desc = "Macro to list buffers" })
+-- map("n", "<BS>", "<cmd>b#<cr>", { desc = "Switch to previous buffer" })
+map("n", "<M-b>", "<cmd>bdelete<cr>", { desc = "Delete current buffer" })
 
 -- tab stuff
 -- imitate ]b [b for switching buffers
