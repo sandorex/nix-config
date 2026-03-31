@@ -1,5 +1,7 @@
 -- all keybindings should be here
 
+local core = require("core")
+
 -- make wildchar trigger autocompletion in command mode (<tab> by default)
 vim.o.wildcharm = vim.o.wildchar
 
@@ -73,6 +75,25 @@ map("v", "<leader>s[", 'c[<c-r>"]', { desc = "Surround with sq. brackets" })
 map("v", "<leader>s{", 'c{<c-r>"}', { desc = "Surround with curly brackets" })
 map("v", "<leader>s<", 'c<<c-r>">', { desc = "Surround with ?" })
 map("v", "<leader>s`", 'c`<c-r>"`', { desc = "Surround with backticks" })
+
+-- creates a function that just goes to the buffer indexed by last usage
+local function goto_buff(index)
+    return function(...)
+        local buffers = core.get_buffers_by_last_used()
+        if #buffers <= 0 or #buffers < index then
+            -- TODO what is a good error message here?
+            return
+        end
+
+        vim.cmd(":b " .. buffers[index].buf)
+    end
+end
+
+map("n", "<M-1>", goto_buff(1), { desc = "Goto last used buffer" })
+map("n", "<M-2>", goto_buff(2), { desc = "Goto second last used buffer" })
+map("n", "<M-3>", goto_buff(3), { desc = "Goto third last used buffer" })
+map("n", "<M-4>", goto_buff(4), { desc = "Goto fourth last used buffer" })
+map("n", "<M-5>", goto_buff(5), { desc = "Goto fifth last used buffer" })
 
 -------------------------------------------------------------------------------
 -- Fuzzy related (requires fzy and rg)                                       --
