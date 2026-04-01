@@ -10,9 +10,11 @@ local function lua_ls_on_init(client)
     if vim.fn.filereadable(path .. "/.nvimconfig") then
         local settings = {
             Lua = {
+                diagnostics = {
+                    globals = { "vim" },
+                },
                 workspace = {
                     checkThirdParty = false,
-                    -- library = vim.api.nvim_get_runtime_file("", true),
                     library = vim.tbl_filter(function(d)
                         return not d:match(vim.fn.stdpath('config') .. '/?a?f?t?e?r?')
                     end, vim.api.nvim_get_runtime_file('', true)),
@@ -26,9 +28,6 @@ end
 
 ---@type vim.lsp.Config
 local config = {
-    -- TODO need directory as firejail does not know what PWD is, could also be a script
-    -- cmd = { "sh -c 'exec firejail --whitelist=$PWD lua-language-server'" },
-    -- cmd = { vim.fn.stdpath("config") .. "/scripts/firejail-lsp", "lua-language-server" },
     cmd = { "lua-language-server" },
     root_markers = {
         ".luarc.json",

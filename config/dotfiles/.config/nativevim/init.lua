@@ -1,5 +1,5 @@
 if vim.fn.has("nvim-0.11") == 0 then
-    vim.notify("NativeVim only supports Neovim 0.11+", vim.log.levels.ERROR)
+    vim.notify("Configuration only supports Neovim 0.11+", vim.log.levels.ERROR)
     return
 end
 
@@ -14,5 +14,4 @@ require("core.statusline")
 require("core.keybindings")
 require("core.extras")
 require("core.tabline")
-require("plugins")
 

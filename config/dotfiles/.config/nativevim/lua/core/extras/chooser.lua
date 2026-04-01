@@ -4,14 +4,18 @@ local utils = require("core.extras.utils")
 local M = {}
 
 M.chooser_keymaps = {
-    -- letters on left part of the keyboard
+    -- characters easily reachable by the left hand
     left = {
-        'q', 'w', 'e', 'r',
-        'a', 's', 'd', 'f',
-        'z', 'x', 'c', 'v',
-        'Q', 'W', 'E', 'R',
-        'A', 'S', 'D', 'F',
-        'Z', 'X', 'C', 'V',
+        "q", "w", "e", "r", "t",
+        "a", "s", "d", "f", "g",
+        "z", "x", "c", "v", "b",
+        "Q", "W", "E", "R", "T",
+        "A", "S", "D", "F", "G",
+        "Z", "X", "C", "V", "B",
+
+        -- these are just in case the list is long..
+        "1", "2", "3", "4", "5",
+        "!", "@", "#", "$", "%"
     },
 
     -- only numbers
@@ -27,6 +31,8 @@ M.chooser_keymaps = {
     },
 }
 
+-- TODO highlight key for each choice
+-- TODO make options a dict and validate using vim.validate
 -- TODO add option to ask user for confirmation for more dangerous things
 function M.chooser(title, keymap, options, format_callback, callback)
     local buf = vim.api.nvim_create_buf(false, true)
@@ -50,37 +56,13 @@ function M.chooser(title, keymap, options, format_callback, callback)
 
     local win = vim.api.nvim_open_win(buf, true, opts)
 
-    local function close()
-        if vim.api.nvim_win_is_valid(win) then
-            vim.api.nvim_win_close(win, true)
-        end
-
-        -- TODO should the namespace be the same? saved somewhere?
-        vim.on_key(nil, vim.api.nvim_create_namespace("chooser"))
-    end
-
-    -- this runs every time a key is pressed anywhere in neovim
-    vim.on_key(function(key)
-        -- if window lost focus just close
-        if vim.api.nvim_get_current_win() ~= win then
-            close()
-        end
-
-        -- if key is one of the allowed choices do the thing
-        local index = utils.tbl_find(key, keymap)
-        if index and index > 0 then
-            callback(options[index])
-        end
-
-        -- always quit after keypress
-        close()
-
-        -- always return empty string to prevent default key actions
-        return ""
-    end, vim.api.nvim_create_namespace("chooser"))
-
     local lines = {}
     for i, item in ipairs(options) do
+        -- limit to screen size
+        if i > height then
+            break
+        end
+
         -- in case there are too many options just show without any keys
         if i > #keymap then
             lines[i] = ' ) ' .. format_callback(item)
@@ -89,22 +71,24 @@ function M.chooser(title, keymap, options, format_callback, callback)
         end
     end
 
-    -- write text to the buffer
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
-
-    -- TODO there is no way to hide the cursor right now
-    -- set options so it is more like an application than text buffer
-    -- vim.api.nvim_buf_set_option(buf, 'modifiable', false)
-    -- vim.api.nvim_buf_set_option(buf, 'cursorline', false)
     vim.api.nvim_set_option_value("modifiable", false, { scope = "local", buf = buf })
+    vim.api.nvim_win_set_buf(win, buf)
 
-    vim.api.nvim_set_option_value("cursorline", false, { scope = "local", win = win })
+    -- force redraw so new window is shown
+    vim.cmd("redraw")
 
-    -- allow moving cursor past text to hide it
-    vim.api.nvim_set_option_value("virtualedit", "all", { scope = "local", win = win })
+    -- NOTE i do not need special keys here so im not using nr2char
+    local ch = vim.fn.getcharstr(-1)
 
-    -- move the cursor so its not in the way
-    vim.api.nvim_win_set_cursor(win, {1, width - 1})
+    -- find the index of key and call callback if valid
+    local index = utils.tbl_find(ch, keymap)
+    if index and index > 0 and index <= #options then
+        callback(options[index])
+    end
+
+    -- always close afterwards
+    vim.api.nvim_win_close(win, true)
 end
 
 -- @param show_if_one should the menu be shown if there is only one buffer
@@ -141,13 +125,9 @@ local function choose_buffer(show_if_one)
             return name
         end,
         function(choice)
-            if choice then
-                vim.schedule(function()
-                    vim.cmd(":b " .. choice.buf)
-                end)
-            else
-                print("ChooserBuffer cancelled")
-            end
+            vim.schedule(function()
+                vim.cmd(":b " .. choice.buf)
+            end)
         end
     )
 end
