@@ -73,7 +73,7 @@ map("v", "<leader>s'", "c'<c-r>\"'", { desc = "Surround with s. quotes" })
 map("v", "<leader>s(", 'c(<c-r>")', { desc = "Surround with paren" })
 map("v", "<leader>s[", 'c[<c-r>"]', { desc = "Surround with sq. brackets" })
 map("v", "<leader>s{", 'c{<c-r>"}', { desc = "Surround with curly brackets" })
-map("v", "<leader>s<", 'c<<c-r>">', { desc = "Surround with ?" })
+map("v", "<leader>s<", 'c<<c-r>">', { desc = "Surround with angle brackets" })
 map("v", "<leader>s`", 'c`<c-r>"`', { desc = "Surround with backticks" })
 
 -- creates a function that just goes to the buffer indexed by last usage
@@ -99,13 +99,13 @@ map("n", "<M-5>", goto_buff(5), { desc = "Goto fifth last used buffer" })
 -- Fuzzy related (requires fzy and rg)                                       --
 -------------------------------------------------------------------------------
 --- TODO the fuzzy plugin should check for its dependencies itself
-if vim.fn.executable("fzy") == 1 and vim.fn.executable("rg") == 1 then
-    map("n", "<leader>b", "<cmd>:FuzzyBuffers<cr>", { desc = "Fuzzy buffer selection" })
-    map("n", "<M-f>", "<cmd>:FuzzyFile:s<cr>", { desc = "Fuzzy file selection" })
-    map("n", '<M-F>', function ()
-        return "<cmd>:FuzzyFile " .. vim.fn.expand("%:p:h") .. "<cr>"
-    end, { expr = true, desc = "Fuzzy file selection (cwd)" })
-end
+-- if vim.fn.executable("fzy") == 1 and vim.fn.executable("rg") == 1 then
+--     map("n", "<leader>b", "<cmd>:FuzzyBuffers<cr>", { desc = "Fuzzy buffer selection" })
+--     map("n", "<M-f>", "<cmd>:FuzzyFile:s<cr>", { desc = "Fuzzy file selection" })
+--     map("n", '<M-F>', function ()
+--         return "<cmd>:FuzzyFile " .. vim.fn.expand("%:p:h") .. "<cr>"
+--     end, { expr = true, desc = "Fuzzy file selection (cwd)" })
+-- end
 
 -------------------------------------------------------------------------------
 -- LSP and autocompletion related                                            --
