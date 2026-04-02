@@ -1,4 +1,4 @@
-local lspcontainers = require("lspcontainers")
+local lspcontainers = require("core.lspcontainers")
 
 local function lua_ls_on_init(client)
     local path = vim.tbl_get(client, "workspace_folders", 1, "name")

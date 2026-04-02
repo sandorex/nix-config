@@ -1,4 +1,4 @@
-local utils = require("core.extras.utils")
+local utils = require("core.utils")
 local M = {}
 
 -- timeout for files searching in millis, prevents lockup when running in wrong directory

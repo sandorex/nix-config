@@ -76,6 +76,6 @@ M.tabline = function()
 end
 
 -- setup
-vim.opt.tabline = '%!v:lua.require\'core.tabline\'.tabline()'
+vim.opt.tabline = '%!v:lua.require\'config.tabline\'.tabline()'
 
 return M

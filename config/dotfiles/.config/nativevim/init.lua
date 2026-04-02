@@ -6,12 +6,8 @@ end
 -- load catppuccin at start
 vim.cmd("colorscheme catppuccin_macchiato")
 
-require("core.options")
-require("core.treesitter")
-require("core.lsp")
-require("core.netrw")
-require("core.statusline")
-require("core.keybindings")
-require("core.extras")
-require("core.tabline")
+-- load core
+require("core")
 
+-- load the config
+require("config")

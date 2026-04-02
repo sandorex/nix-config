@@ -34,6 +34,8 @@ map({"n", "v"}, "<leader>p", '"+p', { desc = "Paste from system clipboard" })
 map({"n", "v"}, "<leader>P", '"+P', { desc = "Paste from system clipboard" })
 
 -- paste without yanking in visual mode
+-- TODO i cannot change the register by prefixing it with "2 this needs to be
+-- user command with register = true
 map('v', 'p', function()
     vim.fn.setreg('x', vim.fn.getreg('"'))
     vim.api.nvim_paste(vim.fn.getreg('"'), {}, -1)
@@ -117,6 +119,7 @@ map("i", "<C-CR>", "<C-Y>")
 
 vim.api.nvim_create_autocmd('LspAttach', {
     callback = function()
+        -- TODO are these already predefined?? just delete those that are already defined
         map("n", "<leader>ld", vim.lsp.buf.declaration, { desc = "Goto declaration (LSP)" })
         map("n", "<leader>lD", vim.lsp.buf.definition, { desc = "Goto definition (LSP)" })
         map("n", "<leader>la", vim.lsp.buf.code_action, { desc = "Code action (LSP)" })

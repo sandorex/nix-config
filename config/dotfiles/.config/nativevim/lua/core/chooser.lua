@@ -1,6 +1,6 @@
 -- contains code for buffer chooser
 
-local utils = require("core.extras.utils")
+local utils = require("core.utils")
 local M = {}
 
 M.chooser_keymaps = {
@@ -31,6 +31,7 @@ M.chooser_keymaps = {
     },
 }
 
+-- TODO copy validate from fuzzy_chooser
 -- TODO highlight key for each choice
 -- TODO make options a dict and validate using vim.validate
 -- TODO add option to ask user for confirmation for more dangerous things
