@@ -76,6 +76,9 @@ map("v", "<M-s>{", 'c{<c-r>"}', { desc = "Surround with curly brackets" })
 map("v", "<M-s><", 'c<<c-r>">', { desc = "Surround with angle brackets" })
 map("v", "<M-s>`", 'c`<c-r>"`', { desc = "Surround with backticks" })
 
+-- terminal
+map("t", "<c-\\><c-\\>", "<c-\\><c-n>", { desc = "Exit terminal insert mode" })
+
 -- creates a function that just goes to the buffer indexed by last usage
 local function goto_buff(index)
     return function(...)

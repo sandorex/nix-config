@@ -169,6 +169,13 @@ local function fuzzy_files()
     M.fuzzy_chooser {
         title = "Select file (fuzzy)",
         options = files,
+        map = function(buf)
+            if vim.startswith(buf, "/") then
+                return vim.fn.fnamemodify(buf, ':~:.')
+            else
+                return buf
+            end
+        end,
         callback = function(index)
             vim.schedule(function()
                 vim.cmd(":e " .. files[index])

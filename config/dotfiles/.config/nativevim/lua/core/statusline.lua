@@ -15,15 +15,19 @@ local mode_strings = {
     ["c"]  = "C",
     ["cv"] = "VE",
     ["ce"] = "EX",
+    ["cr"] = "CR",
     ["r"]  = "P",
     ["rm"] = "MO",
     ["r?"] = "CO",
     ["!"]  = "SH",
     ["t"]  = "T",
+    ["nt"] = "TN",
 }
 
 -- contains hightlighting for each mode
 local mode_hl = {
+    ["n"]  = "%#StatuslineNormalAccent#",
+    ["no"] = "%#StatuslineNormalAccent#",
     ["v"]  = "%#StatuslineVisualAccent#",
     ["V"]  = "%#StatuslineVisualAccent#",
     [""] = "%#StatuslineVisualAccent#",
@@ -31,8 +35,10 @@ local mode_hl = {
     ["ic"] = "%#StatuslineInsertAccent#",
     ["R"]  = "%#StatuslineReplaceAccent#",
     ["Rv"] = "%#StatuslineReplaceAccent#",
-    ["c"]  = "%#StatuslineCmdLineAccent#",
+    ["c"]  = "%#StatuslineCommandAccent#",
+    ["cr"]  = "%#StatuslineCommandAccent#",
     ["t"]  = "%#StatuslineTerminalAccent#",
+    ["nt"] = "%#StatuslineNormalAccent#",
 }
 
 local function lsp()
@@ -44,27 +50,67 @@ local function lsp()
     end
 end
 
--- TODO do the rest of accents
+-- fallback color
 vim.api.nvim_set_hl(0, 'StatusLineAccent', {
-    fg = "#FFFFFF",
-    bg = "#393D5C",
-    -- bold = true
+    fg = "#82AAFF",
+    bg = "#1E2030",
+    bold = true,
+})
+
+vim.api.nvim_set_hl(0, 'StatusLineNormalAccent', {
+    fg = "#1E2030",
+    bg = "#82AAFF",
+    bold = true,
+})
+
+vim.api.nvim_set_hl(0, 'StatusLineInsertAccent', {
+    fg = "#1E2030",
+    bg = "#98F096",
+    bold = true
+})
+
+vim.api.nvim_set_hl(0, 'StatusLineVisualAccent', {
+    fg = "#1E2030",
+    bg = "#B767EB",
+    bold = true
+})
+
+vim.api.nvim_set_hl(0, 'StatusLineReplaceAccent', {
+    fg = "#1E2030",
+    bg = "#FF5656",
+    bold = true
+})
+
+vim.api.nvim_set_hl(0, 'StatusLineCommandAccent', {
+    fg = "#1E2030",
+    bg = "#F0A17A",
+    bold = true
+})
+
+vim.api.nvim_set_hl(0, 'StatusLineTerminalAccent', {
+    fg = "#1E2030",
+    bg = "#D5E1FB",
+    bold = true
 })
 
 local function mode()
-    local current_mode = vim.api.nvim_get_mode().mode
-    local mode_string = mode_strings[current_mode] or "?"
-    local mode_color = mode_hl[current_mode] or "%#StatusLineAccent#"
+    -- use first two characters only
+    local curr = vim.api.nvim_get_mode().mode:sub(1, 2)
+    local mode_string = mode_strings[curr] or "?"
+    local mode_color = mode_hl[curr] or "%#StatusLineAccent#"
 
     -- NOTE padding here is so that rest of statusline does not move when
     -- changing between different length mode strings
     local padding = (mode_string:len() == 1 and " ") or ""
+
+    -- return mode_color .. " " .. current_mode .. " %*" .. padding
     return mode_color .. " " .. mode_string .. " %*" .. padding
 end
 
 local function filename()
     local path = vim.api.nvim_buf_get_name(0)
     if not path or path == "" then
+        -- use neovim default for invalid names
         return "%t"
     end
 
