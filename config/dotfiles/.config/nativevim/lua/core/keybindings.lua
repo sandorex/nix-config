@@ -68,13 +68,13 @@ map('v', '<M-Up>', ":m '<-2<cr>gv=gv", { desc = 'Move lines up', silent = true }
 map('v', '<M-Down>', ":m '>+1<cr>gv=gv", { desc = 'move lines down', silent = true })
 
 -- surround selection
-map("v", '<leader>s"', 'c"<c-r>""', { desc = "Surround with quotes" })
-map("v", "<leader>s'", "c'<c-r>\"'", { desc = "Surround with s. quotes" })
-map("v", "<leader>s(", 'c(<c-r>")', { desc = "Surround with paren" })
-map("v", "<leader>s[", 'c[<c-r>"]', { desc = "Surround with sq. brackets" })
-map("v", "<leader>s{", 'c{<c-r>"}', { desc = "Surround with curly brackets" })
-map("v", "<leader>s<", 'c<<c-r>">', { desc = "Surround with angle brackets" })
-map("v", "<leader>s`", 'c`<c-r>"`', { desc = "Surround with backticks" })
+map("v", '<M-s>"', 'c"<c-r>""', { desc = "Surround with quotes" })
+map("v", "<M-s>'", "c'<c-r>\"'", { desc = "Surround with s. quotes" })
+map("v", "<M-s>(", 'c(<c-r>")', { desc = "Surround with paren" })
+map("v", "<M-s>[", 'c[<c-r>"]', { desc = "Surround with sq. brackets" })
+map("v", "<M-s>{", 'c{<c-r>"}', { desc = "Surround with curly brackets" })
+map("v", "<M-s><", 'c<<c-r>">', { desc = "Surround with angle brackets" })
+map("v", "<M-s>`", 'c`<c-r>"`', { desc = "Surround with backticks" })
 
 -- creates a function that just goes to the buffer indexed by last usage
 local function goto_buff(index)
@@ -106,6 +106,7 @@ map("n", "<M-5>", goto_buff(5), { desc = "Goto fifth last used buffer" })
 --         return "<cmd>:FuzzyFile " .. vim.fn.expand("%:p:h") .. "<cr>"
 --     end, { expr = true, desc = "Fuzzy file selection (cwd)" })
 -- end
+map("n", "<M-f>", "<cmd>:FuzzyFiles<cr>", { desc = "Fuzzy file selection" })
 
 -------------------------------------------------------------------------------
 -- LSP and autocompletion related                                            --

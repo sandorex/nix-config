@@ -1,100 +1,30 @@
 local utils = require("core.extras.utils")
-local fzy = {}
+local M = {}
 
-local SCORE_GAP_LEADING = -0.005
-local SCORE_GAP_TRAILING = -0.005
-local SCORE_GAP_INNER = -0.01
-local SCORE_MATCH_CONSECUTIVE = 1.0
-local SCORE_MATCH_SLASH = 0.9
-local SCORE_MATCH_WORD = 0.8
-local SCORE_MATCH_CAPITAL = 0.7
-local SCORE_MATCH_DOT = 0.6
-local SCORE_MIN = -math.huge
-local SCORE_MAX = math.huge
+--- Opens floating fuzzy chooser
+function M.fuzzy_chooser(options)
+    local opts = options or {}
 
-local function compute_bonus(str)
-    local n = #str
-    local bonuses = {}
-    local last_char = "/"
+    vim.validate("opts.options", opts.options, "table")
+    vim.validate("opts.title", opts.title, "string", true)
+    vim.validate("opts.callback", opts.callback, "function")
+    vim.validate("opts.map", opts.map, "function", true)
 
-    for i = 1, n do
-        local char = str:sub(i, i)
-        local score = 0
+    local orig_options = opts.options
+    local title = opts.title or "Fuzzy chooser"
+    local callback = opts.callback
+    local map = opts.map
 
-        if last_char == "/" then score = SCORE_MATCH_SLASH
-        elseif last_char == "-" or last_char == "_" or last_char == " " then score = SCORE_MATCH_WORD
-        elseif last_char == "." then score = SCORE_MATCH_DOT
-        elseif last_char:match("%l") and char:match("%u") then score = SCORE_MATCH_CAPITAL
+    -- if map function is provided then map all options
+    local lines = {}
+    if map then
+        for i, option in ipairs(orig_options) do
+            lines[i] = map(option)
         end
-
-        bonuses[i] = score
-        last_char = char
-    end
-    return bonuses
-end
-
-local function score_item(needle, haystack)
-    local n = #needle
-    local m = #haystack
-
-    if n == 0 or m == 0 or n > m then return SCORE_MIN end
-    if n == m then return SCORE_MAX end
-
-    local bonus = compute_bonus(haystack)
-    local D = {}
-    local M = {}
-
-    for i = 1, n do
-        D[i] = {}
-        M[i] = {}
+    else
+        lines = orig_options
     end
 
-    for i = 1, n do
-        local prev_score = SCORE_MIN
-        local gap_score = (i == n) and SCORE_GAP_TRAILING or SCORE_GAP_INNER
-        local needle_char = needle:sub(i, i):lower()
-
-        for j = 1, m do
-            local haystack_char = haystack:sub(j, j):lower()
-
-            if needle_char == haystack_char then
-                local score = SCORE_MIN
-                if i == 1 then
-                    score = (j - 1) * SCORE_GAP_LEADING + bonus[j]
-                elseif j > 1 then
-                    score = math.max(
-                        M[i - 1][j - 1] + bonus[j],
-                        D[i - 1][j - 1] + SCORE_MATCH_CONSECUTIVE
-                    )
-                end
-                D[i][j] = score
-                M[i][j] = math.max(score, prev_score + gap_score)
-                prev_score = M[i][j]
-            else
-                D[i][j] = SCORE_MIN
-                M[i][j] = prev_score + gap_score
-                prev_score = M[i][j]
-            end
-        end
-    end
-
-    return M[n][m]
-end
-
-function fzy.fuzzy_search(needle, haystack_list)
-    local results = {}
-    for _, item in ipairs(haystack_list) do
-        local score = score_item(needle, item)
-        if score > SCORE_MIN then
-            table.insert(results, { value = item, score = score })
-        end
-    end
-
-    table.sort(results, function(a, b) return a.score > b.score end)
-    return results
-end
-
-function fzy.fuzzy_chooser(title, options, format_callback, callback)
     local buf = vim.api.nvim_create_buf(false, true)
     local ui = vim.api.nvim_list_uis()[1]
 
@@ -106,7 +36,22 @@ function fzy.fuzzy_chooser(title, options, format_callback, callback)
     local width = math.min(80, ui.width)
     local height = math.min(80, ui.height - 4)
 
-    local opts = {
+    local function render(query)
+        local formatted = {}
+        if query ~= nil and query ~= "" then
+            formatted = vim.fn.matchfuzzy(lines, query)
+        else
+            formatted = lines
+        end
+
+        -- write text to the buffer (making sure not to overwrite the prompt)
+        vim.api.nvim_buf_set_lines(buf, 0, -2, false, formatted)
+
+        -- return first line
+        return formatted[1]
+    end
+
+    local win = vim.api.nvim_open_win(buf, true, {
         relative = 'editor',
         width = width,
         height = height,
@@ -116,37 +61,16 @@ function fzy.fuzzy_chooser(title, options, format_callback, callback)
         border = 'bold',
         title = ' ' .. title .. ' ',
         title_pos = 'center',
-    }
-
-    local lines = {}
-    for i, item in ipairs(options) do
-        lines[i] = format_callback(item)
-    end
-
-    local function render(query)
-        local formatted = {}
-        if query ~= nil and query ~= "" then
-            for i, val in ipairs(fzy.fuzzy_search(query, lines)) do
-                formatted[i] = val.value
-            end
-        else
-            formatted = lines
-        end
-
-        -- write text to the buffer
-        vim.api.nvim_buf_set_lines(buf, 0, -2, false, formatted)
-
-        -- return first line
-        return formatted[1]
-    end
-
-    local win = vim.api.nvim_open_win(buf, true, opts)
+    })
 
     local function close()
         if vim.api.nvim_win_is_valid(win) then
             vim.api.nvim_win_close(win, true)
         end
     end
+
+    -- close on escape
+    vim.keymap.set({"n", "i"}, "<Esc>", close, { buffer = buf })
 
     vim.fn.prompt_setcallback(buf, function(text)
         -- render again and get the first line
@@ -155,12 +79,12 @@ function fzy.fuzzy_chooser(title, options, format_callback, callback)
         -- find the option
         local index = utils.tbl_find(target, lines)
         if index ~= nil then
-            callback(options[index])
+            callback(index)
         else
             error("The first line is not valid option")
         end
 
-        -- close the window now
+        -- close the window
         close()
     end)
 
@@ -179,6 +103,7 @@ function fzy.fuzzy_chooser(title, options, format_callback, callback)
     vim.cmd("startinsert")
 end
 
+-- TODO accept root for searching for files for relative
 -- @param show_if_one should the menu be shown if there is only one buffer
 local function fuzzy_buffer(show_if_one)
     local sorted_bufs = utils.get_buffers_by_last_used()
@@ -197,32 +122,57 @@ local function fuzzy_buffer(show_if_one)
         return
     end
 
-    fzy.fuzzy_chooser(
-        "Select buffer (fuzzy)",
-        sorted_bufs,
-        function(item)
-            local name = item.name
-            if name == '' or not name then
-                name = '[unnamed]'
-            else
-                -- make the filename relative to current dir or home
-                name = vim.fn.fnamemodify(item.name, ':~:.')
-            end
-
-            return name
+    M.fuzzy_chooser {
+        title = "Select buffer (fuzzy)",
+        options = sorted_bufs,
+        map = function(buf)
+            return buf.name
         end,
-        function(choice)
-            if choice then
-                vim.schedule(function()
-                    vim.cmd(":b " .. choice.buf)
-                end)
-            else
-                print("FuzzyBuffer cancelled")
-            end
-        end
-    )
+        callback = function(index)
+            vim.schedule(function()
+                vim.cmd("buffer " .. sorted_bufs[index].buf)
+            end)
+        end,
+    }
 end
 
 vim.api.nvim_create_user_command("FuzzyBuffer", function() fuzzy_buffer(false) end, { desc = "Choose buffer (fuzzy)" })
 
-return fzy
+local function find_files_rg(root)
+    local list = { "rg", "--color", "never", "--files", "--fixed-strings" }
+    if root ~= nil and root ~= "" then table.insert(list, root) end
+
+    return vim.fn.systemlist(list)
+end
+
+local function find_files_find(root)
+    local list = { "find", (root or "."), "-type", "f", "-or", "-type", "l" }
+
+    return vim.fn.systemlist(list)
+end
+
+-- automatically use rg if available
+local find_files
+if vim.fn.executable("rg") == 1 then
+    find_files = find_files_rg
+else
+    find_files = find_files_find
+end
+
+local function fuzzy_files()
+    local files = find_files()
+
+    M.fuzzy_chooser {
+        title = "Select file (fuzzy)",
+        options = files,
+        callback = function(index)
+            vim.schedule(function()
+                vim.cmd(":e " .. files[index])
+            end)
+        end,
+    }
+end
+
+vim.api.nvim_create_user_command("FuzzyFiles", function() fuzzy_files() end, { desc = "Choose file (fuzzy)" })
+
+return M
