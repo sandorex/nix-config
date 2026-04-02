@@ -38,6 +38,7 @@ function M.fuzzy_chooser(options)
     local ui = vim.api.nvim_list_uis()[1]
 
     -- special prompt buffer
+    vim.api.nvim_buf_set_option(buf, "bufhidden", "wipe")
     vim.api.nvim_buf_set_option(buf, "buftype", "prompt")
     vim.fn.prompt_setprompt(buf, "> ")
 
@@ -75,6 +76,10 @@ function M.fuzzy_chooser(options)
     local function close()
         if vim.api.nvim_win_is_valid(win) then
             vim.api.nvim_win_close(win, true)
+        end
+
+        if vim.api.nvim_win_is_valid(buf) then
+            vim.api.nvim_buf_delete(buf, { force = true })
         end
     end
 
