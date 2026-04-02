@@ -126,7 +126,11 @@ local function fuzzy_buffer(show_if_one)
         title = "Select buffer (fuzzy)",
         options = sorted_bufs,
         map = function(buf)
-            return buf.name
+            if vim.startswith(buf.name, "/") then
+                return vim.fn.fnamemodify(buf.name, ':~:.')
+            else
+                return buf.name
+            end
         end,
         callback = function(index)
             vim.schedule(function()

@@ -65,3 +65,6 @@ vim.opt.wildignore:append {
 -- recursive but with limited depth of 2
 vim.opt.path:append { "**2" }
 
+-- hide `-- INSERT --` from messages as i have it in statusline
+vim.o.showmode = false
+
