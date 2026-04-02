@@ -238,10 +238,17 @@ local function fuzzy_map()
             desc = " - " .. key.desc
         end
 
+        local rhs = ""
+        if type(key.rhs) == "string" then
+            rhs = " '" .. key.rhs .. "'"
+        end
+
+        -- TODO maybe add padding to lhs and rhs?
         lines[#lines + 1] = string.format(
-            "%-3s '%s' %s",
+            "%-3s '%s'%s%s",
             key.mode,
             key.lhs,
+            rhs,
             desc
         )
     end
