@@ -27,12 +27,11 @@ map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit" })
 map("n", "<s-u>", "<cmd>redo<cr>", { desc = "Redo" })
 
 -- easy system clipboard copy / paste by prefixing with <leader>
-map({"n", "v"}, "<leader>y", '"+y')
-map("n", "<leader>Y", '"+yg_')
-map("n", "<leader>y", '"+y')
+map({"n", "v"}, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
+map("n", "<leader>Y", '"+yg_', { desc = "Copy line to system clipboard" })
 
-map({"n", "v"}, "<leader>p", '"+p')
-map({"n", "v"}, "<leader>P", '"+P')
+map({"n", "v"}, "<leader>p", '"+p', { desc = "Paste from system clipboard" })
+map({"n", "v"}, "<leader>P", '"+P', { desc = "Paste from system clipboard" })
 
 -- paste without yanking in visual mode
 map('v', 'p', function()
@@ -42,10 +41,10 @@ map('v', 'p', function()
 end, { silent = true })
 
 -- buffer stuff
-map("n", "<leader>b", "<cmd>ChooseBuffer<cr>", { desc = "Choose buffer interactively" })
-map("n", "<C-b>", "<cmd>ChooseBuffer<cr>", { desc = "Choose buffer interactively" })
+map("n", "<leader>b", "<cmd>ChooseBuffer<cr>", { desc = "Choose buffer" })
+map("n", "<C-b>", "<cmd>ChooseBuffer<cr>", { desc = "Choose buffer" })
 -- map("n", "<leader>b", ":ls<cr>:b<space>", { desc = "Macro to list buffers" })
--- map("n", "<BS>", "<cmd>b#<cr>", { desc = "Switch to previous buffer" })
+map("n", "<M-s>", "<cmd>FuzzyBuffer<cr>", { desc = "Switch buffer (fuzzy)" })
 map("n", "<M-b>", "<cmd>bdelete<cr>", { desc = "Delete current buffer" })
 
 -- tab stuff
@@ -81,7 +80,7 @@ map("t", "<c-\\><c-\\>", "<c-\\><c-n>", { desc = "Exit terminal insert mode" })
 
 -- creates a function that just goes to the buffer indexed by last usage
 local function goto_buff(index)
-    return function(...)
+    return function()
         local buffers = core.get_buffers_by_last_used()
         if #buffers <= 0 or #buffers < index then
             -- TODO what is a good error message here?
@@ -99,17 +98,13 @@ map("n", "<M-4>", goto_buff(4), { desc = "Goto fourth last used buffer" })
 map("n", "<M-5>", goto_buff(5), { desc = "Goto fifth last used buffer" })
 
 -------------------------------------------------------------------------------
--- Fuzzy related (requires fzy and rg)                                       --
+-- Fuzzy related                                                             --
 -------------------------------------------------------------------------------
---- TODO the fuzzy plugin should check for its dependencies itself
--- if vim.fn.executable("fzy") == 1 and vim.fn.executable("rg") == 1 then
---     map("n", "<leader>b", "<cmd>:FuzzyBuffers<cr>", { desc = "Fuzzy buffer selection" })
---     map("n", "<M-f>", "<cmd>:FuzzyFile:s<cr>", { desc = "Fuzzy file selection" })
---     map("n", '<M-F>', function ()
---         return "<cmd>:FuzzyFile " .. vim.fn.expand("%:p:h") .. "<cr>"
---     end, { expr = true, desc = "Fuzzy file selection (cwd)" })
--- end
-map("n", "<M-f>", "<cmd>:FuzzyFiles<cr>", { desc = "Fuzzy file selection" })
+map("n", "<M-f>", "<cmd>FuzzyFile<cr>", { desc = "File selection (fuzzy)" })
+map("n", '<M-F>', function()
+    return "<cmd>:FuzzyFile " .. vim.fn.expand("%:p:h") .. "<cr>"
+end, { expr = true, desc = "File selection in current file dir (fuzzy)" })
+map("n", "<leader>k", "<cmd>FuzzyMap<cr>", { desc = "Search keybindings (fuzzy)" })
 
 -------------------------------------------------------------------------------
 -- LSP and autocompletion related                                            --
@@ -121,7 +116,7 @@ map("n", "<leader>D", vim.diagnostic.setloclist, { desc = "Open diagnostics list
 map("i", "<C-CR>", "<C-Y>")
 
 vim.api.nvim_create_autocmd('LspAttach', {
-    callback = function(args)
+    callback = function()
         map("n", "<leader>ld", vim.lsp.buf.declaration, { desc = "Goto declaration (LSP)" })
         map("n", "<leader>lD", vim.lsp.buf.definition, { desc = "Goto definition (LSP)" })
         map("n", "<leader>la", vim.lsp.buf.code_action, { desc = "Code action (LSP)" })

@@ -1,6 +1,15 @@
 local utils = require("core.extras.utils")
 local M = {}
 
+-- timeout for files searching in millis, prevents lockup when running in wrong directory
+M.timeout = 700
+
+-- default depth to traverse
+M.default_depth = 5
+
+-- depth to traverse in case of a timeout
+M.timeout_depth = 2
+
 --- Opens floating fuzzy chooser
 function M.fuzzy_chooser(options)
     local opts = options or {}
@@ -103,7 +112,6 @@ function M.fuzzy_chooser(options)
     vim.cmd("startinsert")
 end
 
--- TODO accept root for searching for files for relative
 -- @param show_if_one should the menu be shown if there is only one buffer
 local function fuzzy_buffer(show_if_one)
     local sorted_bufs = utils.get_buffers_by_last_used()
@@ -142,29 +150,49 @@ end
 
 vim.api.nvim_create_user_command("FuzzyBuffer", function() fuzzy_buffer(false) end, { desc = "Choose buffer (fuzzy)" })
 
-local function find_files_rg(root)
-    local list = { "rg", "--color", "never", "--files", "--fixed-strings" }
-    if root ~= nil and root ~= "" then table.insert(list, root) end
-
-    return vim.fn.systemlist(list)
+local function find_files_cmd_find(root, max_depth)
+    return { "find", (root or "."), "-maxdepth", tostring(max_depth), "-type", "f", "-or", "-type", "l" }
 end
 
-local function find_files_find(root)
-    local list = { "find", (root or "."), "-type", "f", "-or", "-type", "l" }
+local function find_files_cmd_rg(root, max_depth)
+    local list = { "rg", "--color", "never", "--max-depth=" .. max_depth, "--files", "--fixed-strings" }
+    if root ~= nil and root ~= "" then table.insert(list, root) end
 
-    return vim.fn.systemlist(list)
+    return list
 end
 
 -- automatically use rg if available
-local find_files
+local find_files_cmd
 if vim.fn.executable("rg") == 1 then
-    find_files = find_files_rg
+    find_files_cmd = find_files_cmd_rg
 else
-    find_files = find_files_find
+    find_files_cmd = find_files_cmd_find
 end
 
-local function fuzzy_files()
-    local files = find_files()
+local function find_files(root, depth, recursion)
+    local cmd = find_files_cmd(root, depth or M.default_depth)
+    local obj = vim.system(cmd, {
+        text = true,
+        timeout = M.timeout,
+    }):wait()
+
+    -- the timeout was triggered try again with lower depth but only once
+    if obj.code == 124 and obj.signal == 15 then
+        if recursion ~= true then
+            -- TODO should the user be warned?
+            return find_files(root, M.timeout_depth, true)
+        else
+            error("Process has timeout out, the directory is too large")
+        end
+    elseif obj.code ~= 0 then
+        error("Find command exited with code " .. obj.code)
+    end
+
+    return vim.split(obj.stdout, "\n")
+end
+
+local function fuzzy_file(root)
+    local files = find_files(root)
 
     M.fuzzy_chooser {
         title = "Select file (fuzzy)",
@@ -184,6 +212,51 @@ local function fuzzy_files()
     }
 end
 
-vim.api.nvim_create_user_command("FuzzyFiles", function() fuzzy_files() end, { desc = "Choose file (fuzzy)" })
+vim.api.nvim_create_user_command(
+    "FuzzyFile",
+    function(args)
+        if args.args and args.args ~= "" then
+            fuzzy_file(args.args)
+        else
+            fuzzy_file()
+        end
+    end,
+    { desc = "Choose file (fuzzy)", nargs="?" }
+)
+
+local function fuzzy_map()
+    local lines = {}
+
+    local function add_key(key)
+        local desc = ""
+        if key.desc then
+            desc = " - " .. key.desc
+        end
+
+        lines[#lines + 1] = string.format(
+            "%-3s '%s' %s",
+            key.mode,
+            key.lhs,
+            desc
+        )
+    end
+
+    -- add keys for all the modes
+    for _, mode in ipairs({ "n", "i", "l", "v", "s", "x", "o", "c", "t" }) do
+        for _, key in ipairs(vim.api.nvim_get_keymap(mode)) do
+            add_key(key)
+        end
+    end
+
+    M.fuzzy_chooser {
+        title = "Find mapping (fuzzy)",
+        options = lines,
+        callback = function(_)
+            -- do nothing as there's nothing to do?
+        end,
+    }
+end
+
+vim.api.nvim_create_user_command("FuzzyMap", fuzzy_map, { desc = "Search mapped keys (fuzzy)" })
 
 return M
