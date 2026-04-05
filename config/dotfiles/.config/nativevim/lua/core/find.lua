@@ -1,14 +1,9 @@
 -- pure lua implementation or find
 
--- TODO there are plenty of unix-only path in this
-
 local uv = vim.uv or vim.loop
 local joinpath = vim.fs.joinpath
+local const = require("core.constants")
 local M = {}
-
-M.default_max_depth = 5
-
-M.default_timeout = 500
 
 -- directories with these names are not searched
 M.ignore_dir_list = {
@@ -44,8 +39,7 @@ M.ignore_ext_list = {
     [".xz"] = true,
 }
 
--- TODO needs more testing
-function M.get_files_raw(root, filter_dir, filter_file, max_depth, timeout)
+function M.find_files_raw(root, filter_dir, filter_file, max_depth, timeout)
     local fs_scandir = uv.fs_scandir
     local fs_scandir_next = uv.fs_scandir_next
     local files = {}
@@ -102,9 +96,9 @@ function M.get_files_raw(root, filter_dir, filter_file, max_depth, timeout)
 end
 
 local home = os.getenv("HOME")
-function M.get_files(root, max_depth)
-    return M.get_files_raw(
-        root,
+function M.find_files(root, max_depth, timeout)
+    return M.find_files_raw(
+        (root or "."),
         function(full_path, name)
             -- remove .confg, .local and other garbage from home
             if vim.startswith(full_path, joinpath(home, ".")) then
@@ -128,8 +122,8 @@ function M.get_files(root, max_depth)
 
             return true
         end,
-        (max_depth or M.default_max_depth),
-        M.default_timeout
+        (max_depth or const.max_depth),
+        (timeout or const.timeout)
     )
 end
 

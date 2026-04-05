@@ -1,8 +1,6 @@
 local utils = require("core.utils")
+local const = require("core.constants")
 local M = {}
-
--- timeout for files searching in millis, prevents lockup when running in wrong directory
-M.timeout = 700
 
 -- default depth to traverse
 M.default_depth = 5
@@ -94,8 +92,6 @@ function M.fuzzy_chooser(options)
         local index = utils.tbl_find(target, lines)
         if index ~= nil then
             callback(index)
-        else
-            error("The first line is not valid option")
         end
 
         -- close the window
@@ -122,7 +118,7 @@ local function fuzzy_buffer(show_if_one)
     local sorted_bufs = utils.get_buffers_by_last_used()
 
     if not sorted_bufs or #sorted_bufs == 0 then
-        print("No buffers found")
+        vim.notify("No buffers found", vim.log.levels.WARN)
         return
     end
 
@@ -155,49 +151,46 @@ end
 
 vim.api.nvim_create_user_command("FuzzyBuffer", function() fuzzy_buffer(false) end, { desc = "Choose buffer (fuzzy)" })
 
-local function find_files_cmd_find(root, max_depth)
-    return { "find", (root or "."), "-maxdepth", tostring(max_depth), "-type", "f", "-or", "-type", "l" }
-end
+local function find_files_rg(root, max_depth, timeout)
+    local cmd = {
+        "rg",
+        "--color", "never",
+        "--max-depth=" .. (max_depth or const.max_depth),
+        "--files",
+        "--fixed-strings"
+    }
+    if root ~= nil and root ~= "" then table.insert(cmd, root) end
 
-local function find_files_cmd_rg(root, max_depth)
-    local list = { "rg", "--color", "never", "--max-depth=" .. max_depth, "--files", "--fixed-strings" }
-    if root ~= nil and root ~= "" then table.insert(list, root) end
+    local obj = vim.system(cmd, {
+        text = true,
+        timeout = (timeout or const.timeout),
+    }):wait()
 
-    return list
+    if obj.code == 124 and obj.signal == 15 then
+        -- return existing data but signify that timeout has happened
+        return vim.split(obj.stdout, "\n"), true
+    elseif obj.code ~= 0 then
+        error("Ripgrep command exited with code " .. obj.code)
+    end
+
+    return vim.split(obj.stdout, "\n"), false
 end
 
 -- automatically use rg if available
-local find_files_cmd
+local find_files
 if vim.fn.executable("rg") == 1 then
-    find_files_cmd = find_files_cmd_rg
+    find_files = find_files_rg
 else
-    find_files_cmd = find_files_cmd_find
-end
-
-local function find_files(root, depth, recursion)
-    local cmd = find_files_cmd(root, depth or M.default_depth)
-    local obj = vim.system(cmd, {
-        text = true,
-        timeout = M.timeout,
-    }):wait()
-
-    -- the timeout was triggered try again with lower depth but only once
-    if obj.code == 124 and obj.signal == 15 then
-        if recursion ~= true then
-            -- TODO should the user be warned?
-            return find_files(root, M.timeout_depth, true)
-        else
-            error("Process has timeout out, the directory is too large")
-        end
-    elseif obj.code ~= 0 then
-        error("Find command exited with code " .. obj.code)
-    end
-
-    return vim.split(obj.stdout, "\n")
+    -- fallback to pure lua version
+    find_files = require("core.find").find_files
 end
 
 local function fuzzy_file(root)
-    local files = find_files(root)
+    local files, timeout = find_files(root)
+
+    if timeout == true then
+        vim.notify("Warning: timeout searching for files", vim.log.levels.WARN)
+    end
 
     M.fuzzy_chooser {
         title = "Select file (fuzzy)",
@@ -211,7 +204,7 @@ local function fuzzy_file(root)
         end,
         callback = function(index)
             vim.schedule(function()
-                vim.cmd(":e " .. files[index])
+                vim.cmd("edit " .. files[index])
             end)
         end,
     }
@@ -244,13 +237,13 @@ local function fuzzy_map()
         end
 
         -- TODO maybe add padding to lhs and rhs?
-        lines[#lines + 1] = string.format(
+        table.insert(lines, string.format(
             "%-3s '%s'%s%s",
             key.mode,
             key.lhs,
             rhs,
             desc
-        )
+        ))
     end
 
     -- add keys for all the modes
