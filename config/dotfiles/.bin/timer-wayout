@@ -9,9 +9,6 @@ TIMER_FILE="/tmp/.timer-wayout"
 # how often to update wayout widget
 UPDATE_INTERVAL=10
 
-# time after set timer to just quit (in seconds)
-OVERTIME=600 # 10 minutes
-
 wayout_cmd=""
 if command -v wayout &>/dev/null; then
     wayout_cmd="wayout"
@@ -26,7 +23,11 @@ fi
 if [[ -f "$TIMER_FILE" ]]; then
     echo "Killing old timer.."
     pid="$(cat "$TIMER_FILE")"
-    kill -INT "-$pid" &>/dev/null || true
+
+    # send TERM signal then KILL
+    kill -TERM "-$pid" &>/dev/null || true
+    sleep 2s
+    kill -KILL "-$pid" &>/dev/null || true
 fi
 
 # if no arguments just quit after killing old timer
@@ -75,12 +76,6 @@ function display() {
         printf '%s\n' "<span foreground=\"red\">${rel_time% }</span>"
     else
         printf '%s\n' "${rel_time% }"
-    fi
-
-    # quit timer 10 minutes after the set time
-    if [[ "$passed" -eq 1 && "$diff" -gt "$OVERTIME" ]]; then
-        echo "The timer has passed" >&2
-        exit 0
     fi
 }
 
