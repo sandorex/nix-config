@@ -43,7 +43,7 @@ in
 
         # editor
         helix
-        neovim
+        pkgsUnstable.neovim # new 0.12 neovim
 
         # neovim utils
         ripgrep
