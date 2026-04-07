@@ -1,44 +1,34 @@
 -- shortened mode strings
 local mode_strings = {
-    ["n"]  = "N",
-    ["no"] = "N",
-    ["v"]  = "V",
-    ["V"]  = "VL",
-    [""] = "VB",
-    ["s"]  = "S",
-    ["S"]  = "SL",
-    [""] = "SB",
-    ["i"]  = "I",
-    ["ic"] = "I",
-    ["R"]  = "R",
-    ["Rv"] = "VR",
-    ["c"]  = "C",
-    ["cv"] = "VE",
-    ["ce"] = "EX",
-    ["cr"] = "CR",
-    ["r"]  = "P",
-    ["rm"] = "MO",
-    ["r?"] = "CO",
-    ["!"]  = "SH",
-    ["t"]  = "T",
-    ["nt"] = "TN",
+    ["n"]  = "NORMAL",
+    ["v"]  = "VISUAL",
+    ["V"]  = "V LINE",
+    [""] = "V BLOCK",
+    ["s"]  = "SELECT",
+    ["S"]  = "L SELECT",
+    [""] = "S BLOCK",
+    ["i"]  = "INSERT",
+    ["R"]  = "REPLACE",
+    ["Rv"] = "V REPLACE",
+    ["cr"] = "REPLACE",
+    ["c"]  = "COMMAND",
+    ["r"]  = "PROMPT",
+    ["rm"] = "MORE",
+    ["r?"] = "CONFIRM",
+    ["!"]  = "SHELL",
+    ["t"]  = "TERMINAL",
 }
 
 -- contains hightlighting for each mode
 local mode_hl = {
     ["n"]  = "%#StatuslineNormalAccent#",
-    ["no"] = "%#StatuslineNormalAccent#",
     ["v"]  = "%#StatuslineVisualAccent#",
     ["V"]  = "%#StatuslineVisualAccent#",
     [""] = "%#StatuslineVisualAccent#",
     ["i"]  = "%#StatuslineInsertAccent#",
-    ["ic"] = "%#StatuslineInsertAccent#",
     ["R"]  = "%#StatuslineReplaceAccent#",
-    ["Rv"] = "%#StatuslineReplaceAccent#",
     ["c"]  = "%#StatuslineCommandAccent#",
-    ["cr"]  = "%#StatuslineCommandAccent#",
     ["t"]  = "%#StatuslineTerminalAccent#",
-    ["nt"] = "%#StatuslineNormalAccent#",
 }
 
 -- fallback color
@@ -87,15 +77,12 @@ vim.api.nvim_set_hl(0, 'StatusLineTerminalAccent', {
 local function mode()
     -- use first two characters only
     local curr = vim.api.nvim_get_mode().mode:sub(1, 2)
-    local mode_string = mode_strings[curr] or "?"
-    local mode_color = mode_hl[curr] or "%#StatusLineAccent#"
 
-    -- NOTE padding here is so that rest of statusline does not move when
-    -- changing between different length mode strings
-    local padding = (mode_string:len() == 1 and " ") or ""
+    -- fallback to single character
+    local mode_string = mode_strings[curr] or (mode_strings[curr:sub(1, 1)] or "?")
+    local mode_color = mode_hl[curr] or (mode_hl[curr:sub(1, 1)] or "%#StatusLineAccent#")
 
-    -- return mode_color .. " " .. current_mode .. " %*" .. padding
-    return mode_color .. " " .. mode_string .. " %*" .. padding
+    return mode_color .. " " .. mode_string .. " %*"
 end
 
 local function filename()
