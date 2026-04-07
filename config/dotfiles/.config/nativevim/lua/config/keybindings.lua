@@ -2,10 +2,20 @@
 
 local core = require("core.utils")
 
+if vim.fn.has("nvim-0.12") == 1 then
+    vim.cmd("packadd! nvim.undotree")
+end
+
 -- make wildchar trigger autocompletion in command mode (<tab> by default)
 vim.o.wildcharm = vim.o.wildchar
 
 local map = vim.keymap.set
+
+local function deprecated(msg)
+    return function()
+        vim.notify("Key deprecated: " .. msg, vim.log.levels.WARN)
+    end
+end
 
 -------------------------------------------------------------------------------
 -- Movement keybindings                                                      --
@@ -19,28 +29,23 @@ map('n', '<C-Up>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 -------------------------------------------------------------------------------
 -- Quality of life additions                                                 --
 -------------------------------------------------------------------------------
-map("n", "<leader>f", "<cmd>e .<cr>", { desc = "netrw cwd" })
-map("n", "<leader>F", "<cmd>e %:p:h<cr>", { desc = "netrw cur buf dir" })
+map("n", "<leader>f", "<cmd>e .<cr>", { desc = "Open netrw in CWD" })
+map("n", "<leader>F", "<cmd>e %:p:h<cr>", { desc = "Open netrw current buffer directory" })
 map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write" })
-map("n", "<leader>q", "<cmd>q<cr>", { desc = "Quit" })
+map("n", "<leader>q", deprecated("Use <c-w>c to close window or ZZ to close/quit"))
 
+map("n", "<leader>u", function() require("undotree").open() end, { desc = "Open undotree plugin" })
 map("n", "<s-u>", "<cmd>redo<cr>", { desc = "Redo" })
 
 -- easy system clipboard copy / paste by prefixing with <leader>
 map({"n", "v"}, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
 map("n", "<leader>Y", '"+yg_', { desc = "Copy line to system clipboard" })
 
-map({"n", "v"}, "<leader>p", '"+p', { desc = "Paste from system clipboard" })
+map({"n", "v"}, "<leader>p", '"+P', { desc = "Paste from system clipboard" })
 map({"n", "v"}, "<leader>P", '"+P', { desc = "Paste from system clipboard" })
 
--- paste without yanking in visual mode
--- TODO i cannot change the register by prefixing it with "2 this needs to be
--- user command with register = true
-map('v', 'p', function()
-    vim.fn.setreg('x', vim.fn.getreg('"'))
-    vim.api.nvim_paste(vim.fn.getreg('"'), {}, -1)
-    vim.fn.setreg('"', vim.fn.getreg('x'))
-end, { silent = true })
+-- do not overwrite register when pasting
+map("v", "p", "P")
 
 -- buffer stuff
 map("n", "<leader>b", "<cmd>ChooseBuffer<cr>", { desc = "Choose buffer" })
@@ -56,7 +61,7 @@ map("n", "[t", "<cmd>tabprevious<cr>", { desc = "Goto previous tab" })
 
 map("n", "<leader>tw", "<cmd>set wrap!<cr>", { desc = "Toggle word wrap" })
 
--- make <Up>/<Down> respect word wrap
+-- make <Up>/<Down> respect word wrap but not when count is used
 map("i", "<Up>", "v:count == 0 ? '<C-o>gk' : '<C-o>k'", { expr = true, silent = true })
 map("i", "<Down>", "v:count == 0 ? '<C-o>gj' : '<C-o>j'", { expr = true, silent = true })
 map({"n", "v"}, "<Up>", "v:count == 0 ? 'gk' : 'k'", { expr = true, silent = true })
@@ -85,11 +90,10 @@ local function goto_buff(index)
     return function()
         local buffers = core.get_buffers_by_last_used()
         if #buffers <= 0 or #buffers < index then
-            -- TODO what is a good error message here?
-            return
+            vim.notify("Buffer index " .. index .. " out of range", vim.log.levels.WARN)
+        else
+            vim.cmd("buffer " .. buffers[index].buf)
         end
-
-        vim.cmd(":b " .. buffers[index].buf)
     end
 end
 
@@ -111,28 +115,27 @@ map("n", "<leader>k", "<cmd>FuzzyMap<cr>", { desc = "Search keybindings (fuzzy)"
 -------------------------------------------------------------------------------
 -- LSP and autocompletion related                                            --
 -------------------------------------------------------------------------------
-map("n", "<leader>d", vim.diagnostic.open_float, { desc = "Open floating diagnostic message" })
-map("n", "<leader>D", vim.diagnostic.setloclist, { desc = "Open diagnostics list" })
+map("n", "<leader>d", deprecated("Use <c-w>d to show diagnostics"))
+map("n", "<leader>D", deprecated("Use <c-w><c-d> to open diagnostics window"))
+
+local definition_deprecation = deprecated("Use grt to go to definition")
+map("n", "<leader>ld", definition_deprecation)
+map("n", "<leader>lD", definition_deprecation)
+
+map("n", "<leader>la", deprecated("Use gra to use trigger code action"))
+map("n", "<leader>lr", deprecated("Use grn to rename"))
 
 -- remap autocompletion to Ctrl+Enter
 map("i", "<C-CR>", "<C-Y>")
 
-vim.api.nvim_create_autocmd('LspAttach', {
-    callback = function()
-        -- TODO are these already predefined?? just delete those that are already defined
-        map("n", "<leader>ld", vim.lsp.buf.declaration, { desc = "Goto declaration (LSP)" })
-        map("n", "<leader>lD", vim.lsp.buf.definition, { desc = "Goto definition (LSP)" })
-        map("n", "<leader>la", vim.lsp.buf.code_action, { desc = "Code action (LSP)" })
-        map("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format file (LSP)" })
-        map("n", "<leader>lr", vim.lsp.buf.rename, { desc = "Rename symbol (LSP)" })
+map("n", "<c-w><c-d>", vim.diagnostic.setloclist, { desc = "Open diagnostics window" })
+map("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format file (LSP)" })
 
-        map("i", "<c-k>", vim.lsp.buf.hover, { silent = true, desc = "Trigger hover in insert mode (LSP)" })
-        map("i", "<c-space>", vim.lsp.completion.get, { silent = true, desc = "Trigger autocompletion (LSP)" })
+-- this could be triggered with `<c-o>K` but its a pain
+map("i", "<c-k>", vim.lsp.buf.hover, { silent = true, desc = "Trigger hover in insert mode (LSP)" })
+map("i", "<c-space>", vim.lsp.completion.get, { silent = true, desc = "Trigger autocompletion (LSP)" })
 
-        map("n", "<leader>ti", function()
-            -- toggle inlay for current buffer
-            vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(), 0)
-        end, { desc = "Toggle inlay hints (LSP)" })
-    end,
-})
-
+map("n", "<leader>ti", function()
+    -- toggle inlay for current buffer
+    vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(), 0)
+end, { desc = "Toggle inlay hints (LSP)" })

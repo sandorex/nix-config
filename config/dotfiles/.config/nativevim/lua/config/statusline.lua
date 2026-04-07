@@ -41,15 +41,6 @@ local mode_hl = {
     ["nt"] = "%#StatuslineNormalAccent#",
 }
 
-local function lsp()
-    local attached_clients = vim.lsp.get_clients({ bufnr = 0 })
-    if #attached_clients == 0 then
-        return ""
-    else
-        return "[LSP]"
-    end
-end
-
 -- fallback color
 vim.api.nvim_set_hl(0, 'StatusLineAccent', {
     fg = "#82AAFF",
@@ -123,21 +114,67 @@ local function filetype()
         .. "%*"
 end
 
+local function lsp()
+    local attached_clients = vim.lsp.get_clients({ bufnr = 0 })
+    if #attached_clients == 0 then
+        return ""
+    else
+        return "[LSP]"
+    end
+end
+
+local function diagnostics()
+    local counts = vim.diagnostic.count(0)
+
+    -- if no diagnostics show LSP flag if running
+    if vim.tbl_isempty(counts) then
+        return lsp()
+    end
+
+    local severity_map = {
+        { id = vim.diagnostic.severity.ERROR, label = "E", hl = "DiagnosticSignError" },
+        { id = vim.diagnostic.severity.WARN,  label = "W", hl = "DiagnosticSignWarn" },
+        { id = vim.diagnostic.severity.INFO,  label = "I", hl = "DiagnosticSignInfo" },
+        { id = vim.diagnostic.severity.HINT,  label = "H", hl = "DiagnosticSignHint" },
+    }
+
+    local parts = {}
+    for _, item in ipairs(severity_map) do
+        local count = counts[item.id] or 0
+        if count > 0 then
+            table.insert(parts, "%#" .. item.hl .. "#" .. item.label .. count .. "%*")
+        end
+    end
+
+    return "[" .. table.concat(parts, " ") .. "]"
+end
+
+local function progress()
+    -- vim.ui.progress_status is 0.12 only
+    local ok, val = pcall(vim.ui.progress_status)
+    if ok and val ~= "" then
+        return "[" .. val .. "] "
+    end
+
+    return ""
+end
+
 -- TODO there are extra spaces when no flags are present!
-function _G.statusline()
+function _G.my_statusline()
     return table.concat({
         mode(),
         filetype(),
         "%w" ..             -- preview window flag [Preview]
         "%m" ..             -- modified flag [+] / [-]
         "%r" ..             -- readonly flag [RO]
-        lsp() ..            -- LSP flag [LSP]
+        diagnostics() ..    -- show [LSP] or [E2 W3 I1 H3]
         " %<" ..            -- truncate at filename
         filename(),         -- filename but with minimized path
         "%=",               -- split statusline
+        -- progress() ..    -- show progress (WIP)
         "%0l:%0c %P ",      -- show line:col progress%
     }, " ")
 end
 
-vim.o.statusline = "%{%v:lua._G.statusline()%}"
+vim.o.statusline = "%{%v:lua._G.my_statusline()%}"
 

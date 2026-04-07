@@ -74,6 +74,8 @@ function M.chooser(title, keymap, options, format_callback, callback)
 
     vim.api.nvim_buf_set_lines(buf, 0, -1, false, lines)
     vim.api.nvim_set_option_value("modifiable", false, { scope = "local", buf = buf })
+    vim.api.nvim_set_option_value("buftype", "nofile", { scope = "local", buf = buf })
+    vim.api.nvim_set_option_value("bufhidden", "wipe", { scope = "local", buf = buf })
     vim.api.nvim_win_set_buf(win, buf)
 
     -- force redraw so new window is shown
