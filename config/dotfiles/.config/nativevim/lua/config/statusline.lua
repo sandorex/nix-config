@@ -146,16 +146,17 @@ local function progress()
     return ""
 end
 
--- TODO there are extra spaces when no flags are present!
 function _G.my_statusline()
     return table.concat({
         mode(),
         filetype(),
-        "%w" ..             -- preview window flag [Preview]
+        "%(" ..
+        "w" ..              -- preview window flag [Preview]
         "%m" ..             -- modified flag [+] / [-]
         "%r" ..             -- readonly flag [RO]
         diagnostics() ..    -- show [LSP] or [E2 W3 I1 H3]
-        " %<" ..            -- truncate at filename
+        " %)" ..            -- group so if empty no whitespace is left
+        "%<" ..             -- truncate at filename
         filename(),         -- filename but with minimized path
         "%=",               -- split statusline
         -- progress() ..    -- show progress (WIP)
