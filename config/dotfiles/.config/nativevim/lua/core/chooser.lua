@@ -93,7 +93,7 @@ function M.chooser(title, keymap, options, format_callback, callback)
 end
 
 -- @param show_if_one should the menu be shown if there is only one buffer
-local function choose_buffer(show_if_one)
+function M.cmd_choose_buffer()
     local sorted_bufs = utils.get_buffers_by_last_used()
 
     if not sorted_bufs or #sorted_bufs == 0 then
@@ -102,7 +102,7 @@ local function choose_buffer(show_if_one)
     end
 
     -- just switch if there is only one buffer open
-    if #sorted_bufs == 1 and not show_if_one then
+    if #sorted_bufs == 1 then
         vim.schedule(function()
             vim.cmd(":b " .. sorted_bufs[1].buf)
         end)
@@ -132,7 +132,5 @@ local function choose_buffer(show_if_one)
         end
     )
 end
-
-vim.api.nvim_create_user_command("ChooseBuffer", function() choose_buffer(false) end, { desc = "Choose buffer" })
 
 return M

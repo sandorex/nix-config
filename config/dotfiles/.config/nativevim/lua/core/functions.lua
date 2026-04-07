@@ -1,10 +1,5 @@
 -- contains smaller user functions which dont really need their own file
 
-vim.api.nvim_create_user_command("LspLog", function()
-    local log_file = require('vim.lsp.log').get_filename()
-    vim.cmd(":edit " .. log_file)
-end, { desc = "Opens the LSP log file" })
-
 -- same as :make command but async
 local function async_make(args)
     local lines = {""}

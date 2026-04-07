@@ -1,6 +1,6 @@
 -- all keybindings should be here
 
-local core = require("core")
+local core = require("core.utils")
 
 -- make wildchar trigger autocompletion in command mode (<tab> by default)
 vim.o.wildcharm = vim.o.wildchar

@@ -2,12 +2,6 @@ local utils = require("core.utils")
 local const = require("core.constants")
 local M = {}
 
--- default depth to traverse
-M.default_depth = 5
-
--- depth to traverse in case of a timeout
-M.timeout_depth = 2
-
 --- Opens floating fuzzy chooser
 function M.fuzzy_chooser(options)
     local opts = options or {}
@@ -114,7 +108,7 @@ function M.fuzzy_chooser(options)
 end
 
 -- @param show_if_one should the menu be shown if there is only one buffer
-local function fuzzy_buffer(show_if_one)
+function M.cmd_fuzzy_buffer()
     local sorted_bufs = utils.get_buffers_by_last_used()
 
     if not sorted_bufs or #sorted_bufs == 0 then
@@ -123,7 +117,7 @@ local function fuzzy_buffer(show_if_one)
     end
 
     -- just switch if there is only one buffer open
-    if #sorted_bufs == 1 and not show_if_one then
+    if #sorted_bufs == 1 then
         vim.schedule(function()
             vim.cmd(":b " .. sorted_bufs[1].buf)
         end)
@@ -148,8 +142,6 @@ local function fuzzy_buffer(show_if_one)
         end,
     }
 end
-
-vim.api.nvim_create_user_command("FuzzyBuffer", function() fuzzy_buffer(false) end, { desc = "Choose buffer (fuzzy)" })
 
 local function find_files_rg(root, max_depth, timeout)
     local cmd = {
@@ -185,7 +177,15 @@ else
     find_files = require("core.find").find_files
 end
 
-local function fuzzy_file(root)
+function M.cmd_fuzzy_file(args)
+    -- allow specifying the root as argument
+    local root
+    if args.args and args.args ~= "" then
+        root = args.args
+    else
+        root = nil
+    end
+
     local files, timeout = find_files(root)
 
     if timeout == true then
@@ -210,19 +210,7 @@ local function fuzzy_file(root)
     }
 end
 
-vim.api.nvim_create_user_command(
-    "FuzzyFile",
-    function(args)
-        if args.args and args.args ~= "" then
-            fuzzy_file(args.args)
-        else
-            fuzzy_file()
-        end
-    end,
-    { desc = "Choose file (fuzzy)", nargs="?" }
-)
-
-local function fuzzy_map()
+function M.cmd_fuzzy_map()
     local lines = {}
 
     local function add_key(key)
@@ -261,7 +249,5 @@ local function fuzzy_map()
         end,
     }
 end
-
-vim.api.nvim_create_user_command("FuzzyMap", fuzzy_map, { desc = "Search mapped keys (fuzzy)" })
 
 return M

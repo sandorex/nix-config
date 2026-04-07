@@ -24,8 +24,8 @@ if [[ -f "$TIMER_FILE" ]]; then
     echo "Killing old timer.."
     pid="$(cat "$TIMER_FILE")"
 
-    # send TERM signal then KILL
-    kill -TERM "-$pid" &>/dev/null || true
+    # send INT signal then KILL
+    kill -INT "-$pid" &>/dev/null || true
     sleep 2s
     kill -KILL "-$pid" &>/dev/null || true
 fi

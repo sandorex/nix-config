@@ -6,7 +6,7 @@ end
 -- load catppuccin at start
 vim.cmd("colorscheme catppuccin_macchiato")
 
--- load core
+-- load lazy core commands
 require("core")
 
 -- load the config

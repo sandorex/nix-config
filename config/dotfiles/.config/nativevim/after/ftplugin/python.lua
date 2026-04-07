@@ -1,4 +1,4 @@
-local core = require("core")
+local core = require("core.utils")
 
 -- autocomplete pairs
 core.map_autopairs({ '""', "''", "{}", "[]", "()" })

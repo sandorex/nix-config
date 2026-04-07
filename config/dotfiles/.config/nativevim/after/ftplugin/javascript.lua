@@ -1,4 +1,4 @@
-local core = require("core")
+local core = require("core.utils")
 local opt = vim.opt
 
 -- 2 spaces indentation
