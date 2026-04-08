@@ -96,17 +96,11 @@ local function filename()
 end
 
 local function filetype()
-    return "%#Type#"        -- highlight filetype
-        .. vim.bo.filetype
-        .. "%*"
-end
-
-local function lsp()
-    local attached_clients = vim.lsp.get_clients({ bufnr = 0 })
-    if #attached_clients == 0 then
-        return ""
+    if #vim.bo.filetype ~= 0 then
+        -- highlight the filetype
+        return "%#Type#" .. vim.bo.filetype .. "%* "
     else
-        return "[LSP]"
+        return ""
     end
 end
 
@@ -115,7 +109,12 @@ local function diagnostics()
 
     -- if no diagnostics show LSP flag if running
     if vim.tbl_isempty(counts) then
-        return lsp()
+        local attached_clients = vim.lsp.get_clients({ bufnr = 0 })
+        if #attached_clients == 0 then
+            return ""
+        else
+            return "[LSP]"
+        end
     end
 
     local severity_map = {
@@ -136,33 +135,44 @@ local function diagnostics()
     return "[" .. table.concat(parts, " ") .. "]"
 end
 
-local function progress()
-    -- vim.ui.progress_status is 0.12 only
-    local ok, val = pcall(vim.ui.progress_status)
-    if ok and val ~= "" then
-        return "[" .. val .. "] "
-    end
+-- TODO WIP untested
+-- local function progress()
+--     -- vim.ui.progress_status is 0.12 only
+--     local ok, val = pcall(vim.ui.progress_status)
+--     if ok and val ~= "" then
+--         return "[" .. val .. "] "
+--     end
+--
+--     return ""
+-- end
 
-    return ""
+local function flags()
+    -- %w         - preview flag [preview]
+    -- %m         - modified flag [+] / [-]
+    -- %r         - readonly flag [RO]
+    -- diagnotics - lsp diagnostics [E1 W1 I1 H1] or [LSP]
+    local str = vim.api.nvim_eval_statusline("%w%m%r", {}).str .. diagnostics()
+
+    -- show with padding only if it is not empty
+    -- NOTE i could not use %{ .. %} cause it does not work with expanded
+    -- string (diagnostics function)
+    if #str == 0 then
+        return ""
+    else
+        return str .. " "
+    end
 end
 
 function _G.my_statusline()
-    return table.concat({
-        mode(),
-        filetype(),
-        "%(" ..
-        "%w" ..             -- preview window flag [Preview]
-        "%m" ..             -- modified flag [+] / [-]
-        "%r" ..             -- readonly flag [RO]
-        diagnostics() ..    -- show [LSP] or [E2 W3 I1 H3]
-        " %)" ..            -- group so if empty no whitespace is left
-        "%<" ..             -- truncate at filename
-        filename(),         -- filename but with minimized path
-        "%=",               -- split statusline
-        -- progress() ..    -- show progress (WIP)
-        "%0l:%0c %P ",      -- show line:col progress%
-    }, " ")
+    return mode() ..
+           " " ..
+           filetype() ..
+           flags() ..
+           "%<" ..       -- truncate filename as it will be the longest
+           filename() ..
+           "%=" ..       -- split statusline
+           -- progress() ..
+           "%0l:%0c %P " -- line:col progress%
 end
 
 vim.o.statusline = "%{%v:lua._G.my_statusline()%}"
-
