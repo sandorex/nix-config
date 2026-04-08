@@ -151,7 +151,7 @@ function _G.my_statusline()
         mode(),
         filetype(),
         "%(" ..
-        "w" ..              -- preview window flag [Preview]
+        "%w" ..             -- preview window flag [Preview]
         "%m" ..             -- modified flag [+] / [-]
         "%r" ..             -- readonly flag [RO]
         diagnostics() ..    -- show [LSP] or [E2 W3 I1 H3]
