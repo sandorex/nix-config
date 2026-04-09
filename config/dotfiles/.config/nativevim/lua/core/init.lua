@@ -21,6 +21,7 @@ local fuzzy = lazy.fuzzy
 cmd("FuzzyBuffer", fuzzy.cmd_fuzzy_buffer, { desc = "Switch to buffer (fuzzy)" })
 cmd("FuzzyFile", fuzzy.cmd_fuzzy_file, { desc = "Edit file (fuzzy)", nargs="?" })
 cmd("FuzzyMap", fuzzy.cmd_fuzzy_map, { desc = "Search mapped keybindings (fuzzy)" })
+cmd("FuzzySnippet", fuzzy.cmd_fuzzy_snippets, { desc = "Search snippets (fuzzy)" })
 
 local chooser = lazy.chooser
 vim.api.nvim_create_user_command("ChooseBuffer", chooser.cmd_choose_buffer, { desc = "Switch to buffer" })

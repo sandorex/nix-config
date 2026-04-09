@@ -4,7 +4,7 @@ local core = require("core.utils")
 core.map_autopairs({ '""', "{}", "[]", "()" })
 
 core.snippet("testmod", [[
-#[cfg(tests)]
+#[cfg(test)]
 mod tests {
     #[test]
     fn test_unnamed() {}

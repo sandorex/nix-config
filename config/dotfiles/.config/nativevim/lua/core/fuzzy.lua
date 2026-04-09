@@ -107,6 +107,7 @@ function M.fuzzy_chooser(options)
     vim.cmd("startinsert")
 end
 
+-- TODO show modified flag
 -- @param show_if_one should the menu be shown if there is only one buffer
 function M.cmd_fuzzy_buffer()
     local sorted_bufs = utils.get_buffers_by_last_used()
@@ -239,6 +240,12 @@ function M.cmd_fuzzy_map()
         for _, key in ipairs(vim.api.nvim_get_keymap(mode)) do
             add_key(key)
         end
+
+        -- TODO buffer keys should have a special marker
+        -- add buffer keys
+        for _, key in ipairs(vim.api.nvim_buf_get_keymap(0, mode)) do
+            add_key(key)
+        end
     end
 
     M.fuzzy_chooser {
@@ -246,6 +253,34 @@ function M.cmd_fuzzy_map()
         options = lines,
         callback = function(_)
             -- do nothing as there's nothing to do?
+        end,
+    }
+end
+
+function M.cmd_fuzzy_snippets()
+    local lines = {}
+
+    for _, key in ipairs(vim.api.nvim_buf_get_keymap(0, "n")) do
+        -- filter the snippets
+        if vim.startswith(key.lhs, ",") and vim.endswith(key.lhs, ",") then
+            local desc = ""
+            if key.desc then
+                desc = " - " .. key.desc
+            end
+
+            -- remove commas
+            table.insert(lines, key.lhs:sub(2):sub(1, -2) .. desc)
+        end
+    end
+
+    M.fuzzy_chooser {
+        title = "Find snippet (fuzzy)",
+        options = lines,
+        callback = function(index)
+            vim.schedule(function()
+                -- just run the command, its the simplest way
+                vim.cmd("norm ," .. lines[index] .. ",")
+            end)
         end,
     }
 end

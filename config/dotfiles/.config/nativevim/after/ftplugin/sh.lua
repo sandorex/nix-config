@@ -4,6 +4,7 @@ local core = require("core.utils")
 core.map_autopairs({ '""', "''", "()", "[]", "{}", "``" })
 
 -- snippets
+core.snippet("env", "#!/usr/bin/env bash")
 core.snippet("shebang", "#!/usr/bin/env bash")
 core.snippet("cddir", [[cd "$(dirname "${BASH_SOURCE[0]}")" || exit 1]])
 core.snippet("dir", [[DIR=$(realpath "$(dirname "${BASH_SOURCE[0]}")")]])

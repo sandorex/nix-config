@@ -1,12 +1,20 @@
 local M = {}
 
-function M.snippet(name, text)
+--- Creates a keybinding for the snippet
+function M.snippet(name, text, desc)
+    local description = nil
+    if desc and desc ~= "" then
+        -- so its clear its a snippet
+        description = desc .. " (snippet)"
+    end
+
     -- currently the simplest way to create snippets
-    vim.keymap.set("n", "," .. name, function()
-        -- basically insert snippet lines below cursor
-        local row, _ = unpack(vim.api.nvim_win_get_cursor(0))
-        vim.api.nvim_buf_set_lines(0, row, row, true, vim.fn.split(text, "\n"))
-    end, { buffer = true })
+    -- the ending comma is to prevent waiting for timeoutlen when for example
+    -- snippets 'sh' and 'shell' are available
+    vim.keymap.set("n", "," .. name .. ",", function()
+        -- basically paste snippet
+        vim.api.nvim_paste(text, false, -1)
+    end, { buffer = true, desc = description })
 end
 
 --- Automatically maps pairs "{}" -> "{|}" with | being the cursor, works for
