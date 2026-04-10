@@ -1,0 +1,21 @@
+#!/usr/bin/env bash
+#
+# open kitty in 16:9 window without decorations so it can be easily recorded
+# and viewed on smaller screen as well as bigger ones
+
+LOGO="$HOME/.assets/templar_template.png"
+
+# resest shell level
+export SHLVL=''
+
+kitty \
+    --detach \
+    -o font_size=16 \
+    -o hide_window_decorations=yes \
+    -o initial_window_width=1280 \
+    -o initial_window_height=720 \
+    -o "window_logo_path=$LOGO" \
+    -o window_logo_position=center \
+    -o window_logo_scale=30 \
+    -o window_logo_alpha=0.06 \
+    "$@"
