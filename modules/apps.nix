@@ -18,7 +18,7 @@ in
   };
 
   config = lib.mkMerge [
-    (lib.mkIf (base) {
+    (lib.mkIf base {
       # for hdd temps
       boot.kernelModules = [ "drivetemp" ];
 
@@ -45,9 +45,8 @@ in
         helix
         pkgsUnstable.neovim # new 0.12 neovim
 
-        # neovim utils
+        # useful grep replacement
         ripgrep
-        fzy # fuzzy search
 
         # search packages, nicer cli for nixos commands
         nh
@@ -60,7 +59,7 @@ in
         wl-clipboard  # clipboard on wayland
       ]);
 
-      dotfiles.enabled = with config.dotfiles.configs; lib.optionals (dotfiles) [
+      dotfiles.enabled = with config.dotfiles.configs; lib.optionals dotfiles [
         git
         bin
         bash
@@ -69,7 +68,7 @@ in
       ];
     })
 
-    (lib.mkIf (standard) {
+    (lib.mkIf standard {
       environment.systemPackages = with pkgs; [
         nixd # nix lsp
         pkgsUnstable.devenv # devenv 2.0 is not in stable
@@ -80,6 +79,7 @@ in
       # fonts enabled if gui extras are
       fonts.packages = with pkgs; [
         nerd-fonts.fira-code # proper font for terminal
+        nerd-fonts.iosevka-term-slab # another terminal font
         noto-fonts-cjk-sans  # showing japanese and chinese
       ];
 
@@ -101,7 +101,7 @@ in
 
       my.flatpak.install = [];
 
-      dotfiles.enabled = with config.dotfiles.configs; lib.optionals (dotfiles) [
+      dotfiles.enabled = with config.dotfiles.configs; lib.optionals dotfiles [
         kitty
         easyeffects
         # qalculate # TODO do i even have a rule for this?
@@ -114,14 +114,14 @@ in
       # };
     })
 
-    (lib.mkIf (terminal) {
+    (lib.mkIf terminal {
       environment.systemPackages = with pkgs; [
         lsd
         bat
         shellcheck
       ];
 
-      dotfiles.enabled = with config.dotfiles.configs; lib.optionals (dotfiles) [
+      dotfiles.enabled = with config.dotfiles.configs; lib.optionals dotfiles [
         lsd # theme so everything is readable
       ];
     })

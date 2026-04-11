@@ -71,6 +71,10 @@
     proycon-wayout # wayland text widget thingy
   ];
 
+  fonts.packages = with pkgs; [
+    nerd-fonts.bigblue-terminal # funky pixel-y font
+  ];
+
   # # install zerotier but do not autostart it
   # services.zerotierone.enable = true;
   # systemd.services.zerotierone.wantedBy = lib.mkForce [];
