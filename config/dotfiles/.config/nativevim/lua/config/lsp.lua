@@ -16,11 +16,6 @@ vim.api.nvim_create_autocmd("LspAttach", {
             vim.lsp.completion.enable(true, ev.data.client_id, ev.buf, { autotrigger = false })
         end
 
-        -- -- enable inlay hints by default
-        -- if client.server_capabilities.inlayHintProvider then
-        --     vim.lsp.inlay_hint.enable(true, { bufnr = ev.buf })
-        -- end
-
         -- add lsp dirs to path
         local lsp_folders = vim.lsp.buf.list_workspace_folders()
         if lsp_folders ~= nil then
@@ -40,4 +35,3 @@ vim.lsp.enable {
     "basedpyright",
     "nixd",
 }
-

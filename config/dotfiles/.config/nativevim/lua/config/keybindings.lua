@@ -114,17 +114,16 @@ map("n", "<leader>k", "<cmd>FuzzyMap<cr>", { desc = "Search keybindings (fuzzy)"
 -------------------------------------------------------------------------------
 map("n", "<leader>d", deprecated("Use <c-w>d to show diagnostics"))
 map("n", "<leader>D", deprecated("Use <c-w><c-d> to open diagnostics window"))
-
-local definition_deprecation = deprecated("Use grt to go to definition")
-map("n", "<leader>ld", definition_deprecation)
-map("n", "<leader>lD", definition_deprecation)
-
+map("n", "<leader>ld", deprecated("Use grd to go to declaration"))
+map("n", "<leader>lD", deprecated("Use grt to go to definition"))
 map("n", "<leader>la", deprecated("Use gra to use trigger code action"))
 map("n", "<leader>lr", deprecated("Use grn to rename"))
 
 -- remap autocompletion to Ctrl+Enter
 map("i", "<C-CR>", "<C-Y>")
 
+-- NOTE for some reason declaration is not bound by default??
+map("n", "grd", vim.lsp.buf.declaration, { desc = "Go to declaration (LSP)" })
 map("n", "<c-w><c-d>", vim.diagnostic.setloclist, { desc = "Open diagnostics window" })
 map("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format file (LSP)" })
 

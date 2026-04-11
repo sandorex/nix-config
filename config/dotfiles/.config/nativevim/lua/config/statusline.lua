@@ -135,27 +135,23 @@ local function diagnostics()
     return "[" .. table.concat(parts, " ") .. "]"
 end
 
--- TODO WIP untested
--- local function progress()
---     -- vim.ui.progress_status is 0.12 only
---     local ok, val = pcall(vim.ui.progress_status)
---     if ok and val ~= "" then
---         return "[" .. val .. "] "
---     end
---
---     return ""
--- end
+local function progress()
+    -- vim.ui.progress_status is 0.12 only
+    if vim.ui.progress_status then
+        return "%#DiagnosticSignWarn#" .. vim.ui.progress_status() .. "%*"
+    end
+
+    return ""
+end
 
 local function flags()
-    -- %w         - preview flag [preview]
-    -- %m         - modified flag [+] / [-]
-    -- %r         - readonly flag [RO]
-    -- diagnotics - lsp diagnostics [E1 W1 I1 H1] or [LSP]
+    -- %w           - preview flag [preview]
+    -- %m           - modified flag [+] / [-]
+    -- %r           - readonly flag [RO]
+    -- diagnostics  - lsp diagnostics [E1 W1 I1 H1] or [LSP]
     local str = vim.api.nvim_eval_statusline("%w%m%r", {}).str .. diagnostics()
 
     -- show with padding only if it is not empty
-    -- NOTE i could not use %{ .. %} cause it does not work with expanded
-    -- string (diagnostics function)
     if #str == 0 then
         return ""
     else
@@ -170,9 +166,11 @@ function _G.my_statusline()
            flags() ..
            "%<" ..       -- truncate filename as it will be the longest
            filename() ..
-           "%=" ..       -- split statusline
-           -- progress() ..
+           "%= " ..      -- split statusline
+           progress() ..
            "%0l:%0c %P " -- line:col progress%
 end
+
+vim.cmd("autocmd LspProgress * redrawstatus")
 
 vim.o.statusline = "%{%v:lua._G.my_statusline()%}"

@@ -11,6 +11,8 @@ vim.o.cursorline = true     -- enable cursor line
 vim.o.number = true         -- enable line number
 vim.o.relativenumber = true -- and relative line number
 
+vim.o.winborder = "solid"   -- whitespace around all floating windows
+
 vim.o.signcolumn = "yes"    -- always show sign column
 
 vim.o.pumheight = 10        -- max height of completion menu
@@ -26,7 +28,7 @@ vim.opt.listchars = {       -- NOTE: using `vim.opt` instead of `vim.o` to pass 
 vim.opt.diffopt:append("linematch:60") -- second stage diff to align lines
 
 vim.o.confirm = true     -- show dialog for unsaved file(s) before quit
-vim.o.updatetime = 500  -- save swap file after 0.5s
+vim.o.updatetime = 500   -- save swap file after 0.5s
 
 vim.o.ignorecase = true  -- case-insensitive search
 vim.o.smartcase = true   -- , until search pattern contains upper case characters
