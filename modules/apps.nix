@@ -78,9 +78,9 @@ in
     (lib.mkIf (standard && gui) {
       # fonts enabled if gui extras are
       fonts.packages = with pkgs; [
-        nerd-fonts.fira-code # proper font for terminal
-        nerd-fonts.iosevka-term-slab # another terminal font
-        noto-fonts-cjk-sans  # showing japanese and chinese
+        nerd-fonts.fira-code   # proper font for terminal
+        nerd-fonts.ubuntu-mono # another terminal font
+        noto-fonts-cjk-sans    # showing japanese and chinese
       ];
 
       environment.systemPackages = with pkgs; [
