@@ -12,5 +12,6 @@
     ./ddcutil.nix
     ./sshd.nix
     ./zsh.nix
+    ./shpool.nix
   ];
 }

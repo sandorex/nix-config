@@ -1,4 +1,4 @@
-{ config, lib, pkgs, pkgsUnstable, my, ... }:
+{ config, pkgs, pkgsUnstable, my, ... }:
 
 {
   imports = [
@@ -81,6 +81,12 @@
 
   # manual sandboxing
   programs.firejail.enable = true;
+
+  # shell session pool
+  my.shpool = {
+    enable = true;
+    autostart = true;
+  };
 
   # ext. monitor brightness control
   my.ddcutil.enable = true;
