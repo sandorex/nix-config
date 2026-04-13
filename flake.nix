@@ -22,15 +22,26 @@
     flake = self;
     system = "x86_64-linux";
 
-    pkgs = import nixpkgs { inherit system; config.allowUnfree = true; };
-    pkgsUnstable = import nixpkgs-unstable { inherit system; config.allowUnfree = true; };
+    overlays = import ./overlays { inherit repo flake; };
+
+    pkgs = import nixpkgs {
+      inherit system;
+
+      overlays = [ overlays.my ];
+      config.allowUnfree = true;
+    };
+
+    pkgsUnstable = import nixpkgs-unstable {
+      inherit system;
+      config.allowUnfree = true;
+    };
 
     # this is a shortcut so i dont have to use flake.outputs.packages.x86_64-linux.something
     my = {
-      inherit repo;
+      inherit repo overlays;
 
       packages = import ./packages { inherit repo flake pkgs; };
-      overlays = import ./overlays { inherit repo flake; };
+      devShells = import ./shells { inherit repo flake pkgs; };
       secrets = import ./modules/secrets.nix "/nix-secret";
 
       # NOTE these are shortcuts to the base modules
@@ -103,5 +114,7 @@
     overlays = my.overlays;
 
     templates = import ./templates;
+
+    devShells.${system} = my.devShells;
   };
 }

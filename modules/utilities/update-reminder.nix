@@ -6,7 +6,6 @@ let
   # override the script so it has proper localPath
   mynix = (my.packages.mynix.override {
     localPath = config.my.localPath;
-    cfgHostname = my.hostname;
     thresholdDays = config.my.update-reminder.threshold;
   });
 

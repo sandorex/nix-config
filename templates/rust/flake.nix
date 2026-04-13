@@ -22,8 +22,8 @@
       VERGEN_IDEMPOTENT = "1";
       VERGEN_GIT_SHA = if (self ? "rev") then (builtins.substring 0 7 self.rev) else "nix-dirty";
     in
-    rec {
-      packages.${system}.default = pkgs.rustPlatform.buildRustPackage rec {
+    {
+      packages.${system}.default = pkgs.rustPlatform.buildRustPackage {
         pname = cargoConfig.package.name;
         version = cargoConfig.package.version;
 
@@ -39,6 +39,7 @@
         nativeBuildInputs = with pkgs; [
           git
           cargo
+          rustc
           rust-analyzer # lsp
         ];
 
