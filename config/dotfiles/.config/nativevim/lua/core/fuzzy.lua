@@ -110,19 +110,13 @@ function M.fuzzy_chooser(options)
     vim.cmd("startinsert")
 end
 
--- TODO use map with keys being index in original so i dont have to copy it so many times
--- this list can be edited by user
---- The choices available to the chooser
-M.choices = nil
-
--- while this list is hidden as it is used for finding the index
-local choices_orig = nil
+local choices = {}
+local last_query = ""
 
 local win1 = nil
 local buf1 = nil
 local win2 = nil
 local buf2 = nil
-local last_query = ""
 
 function M.close()
     if win1 ~= nil and vim.api.nvim_win_is_valid(win1) then
@@ -137,8 +131,7 @@ function M.close()
     vim.cmd("stopinsert")
 
     -- remove any leftover data
-    M.choices = nil
-    choices_orig = nil
+    choices = {}
 end
 
 local function create_windows(title, prompt)
@@ -206,7 +199,7 @@ function M.refresh(lazy)
     -- use whole input buffer just in case something with newlines is pasted in
     local query = table.concat(vim.api.nvim_buf_get_lines(buf2, 0, -1, false))
 
-    -- do not compute if the query is the same
+    -- do not compute if the query is the same and is lazy
     if query == last_query and lazy == true then
         return
     end
@@ -214,16 +207,22 @@ function M.refresh(lazy)
     -- update last query
     last_query = query
 
-    -- do the fuzzy searching if possible
-    local formatted = {}
+    -- do the fuzzy
+    local sorted = {}
     if query ~= nil and query ~= "" then
-        formatted = vim.fn.matchfuzzy(M.choices, query)
+        sorted = vim.fn.matchfuzzy(choices, query, { key = "value" })
     else
-        formatted = M.choices
+        sorted = choices
+    end
+
+    -- convert the hashmap to text for the buffer
+    local text = {}
+    for _, i in ipairs(sorted) do
+        table.insert(text, i.display or i.value)
     end
 
     -- write text to the buffer
-    vim.api.nvim_buf_set_lines(buf1, 0, -1, false, formatted)
+    vim.api.nvim_buf_set_lines(buf1, 0, -1, false, text)
 
     -- reset selection as they things might have changed
     vim.api.nvim_win_set_cursor(win1, { 1, 0 })
@@ -234,20 +233,40 @@ function M.get_selected_index()
     local cursor_y = vim.api.nvim_win_get_cursor(win1)[1]
     local line = vim.api.nvim_buf_get_lines(buf1, cursor_y - 1, cursor_y, false)[1]
 
-    -- find the index in original list
-    return utils.tbl_find(line, choices_orig)
+    -- find the choice using line in buffer
+    for _, i in ipairs(choices) do
+        if (i.display and i.display == line) or i.value == line then
+            return i.index
+        end
+    end
+
+    return nil
 end
 
 --- Get index of selected item after mouse press
 function M.get_mouse_selected_index()
     local mousepos = vim.fn.getmousepos()
-    if mousepos.winid == win1 and mousepos.line > 0 then
+    if mousepos.winid == win1 and mousepos.line >= 1 then
         local line = vim.api.nvim_buf_get_lines(buf1, mousepos.line - 1, mousepos.line, false)[1]
 
-        -- find the index in original list
-        return utils.tbl_find(line, choices_orig)
-    else
-        return nil
+        -- find the choice using line in buffer
+        for _, i in ipairs(choices) do
+            if (i.display and i.display == line) or i.value == line then
+                return i.index
+            end
+        end
+    end
+
+    return nil
+end
+
+--- Remove entry from choices (remember to refresh afterwards!)
+function M.remove_entry(index)
+    for i, c in ipairs(choices) do
+        if c.index == index then
+            table.remove(choices, i)
+            break
+        end
     end
 end
 
@@ -277,16 +296,17 @@ function M.fuzzy_chooser2(options)
     create_windows(title, prompt)
 
     -- if map function is provided then map all options
-    M.choices = {}
+    choices = {}
     if map then
         for i, option in ipairs(orig_options) do
-            M.choices[i] = map(option)
+            local value, display = map(option)
+            table.insert(choices, { index = i, value = value, display = display })
         end
     else
-        M.choices = orig_options
+        for i, option in ipairs(orig_options) do
+            table.insert(choices, { index = i, value = option, display = nil })
+        end
     end
-
-    choices_orig = vim.deepcopy(M.choices)
 
     -- draw initial screen
     M.refresh()
@@ -345,8 +365,6 @@ function M.fuzzy_chooser2(options)
     vim.cmd("startinsert")
 end
 
--- TODO show modified flag
--- @param show_if_one should the menu be shown if there is only one buffer
 function M.cmd_fuzzy_buffer()
     local sorted_bufs = utils.get_buffers_by_last_used()
 
@@ -355,30 +373,55 @@ function M.cmd_fuzzy_buffer()
         return
     end
 
-    -- just switch if there is only one buffer open
-    if #sorted_bufs == 1 then
+    local function switch(index)
+        if index == nil then
+            return
+        end
+
         vim.schedule(function()
-            vim.cmd(":b " .. sorted_bufs[1].buf)
+            vim.cmd("buffer " .. sorted_bufs[index].buf)
         end)
 
-        return
+        M.close()
     end
 
-    M.fuzzy_chooser {
+    local function delete(index)
+        if index == nil then
+            return
+        end
+
+        vim.schedule(function()
+            vim.cmd("bdelete " .. sorted_bufs[index].buf)
+        end)
+
+        -- remove specified item
+        M.remove_entry(index)
+
+        -- refresh list
+        M.refresh()
+    end
+
+    M.fuzzy_chooser2 {
         title = "Select buffer (fuzzy)",
+        update = "instant", -- there will never be too many buffers
         options = sorted_bufs,
         map = function(buf)
+            local name
             if vim.startswith(buf.name, "/") then
-                return vim.fn.fnamemodify(buf.name, ':~:.')
+                name = vim.fn.fnamemodify(buf.name, ':~:.')
             else
-                return buf.name
+                name = buf.name
             end
+
+            -- show if buffer is modified and unsaved
+            return name, name .. (buf.changed == 1 and " [+]" or "")
         end,
-        callback = function(index)
-            vim.schedule(function()
-                vim.cmd("buffer " .. sorted_bufs[index].buf)
-            end)
-        end,
+        keymap = {
+            { lhs = "<CR>", rhs = function() switch(M.get_selected_index()) end },
+            { lhs = "<M-d>", rhs = function() delete(M.get_selected_index()) end },
+            { lhs = "<LeftMouse>", rhs = function() switch(M.get_mouse_selected_index()) end },
+            { lhs = "<MiddleMouse>", rhs = function() delete(M.get_mouse_selected_index()) end },
+        },
     }
 end
 

@@ -39,7 +39,8 @@ function M.get_buffers_by_last_used()
             table.insert(result, {
                 buf = buf,
                 name = info.name,
-                lastused = info.lastused
+                lastused = info.lastused,
+                changed = info.changed,
             })
         end
     end
