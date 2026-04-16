@@ -110,10 +110,13 @@ function M.fuzzy_chooser(options)
     vim.cmd("startinsert")
 end
 
+-- TODO move win and buf to the module as there will always only be one, this
+-- will make the function much more readable
 function M.fuzzy_chooser2(options)
     local opts = options or {}
 
     vim.validate("opts.options", opts.options, "table")
+    vim.validate("opts.update", opts.update, "string", true)
     vim.validate("opts.title", opts.title, "string", true)
     vim.validate("opts.prompt", opts.title, "string", true)
     vim.validate("opts.keymap", opts.keymap, "table", true)
@@ -122,12 +125,20 @@ function M.fuzzy_chooser2(options)
         vim.validate("opts.keymap[" .. i .. "].lhs", v.lhs, "string")
         vim.validate("opts.keymap[" .. i .. "].callback", v.callback, "function")
     end
+    vim.validate("opts.mousemap", opts.mousemap, "table", true)
+    for i, v in ipairs(opts.mousemap or {}) do
+        vim.validate("opts.mousemap[" .. i .. "]", v, "table")
+        vim.validate("opts.mousemap[" .. i .. "].lhs", v.lhs, "string")
+        vim.validate("opts.mousemap[" .. i .. "].callback", v.callback, "function")
+    end
     vim.validate("opts.map", opts.map, "function", true)
 
     local orig_options = opts.options
+    local update = opts.update or "slow"
     local title = opts.title or "Fuzzy chooser"
-    local prompt = opts.title or "> "
+    local prompt = opts.prompt or "> "
     local keymap = opts.keymap or {}
+    local mousemap = opts.mousemap or {}
     local map = opts.map
 
     local last_query = ""
@@ -160,7 +171,8 @@ function M.fuzzy_chooser2(options)
         row = row - 2, -- allow space for window 2
         col = 0,
         anchor = "SW",
-        focusable = false,
+        focusable = false, -- do not allow focusing
+        mouse = true, -- allow mouse selection
         style = 'minimal',
         title = ' ' .. title .. ' ',
         title_pos = 'center',
@@ -236,6 +248,8 @@ function M.fuzzy_chooser2(options)
         vim.api.nvim_win_set_cursor(win1, { 1, 0 })
     end
 
+    -- TODO these need to be module functions so they can be called in callbacks
+    -- like require("fuzzy").mouse_choice() or .remove_index() to remove specific item from list
     local function current_choice()
         local cursor_y = vim.api.nvim_win_get_cursor(win1)[1]
         local line = vim.api.nvim_buf_get_lines(buf1, cursor_y - 1, cursor_y, false)[1]
@@ -244,14 +258,50 @@ function M.fuzzy_chooser2(options)
         return utils.tbl_find(line, choices)
     end
 
-    -- disable enter and shift-enter by default
-    vim.keymap.set({"n", "i"}, "<CR>", "<NOP>", { buffer = buf2 })
-    vim.keymap.set({"n", "i"}, "<S-CR>", "<NOP>", { buffer = buf2 })
+    local function mouse_choice()
+        local mousepos = vim.fn.getmousepos()
+        if mousepos.winid == win1 and mousepos.line > 0 then
+            local line = vim.api.nvim_buf_get_lines(buf1, mousepos.line - 1, mousepos.line, false)[1]
+
+            -- find the index in original list
+            return utils.tbl_find(line, choices)
+        else
+            return nil
+        end
+    end
+
+    -- keys to make a <NOP> cause defaults cause issues
+    local nop_keys = {
+        "<CR>", "<S-CR>",
+
+        -- left mouse changes mode
+        "<LeftMouse>", "<2-LeftMouse>", "<3-LeftMouse>", "<4-LeftMouse>",
+
+        -- middle pastes
+        "<MiddleMouse>",
+
+        -- right click can also change mode
+        "<RightMouse>", "<2-RightMouse>", "<3-RightMouse>", "<4-RightMouse>"
+    }
+    for _, lhs in ipairs(nop_keys) do
+        vim.keymap.set({"n", "i"}, lhs, "<NOP>", { buffer = buf2 })
+    end
 
     -- define custom keybindings
     for _, v in ipairs(keymap) do
         vim.keymap.set("i", v.lhs, function()
             if v.callback(current_choice()) == nil then
+                reorder(true)
+            else
+                close()
+            end
+        end, { buffer = buf2 })
+    end
+
+    -- define custom keybindings for the mouse keys
+    for _, v in ipairs(mousemap) do
+        vim.keymap.set("i", v.lhs, function()
+            if v.callback(mouse_choice()) == nil then
                 reorder(true)
             else
                 close()
@@ -267,11 +317,27 @@ function M.fuzzy_chooser2(options)
     vim.keymap.set("i", "<Up>", function() move_cursor(-1) end, { buffer = buf2 })
     vim.keymap.set("i", "<Down>", function() move_cursor(1) end, { buffer = buf2 })
 
-    -- update automatically on cursor hold
-    vim.api.nvim_create_autocmd("CursorHoldI", {
-        buffer = buf2,
-        callback = reorder,
-    })
+    -- TODO enable this automatically on smaller lists
+    -- TODO fast should use uv.timer_* to reset timer on each character so its
+    -- always updated X ms after the last character
+    if update == "instant" or update == "fast" then
+        -- update on each character
+        vim.api.nvim_create_autocmd("TextChangedI", {
+            buffer = buf2,
+            callback = reorder,
+        })
+    elseif update == "slow" then
+        -- TODO potentionally use uv.timer_start so the delay doesnt have to be
+        -- tied to timeoutlen and could be just like 50-100ms
+        -- update when cursor is idle for timeoutlen (quite long usually)
+        vim.api.nvim_create_autocmd("CursorHoldI", {
+            buffer = buf2,
+            callback = reorder,
+        })
+    else
+        -- TODO this should be checked before opening windows..
+        error("options.timer = '" .. update .."' is not a valid option")
+    end
 
     -- draw initial options
     reorder(true)
@@ -281,8 +347,6 @@ function M.fuzzy_chooser2(options)
 
     -- start insert mode
     vim.cmd("startinsert")
-
-    -- TODO make mouse presses on first window select
 end
 
 -- TODO show modified flag
