@@ -2,6 +2,8 @@ local utils = require("core.utils")
 local const = require("core.constants")
 local M = {}
 
+local ns = vim.api.nvim_create_namespace("fuzzy")
+
 --- Opens floating fuzzy chooser
 function M.fuzzy_chooser(options)
     local opts = options or {}
@@ -102,9 +104,185 @@ function M.fuzzy_chooser(options)
     })
 
     render(nil)
+    -- vim.hl.range(buf, ns, "String", {0,0}, {4,0}, { priority = 400 })
 
     -- start insert mode on launch
     vim.cmd("startinsert")
+end
+
+function M.fuzzy_chooser2(options)
+    local opts = options or {}
+
+    vim.validate("opts.options", opts.options, "table")
+    vim.validate("opts.title", opts.title, "string", true)
+    vim.validate("opts.prompt", opts.title, "string", true)
+    vim.validate("opts.keymap", opts.keymap, "table", true)
+    for i, v in ipairs(opts.keymap or {}) do
+        vim.validate("opts.keymap[" .. i .. "]", v, "table")
+        vim.validate("opts.keymap[" .. i .. "].lhs", v.lhs, "string")
+        vim.validate("opts.keymap[" .. i .. "].callback", v.callback, "function")
+    end
+    vim.validate("opts.map", opts.map, "function", true)
+
+    local orig_options = opts.options
+    local title = opts.title or "Fuzzy chooser"
+    local prompt = opts.title or "> "
+    local keymap = opts.keymap or {}
+    local map = opts.map
+
+    local last_query = ""
+
+    -- if map function is provided then map all options
+    local choices = {}
+    if map then
+        for i, option in ipairs(orig_options) do
+            choices[i] = map(option)
+        end
+    else
+        choices = orig_options
+    end
+
+    local ui = vim.api.nvim_list_uis()[1]
+
+    local buf1 = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(buf1, "bufhidden", "wipe")
+
+    local buf2 = vim.api.nvim_create_buf(false, true)
+    vim.api.nvim_buf_set_option(buf2, "bufhidden", "wipe")
+
+    local height = math.min(vim.o.pumheight, ui.height)
+
+    local row = ui.height - vim.o.cmdheight - 1
+    local win1 = vim.api.nvim_open_win(buf1, false, {
+        relative = 'editor',
+        width = ui.width,
+        height = height,
+        row = row - 2, -- allow space for window 2
+        col = 0,
+        anchor = "SW",
+        focusable = false,
+        style = 'minimal',
+        title = ' ' .. title .. ' ',
+        title_pos = 'center',
+        zindex = 100,
+    })
+
+    -- highlight selected line
+    vim.wo[win1].cursorline = true
+
+    local win2 = vim.api.nvim_open_win(buf2, true, {
+        relative = 'editor',
+        width = ui.width,
+        height = 1,
+        row = row,
+        col = 0,
+        anchor = "SW",
+        style = 'minimal',
+        zindex = 105, -- show on top of the other window
+    })
+
+    -- show prompt before the first line
+    vim.api.nvim_buf_set_extmark(buf2, ns, 0, 0, {
+        virt_text = { { prompt, "" } },
+        virt_text_pos = "inline",
+        right_gravity = false,
+    })
+
+    local function move_cursor(amount)
+        local line_count = vim.api.nvim_buf_line_count(buf1)
+        local y = vim.api.nvim_win_get_cursor(win1)[1] + amount
+
+        -- guard against going outside buffer bounds
+        vim.api.nvim_win_set_cursor(win1, { math.max(1, math.min(y, line_count)), 0 })
+    end
+
+    local function close()
+        if vim.api.nvim_win_is_valid(win1) then
+            vim.api.nvim_win_close(win1, true)
+        end
+
+        if vim.api.nvim_win_is_valid(win2) then
+            vim.api.nvim_win_close(win2, true)
+        end
+
+        -- exit insert mode when leaving the chooser
+        vim.cmd("stopinsert")
+    end
+
+    local function reorder(force)
+        -- use whole input buffer just in case something with newlines is pasted in
+        local query = table.concat(vim.api.nvim_buf_get_lines(buf2, 0, -1, false))
+
+        -- do not compute if the query is the same, allow forcing reordering
+        if query == last_query and force ~= true then
+            return
+        end
+
+        -- update last query
+        last_query = query
+
+        -- do the fuzzy searching if possible
+        local formatted = {}
+        if query ~= nil and query ~= "" then
+            formatted = vim.fn.matchfuzzy(choices, query)
+        else
+            formatted = choices
+        end
+
+        -- write text to the buffer
+        vim.api.nvim_buf_set_lines(buf1, 0, -1, false, formatted)
+
+        -- reset selection as they things might have changed
+        vim.api.nvim_win_set_cursor(win1, { 1, 0 })
+    end
+
+    local function current_choice()
+        local cursor_y = vim.api.nvim_win_get_cursor(win1)[1]
+        local line = vim.api.nvim_buf_get_lines(buf1, cursor_y - 1, cursor_y, false)[1]
+
+        -- find the index in original list
+        return utils.tbl_find(line, choices)
+    end
+
+    -- disable enter and shift-enter by default
+    vim.keymap.set({"n", "i"}, "<CR>", "<NOP>", { buffer = buf2 })
+    vim.keymap.set({"n", "i"}, "<S-CR>", "<NOP>", { buffer = buf2 })
+
+    -- define custom keybindings
+    for _, v in ipairs(keymap) do
+        vim.keymap.set("i", v.lhs, function()
+            if v.callback(current_choice()) == nil then
+                reorder(true)
+            else
+                close()
+            end
+        end, { buffer = buf2 })
+    end
+
+    -- these key shouldnt be overrideable
+    -- close on escape
+    vim.keymap.set({"n", "i"}, "<Esc>", close, { buffer = buf2 })
+
+    -- up/down keys move the upper buffer
+    vim.keymap.set("i", "<Up>", function() move_cursor(-1) end, { buffer = buf2 })
+    vim.keymap.set("i", "<Down>", function() move_cursor(1) end, { buffer = buf2 })
+
+    -- update automatically on cursor hold
+    vim.api.nvim_create_autocmd("CursorHoldI", {
+        buffer = buf2,
+        callback = reorder,
+    })
+
+    -- draw initial options
+    reorder(true)
+
+    -- redraw to show the windows
+    vim.cmd("redraw")
+
+    -- start insert mode
+    vim.cmd("startinsert")
+
+    -- TODO make mouse presses on first window select
 end
 
 -- TODO show modified flag
