@@ -59,8 +59,6 @@ map("n", "<M-b>", "<cmd>bdelete<cr>", { desc = "Delete current buffer" })
 map("n", "]t", "<cmd>tabnext<cr>", { desc = "Goto next tab" })
 map("n", "[t", "<cmd>tabprevious<cr>", { desc = "Goto previous tab" })
 
-map("n", "<leader>tw", "<cmd>set wrap!<cr>", { desc = "Toggle word wrap" })
-
 -- make <Up>/<Down> respect word wrap but not when count is used
 map("i", "<Up>", "v:count == 0 ? '<C-o>gk' : '<C-o>k'", { expr = true, silent = true })
 map("i", "<Down>", "v:count == 0 ? '<C-o>gj' : '<C-o>j'", { expr = true, silent = true })
@@ -73,14 +71,24 @@ map('n', '<M-Down>', '<cmd>m .+1<cr>==', { desc = 'Move line down', silent = tru
 map('v', '<M-Up>', ":m '<-2<cr>gv=gv", { desc = 'Move lines up', silent = true })
 map('v', '<M-Down>', ":m '>+1<cr>gv=gv", { desc = 'move lines down', silent = true })
 
--- surround selection
-map("v", '<M-s>"', 'c"<c-r>""', { desc = "Surround with quotes" })
-map("v", "<M-s>'", "c'<c-r>\"'", { desc = "Surround with s. quotes" })
-map("v", "<M-s>(", 'c(<c-r>")', { desc = "Surround with paren" })
-map("v", "<M-s>[", 'c[<c-r>"]', { desc = "Surround with sq. brackets" })
-map("v", "<M-s>{", 'c{<c-r>"}', { desc = "Surround with curly brackets" })
-map("v", "<M-s><", 'c<<c-r>">', { desc = "Surround with angle brackets" })
-map("v", "<M-s>`", 'c`<c-r>"`', { desc = "Surround with backticks" })
+-- TODO does not work with block selection
+local pairs = {
+    ["<"] = ">",
+    ["("] = ")",
+    ["["] = "]",
+    ["{"] = "}",
+}
+map("v", '<M-s>', function()
+    local count = vim.v.count1
+    local ch = vim.fn.nr2char(vim.fn.getchar(-1))
+    local ch2 = pairs[ch] or ch
+
+    -- replace selection
+    vim.cmd("normal! c")
+
+    -- paste while repeating character pressed
+    vim.api.nvim_paste(string.rep(ch, count) .. vim.fn.getreg('"') .. string.rep(ch2, count), false, -1)
+end, { desc = "Surround selection" })
 
 -- terminal
 map("t", "<c-\\><c-\\>", "<c-\\><c-n>", { desc = "Exit terminal insert mode" })
@@ -131,9 +139,13 @@ map("n", "<c-w><c-d>", vim.diagnostic.setloclist, { desc = "Open diagnostics win
 map("n", "<leader>lf", vim.lsp.buf.format, { desc = "Format file (LSP)" })
 
 -- this could be triggered with `<c-o>K` but its a pain
-map("i", "<c-k>", vim.lsp.buf.hover, { silent = true, desc = "Trigger hover in insert mode (LSP)" })
-map("i", "<c-space>", vim.lsp.completion.get, { silent = true, desc = "Trigger autocompletion (LSP)" })
+map("i", "<c-k>", vim.lsp.buf.hover, { desc = "Trigger hover in insert mode (LSP)" })
+map("i", "<c-space>", vim.lsp.completion.get, { desc = "Trigger autocompletion (LSP)" })
 
+-------------------------------------------------------------------------------
+-- Toggles                                                                   --
+-------------------------------------------------------------------------------
+map("n", "<leader>tw", "<cmd>set wrap!<cr>", { desc = "Toggle word wrap" })
 map("n", "<leader>ti", function()
     -- toggle inlay for current buffer
     vim.lsp.inlay_hint.enable(not vim.lsp.inlay_hint.is_enabled(), 0)
