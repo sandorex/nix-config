@@ -15,7 +15,7 @@ vim.o.winborder = "solid"   -- whitespace around all floating windows
 
 vim.o.signcolumn = "yes"    -- always show sign column
 
-vim.o.pumheight = 10        -- max height of completion menu
+vim.o.pumheight = 14        -- max height of completion menu
 
 vim.o.list = true           -- use special characters to represent things like tabs or trailing spaces
 vim.opt.listchars = {       -- NOTE: using `vim.opt` instead of `vim.o` to pass rich object

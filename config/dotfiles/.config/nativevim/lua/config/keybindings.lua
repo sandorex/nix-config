@@ -1,6 +1,7 @@
 -- all keybindings should be here
 
-local core = require("core.utils")
+local utils = require("core.utils")
+local const = require("core.constants")
 
 if vim.fn.has("nvim-0.12") == 1 then
     vim.cmd("packadd! nvim.undotree")
@@ -29,13 +30,16 @@ map('n', '<C-Up>', '<C-w><C-k>', { desc = 'Move focus to the upper window' })
 -------------------------------------------------------------------------------
 -- Quality of life additions                                                 --
 -------------------------------------------------------------------------------
-map("n", "<leader>f", "<cmd>e .<cr>", { desc = "Open netrw in CWD" })
-map("n", "<leader>F", "<cmd>e %:p:h<cr>", { desc = "Open netrw current buffer directory" })
+map("n", "<leader>f", "<cmd>e %:p:h<cr>", { desc = "Open netrw current buffer directory" })
+map("n", "<leader>F", "<cmd>e .<cr>", { desc = "Open netrw in CWD" })
 map("n", "<leader>w", "<cmd>w<cr>", { desc = "Write" })
 map("n", "<leader>q", deprecated("Use <c-w>c to close window or ZZ to close/quit"))
 
 map("n", "<leader>u", function() require("undotree").open() end, { desc = "Open undotree plugin" })
 map("n", "<s-u>", "<cmd>redo<cr>", { desc = "Redo" })
+
+-- with single snippet key show fuzzy picker
+map("n", const.snippet_key, "<cmd>FuzzySnippet<cr>", { desc = "Select snippet (fuzzy)" })
 
 -- easy system clipboard copy / paste by prefixing with <leader>
 map({"n", "v"}, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
@@ -45,10 +49,9 @@ map({"n", "v"}, "<leader>p", '"+p', { desc = "Paste from system clipboard" })
 map({"n", "v"}, "<leader>P", '"+P', { desc = "Paste from system clipboard" })
 
 -- buffer stuff
-map("n", "<leader>b", "<cmd>ChooseBuffer<cr>", { desc = "Choose buffer" })
-map("n", "<C-b>", "<cmd>ChooseBuffer<cr>", { desc = "Choose buffer" })
+map("n", "<leader>b", "<cmd>FuzzyBuffer<cr>", { desc = "Choose buffer" })
+map("n", "<C-b>", "<cmd>FuzzyBuffer<cr>", { desc = "Choose buffer" })
 -- map("n", "<leader>b", ":ls<cr>:b<space>", { desc = "Macro to list buffers" })
-map("n", "<M-s>", "<cmd>FuzzyBuffer<cr>", { desc = "Switch buffer (fuzzy)" })
 map("n", "<M-b>", "<cmd>bdelete<cr>", { desc = "Delete current buffer" })
 
 -- tab stuff
@@ -85,7 +88,7 @@ map("t", "<c-\\><c-\\>", "<c-\\><c-n>", { desc = "Exit terminal insert mode" })
 -- creates a function that just goes to the buffer indexed by last usage
 local function goto_buff(index)
     return function()
-        local buffers = core.get_buffers_by_last_used()
+        local buffers = utils.get_buffers_by_last_used()
         if #buffers <= 0 or #buffers < index then
             vim.notify("Buffer index " .. index .. " out of range", vim.log.levels.WARN)
         else
@@ -103,11 +106,11 @@ map("n", "<M-5>", goto_buff(5), { desc = "Goto fifth last used buffer" })
 -------------------------------------------------------------------------------
 -- Fuzzy related                                                             --
 -------------------------------------------------------------------------------
-map("n", "<M-f>", "<cmd>FuzzyFile<cr>", { desc = "File selection (fuzzy)" })
-map("n", '<M-F>', function()
-    return "<cmd>:FuzzyFile " .. vim.fn.expand("%:p:h") .. "<cr>"
+map("n", '<M-f>', function()
+    return "<cmd>FuzzyFile " .. vim.fn.expand("%:p:h") .. "<cr>"
 end, { expr = true, desc = "File selection in current file dir (fuzzy)" })
-map("n", "<leader>k", "<cmd>FuzzyMap<cr>", { desc = "Search keybindings (fuzzy)" })
+map("n", "<M-F>", "<cmd>FuzzyFile<cr>", { desc = "File selection (fuzzy)" })
+map("n", "<leader>k", "<cmd>FuzzyKey<cr>", { desc = "Search keybindings (fuzzy)" })
 
 -------------------------------------------------------------------------------
 -- LSP and autocompletion related                                            --

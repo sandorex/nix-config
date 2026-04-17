@@ -79,7 +79,7 @@ function M.chooser(title, keymap, options, format_callback, callback)
     vim.api.nvim_win_set_buf(win, buf)
 
     -- force redraw so new window is shown
-    vim.cmd("redraw")
+    vim.cmd("redraw!")
 
     -- NOTE i do not need special keys here so im not using nr2char
     local ch = vim.fn.getcharstr(-1)

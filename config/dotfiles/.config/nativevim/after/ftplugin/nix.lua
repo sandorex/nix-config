@@ -8,3 +8,22 @@ opt.expandtab = true
 -- autocomplete pairs
 core.map_autopairs({ '""', "{}", "[]", "()" })
 
+-- snippets
+core.snippet("flake", [[
+{
+  inputs = {
+    nixpkgs.url = "github:nixos/nixpkgs/nixos-unstable";
+  };
+
+  outputs = { self, nixpkgs }:
+    let
+      inherit self;
+      system = "x86_64-linux";
+
+      pkgs = import nixpkgs { inherit system; };
+    in
+    {
+    };
+}
+]])
+

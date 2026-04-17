@@ -25,6 +25,7 @@ function M.map_autopairs(pairs)
     end
 end
 
+-- TODO would using getbufinfo alone be more efficient?
 function M.get_buffers_by_last_used()
     local bufs = vim.api.nvim_list_bufs()
     local result = {}
