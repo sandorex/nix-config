@@ -1,5 +1,8 @@
 local core = require("core.utils")
 
+-- use shellcheck as makeprg (gcc format as errorformat already exists)
+vim.bo.makeprg = "shellcheck -f gcc %"
+
 -- autocomplete pairs
 core.map_autopairs({ '""', "''", "()", "[]", "{}", "``" })
 
