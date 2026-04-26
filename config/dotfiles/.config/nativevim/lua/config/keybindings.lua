@@ -79,6 +79,11 @@ local pairs = {
     ["{"] = "}",
 }
 map("v", '<M-s>', function()
+    if vim.fn.mode() == "" then
+        vim.notify("Surround does not yet support visual block mode", vim.log.levels.ERROR)
+        return
+    end
+
     local count = vim.v.count1
     local ch = vim.fn.nr2char(vim.fn.getchar(-1))
     local ch2 = pairs[ch] or ch

@@ -1,5 +1,8 @@
 local TIMEOUTLEN = vim.g.fuzzy_timeoutlen or 250
 
+-- threshold when to use instant update when fuzzy finding
+local INSTANT_ELEM_THRESHOLD = 5000
+
 local ns = vim.api.nvim_create_namespace("core_fuzzy")
 local choices = {}
 local last_query = ""
@@ -254,7 +257,8 @@ function M.open(options)
         vim.keymap.set("i", v.lhs, v.rhs, { buffer = buf2, desc = v.desc or nil })
     end
 
-    if update == "instant" then
+    -- use instant if there are few options
+    if update == "instant" or (update == "fast" and #orig_options < INSTANT_ELEM_THRESHOLD) then
         -- update on each character
         vim.api.nvim_create_autocmd("TextChangedI", {
             buffer = buf2,
@@ -275,6 +279,7 @@ function M.open(options)
     else
         -- TODO this should be checked before opening windows..
         error("options.timer = '" .. update .."' is not a valid option")
+        M.close()
     end
 
     -- redraw to show the windows
