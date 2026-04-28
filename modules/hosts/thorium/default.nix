@@ -1,8 +1,8 @@
-{ config, pkgs, pkgsUnstable, my, ... }:
+{ flake, config, pkgs, pkgsUnstable, ... }:
 
 {
   imports = [
-    my.nixosModules.workstation
+    flake.nixosModules.workstation
 
     ./networking.nix
     ./hardware-configuration.nix
@@ -55,8 +55,9 @@
     cura-appimage
     qbittorrent
     arduino-ide
-    my.packages.irscrutinizer
-    my.packages.alass
+
+    my.irscrutinizer
+    my.alass
 
     ffmpeg
     yt-dlp  # youtube downloader

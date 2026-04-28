@@ -1,4 +1,4 @@
-{ config, lib, pkgs, pkgsUnstable, my, ... }:
+{ config, lib, pkgs, pkgsUnstable, ... }:
 
 let
   gui = config.my.gui;
@@ -51,7 +51,7 @@ in
         # search packages, nicer cli for nixos commands
         nh
 
-        my.packages.nix-index # find nix files from index
+        my.nix-index # find nix files from index
       ]
       # it may pull in weird dependencies when i dont have a gui
       ++ (lib.optionals gui [

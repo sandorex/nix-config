@@ -1,4 +1,4 @@
-{ config, pkgs, lib, my, ... }:
+{ config, pkgs, lib, ... }:
 
 let
   cursorName = "Breeze_Light";
@@ -35,7 +35,7 @@ in
     # add pywayfire globally for scripts
     users.users.${config.my.user}.packages = lib.mkIf config.my.wayfire.python.enable [
       (pkgs.python3.withPackages (_: [
-        my.packages.pywayfire
+        pkgs.my.packages.pywayfire
       ]))
     ];
 

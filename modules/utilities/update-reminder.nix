@@ -1,10 +1,10 @@
-{ config, pkgs, lib, my, ... }:
+{ config, pkgs, lib, ... }:
 
 # enables the helper script and update notifications
 let
   # TODO this should be moved somewhere else but how do i access it??
   # override the script so it has proper localPath
-  mynix = (my.packages.mynix.override {
+  mynix = (pkgs.my.mynix.override {
     localPath = config.my.localPath;
     thresholdDays = config.my.update-reminder.threshold;
   });

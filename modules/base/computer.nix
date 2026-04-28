@@ -1,4 +1,4 @@
-{ config, my, ... }:
+{ config, hostname, ... }:
 
 # common on all configuration except installers
 
@@ -8,7 +8,7 @@
     ../default.nix
   ];
 
-  networking.hostName = my.hostname;
+  networking.hostName = hostname;
   networking.networkmanager.enable = true;
 
   time.timeZone = "Europe/Belgrade";

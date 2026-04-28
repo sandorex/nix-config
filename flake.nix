@@ -22,52 +22,41 @@
     flake = self;
     system = "x86_64-linux";
 
-    overlays = import ./overlays { inherit repo flake; };
+    secrets = import ./modules/secrets.nix "/nix-secret";
 
     pkgs = import nixpkgs {
       inherit system;
 
-      overlays = [ overlays.my ];
-      config.allowUnfree = true;
+      config = {
+        allowUnfree = true;
+        android_sdk.accept_license = true;
+      };
     };
 
     pkgsUnstable = import nixpkgs-unstable {
       inherit system;
-      config.allowUnfree = true;
-    };
 
-    # this is a shortcut so i dont have to use flake.outputs.packages.x86_64-linux.something
-    my = {
-      inherit repo overlays;
-
-      packages = import ./packages { inherit repo flake pkgs; };
-      devShells = import ./shells { inherit repo flake pkgs; };
-      secrets = import ./modules/secrets.nix "/nix-secret";
-
-      # NOTE these are shortcuts to the base modules
-      nixosModules = {
-        workstation = ./modules/base/workstation.nix;
-        laptop = ./modules/base/laptop.nix;
-        server = ./modules/base/server.nix;
-        installer = ./modules/base/installer.nix;
+      config = {
+        allowUnfree = true;
+        android_sdk.accept_license = true;
       };
     };
 
     # consistent arguments passed to all modules
     createConfiguration = hostname: nixpkgs.lib.nixosSystem {
       specialArgs = {
-        inherit pkgsUnstable inputs flake;
-
-        my = my // {
-          # NOTE reducing number of arguments in the modules
-          hostname = hostname;
-        };
+        inherit pkgsUnstable inputs flake repo hostname secrets;
       };
 
       inherit system;
 
       modules = [
         {
+          nixpkgs.overlays = [
+            # allow access to my own packages
+            (final: prev: { my = flake.packages.${system}; })
+          ];
+
           # allow unfree
           nixpkgs.config.allowUnfree = true;
 
@@ -107,14 +96,20 @@
   in {
     nixosConfigurations = nixpkgs.lib.genAttrs configurations createConfiguration;
 
-    nixosModules = my.nixosModules;
+    nixosModules = {
+      # NOTE these are shortcuts to the base modules
+      workstation = ./modules/base/workstation.nix;
+      laptop = ./modules/base/laptop.nix;
+      server = ./modules/base/server.nix;
+      installer = ./modules/base/installer.nix;
+    };
 
-    packages.${system} = my.packages // packageImageAliases;
+    packages.${system} = (import ./packages { inherit repo flake pkgs; }) // packageImageAliases;
 
-    overlays = my.overlays;
+    overlays = import ./overlays { inherit repo flake; };
 
     templates = import ./templates;
 
-    devShells.${system} = my.devShells;
+    devShells.${system} = import ./shells { inherit repo flake pkgs; };
   };
 }

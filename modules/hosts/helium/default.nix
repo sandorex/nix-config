@@ -1,8 +1,8 @@
-{ config, pkgs, my, ... }:
+{ flake, config, pkgs, ... }:
 
 {
   imports = [
-    my.nixosModules.laptop
+    flake.nixosModules.laptop
 
     ./hardware-configuration.nix
   ];

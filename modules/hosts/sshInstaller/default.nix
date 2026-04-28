@@ -1,10 +1,10 @@
-{ inputs, pkgs, lib, my, ... }:
+{ flake, inputs, lib, ... }:
 
 {
   imports = [
     "${inputs.nixpkgs}/nixos/modules/installer/cd-dvd/installation-cd-minimal.nix"
 
-    my.nixosModules.installer
+    flake.nixosModules.installer
   ];
 
   users.users.nixos = {

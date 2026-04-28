@@ -1,7 +1,7 @@
-{ config, lib, flake, my, pkgs, ... }:
+{ config, lib, flake, pkgs, hostname, ... }:
 
 let
-  inherit (builtins) filter attrNames attrValues readDir readFile map mapAttrs concatStringsSep;
+  inherit (builtins) filter attrNames readDir map mapAttrs;
   inherit (lib) filterAttrs;
 
   enabled = config.my.flatpak.enable;
@@ -33,7 +33,7 @@ let
     builtins.listToAttrs
   ];
 
-  flakeHostRulesDir = "${flakeRulesDir}/${my.hostname}";
+  flakeHostRulesDir = "${flakeRulesDir}/${hostname}";
 
   # NOTE this makes host rules have priority
   ruleAttrs = lib.pipe ((getRules flakeRulesDir) // (if builtins.pathExists flakeHostRulesDir then (getRules flakeHostRulesDir) else {})) [

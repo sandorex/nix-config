@@ -1,4 +1,4 @@
-{ config, lib, flake, inputs, my, ... }:
+{ config, lib, flake, inputs, repo, ... }:
 
 # NOTE file is imported by every configuration including installers
 
@@ -12,13 +12,13 @@
 
   options = {
     my.user = lib.mkOption {
-      default = my.repo.owner;
+      default = repo.owner;
       type = lib.types.str;
       description = "Main user of the system";
     };
 
     my.localPath = lib.mkOption {
-      default = "/home/${config.my.user}/${my.repo.localName}";
+      default = "/home/${config.my.user}/${repo.localName}";
       type = lib.types.str;
       description = "Path on host where dotfiles are stored";
     };
