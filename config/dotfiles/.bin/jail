@@ -21,7 +21,6 @@ args=(
 
     # mount tmpfs on ~/.cache
     --private-cache
-
     --private-dev
 
     # die when first child dies
@@ -54,6 +53,9 @@ whitelist_ro=(
     "$HOME/.config/zellij"
     "$HOME/.config/tmux"
     "$HOME/.config/git"
+
+    # allow nix config (to allow running flake shells)
+    "$HOME/nix-config"
 )
 
 for path in "${whitelist[@]}"; do
