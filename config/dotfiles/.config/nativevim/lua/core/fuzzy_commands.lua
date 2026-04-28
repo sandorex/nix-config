@@ -47,7 +47,8 @@ function M.fuzzy_buffer()
                 -- shorten the filename if in home or CWD
                 name = vim.fn.fnamemodify(buf.name, ':~:.')
             else
-                name = buf.name
+                -- name can be empty for temporary buffers
+                name = buf.name or "[unnamed]"
             end
 
             -- show if buffer is modified and unsaved
