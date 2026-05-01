@@ -13,7 +13,17 @@ vim.api.nvim_create_autocmd("LspAttach", {
 
         if client:supports_method("textDocument/completion") then
             -- autotrigger can be annoying as it depends on server defined keys
-            vim.lsp.completion.enable(true, ev.data.client_id, ev.buf, { autotrigger = false })
+            vim.lsp.completion.enable(true, ev.data.client_id, ev.buf, {
+                autotrigger = false
+            })
+        end
+
+        -- if client supports folding then use it
+        if client:supports_method('textDocument/foldingRange') then
+            local win = vim.api.nvim_get_current_win()
+            vim.wo[win][0].foldmethod = 'expr'
+            vim.wo[win][0].foldexpr = 'v:lua.vim.lsp.foldexpr()'
+            vim.wo[win][0].foldtext = 'v:lua.vim.lsp.foldtext()'
         end
 
         -- add lsp dirs to path

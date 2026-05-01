@@ -1,14 +1,17 @@
 -- general options
 vim.o.completeopt = "menu,menuone,noinsert,popup,fuzzy" -- modern completion menu
 
-vim.o.foldenable = true   -- enable fold
-vim.o.foldlevel = 99      -- start editing with all folds opened
+vim.o.foldmethod = 'indent' -- fold using indents by default
+vim.o.foldenable = true     -- enable fold
+vim.o.foldlevel = 99        -- start editing with all folds opened
+vim.o.foldnestmax = 6       -- maximum nest amount of folds
 
 vim.o.termguicolors = true  -- enable rgb colors
 
 vim.o.cursorline = true     -- enable cursor line
 
-vim.o.number = true         -- enable line number
+vim.o.number = true         -- enable line number column
+vim.o.numberwidth = 2       -- width of number column
 vim.o.relativenumber = true -- and relative line number
 
 vim.o.winborder = "solid"   -- whitespace around all floating windows
