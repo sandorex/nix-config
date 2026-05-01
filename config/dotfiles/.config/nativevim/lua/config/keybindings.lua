@@ -1,7 +1,6 @@
 -- all keybindings should be here
 
 local utils = require("core.utils")
-local const = require("core.constants")
 
 if vim.fn.has("nvim-0.12") == 1 then
     vim.cmd("packadd! nvim.undotree")
@@ -38,6 +37,7 @@ map("n", "<leader>q", deprecated("Use <c-w>c to close window or ZZ to close/quit
 map("n", "<leader>u", function() require("undotree").open() end, { desc = "Open undotree plugin" })
 map("n", "<s-u>", "<cmd>redo<cr>", { desc = "Redo" })
 
+map("i", "<c-,>", utils.try_snippet, { desc = "Expand snippet" })
 -- with single snippet key show fuzzy picker
 map("n", const.snippet_key, "<cmd>FuzzySnippet<cr>", { desc = "Select snippet (fuzzy)" })
 

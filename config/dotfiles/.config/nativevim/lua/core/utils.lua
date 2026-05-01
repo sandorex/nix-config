@@ -1,20 +1,95 @@
 local M = {}
 
---- Creates a keybinding for the snippet
-function M.snippet(name, text, desc)
-    local description = nil
-    if desc and desc ~= "" then
-        -- so its clear its a snippet
-        description = desc .. " (snippet)"
+-- TLDR for snippets
+--
+-- The syntax is defined by microsoft LSP protocol
+-- `$0...$n` placeholders with $0 being the last one
+-- `${1:default}` placeholder with default value
+-- `${1|one,two|}` placeholder with two options
+--
+-- Some special variables
+--   TM_SELECTED_TEXT The currently selected text or the empty string
+--   TM_CURRENT_LINE The contents of the current line
+--   TM_CURRENT_WORD The contents of the word under cursor or the empty string
+--   TM_LINE_INDEX The zero-index based line number
+--   TM_LINE_NUMBER The one-index based line number
+--   TM_FILENAME The filename of the current document
+--   TM_FILENAME_BASE The filename of the current document without its extensions
+--   TM_DIRECTORY The directory of the current document
+--   TM_FILEPATH The full file path of the current document--
+--
+-- More at https://microsoft.github.io/language-server-protocol/specifications/lsp/3.17/specification/#snippet_syntax
+
+--- Global snippets
+M.snippets = {
+    global = {}
+}
+
+-- TODO add vim.validate
+local function define_snippet(ftype, name, text_or_fn, desc)
+    local entry = {}
+
+    entry["desc"] = desc
+
+    if type(text_or_fn) == "string" then
+        entry["text"] = vim.trim(text_or_fn)
+    elseif type(text_or_fn) == "function" then
+        entry["func"] = text_or_fn
     end
 
-    -- currently the simplest way to create snippets
-    -- the ending comma is to prevent waiting for timeoutlen when for example
-    -- snippets 'sh' and 'shell' are available
-    vim.keymap.set("n", "," .. name .. ",", function()
-        -- basically paste snippet
-        vim.api.nvim_paste(text, false, -1)
-    end, { buffer = true, desc = description })
+    if not M.snippets[ftype] then
+        M.snippets[ftype] = {}
+    end
+
+    M.snippets[ftype][name] = entry
+end
+
+local function find_snippet(ftype, name)
+    return (M.snippets[ftype] or {})[name] or M.snippets["global"][name] or nil
+end
+
+--- Defines a snippet for all files and buffers
+function M.global_snippet(name, text, desc)
+    define_snippet("global", name, text, desc)
+end
+
+--- @deprecated
+function M.snippet(...) end
+
+--- Defines a snippet for current buffer
+function M.snippet2(ftype, name, text, desc)
+    define_snippet(ftype, name, text, desc)
+end
+
+--- Try to expand snippet under cursor
+function M.try_snippet()
+    local row, col = unpack(vim.api.nvim_win_get_cursor(0))
+    local raw_line = vim.api.nvim_get_current_line()
+
+    -- extract the snippet
+    -- NOTE: i couldnt use <cword> as it does not match when cursor is at end of
+    -- word like `mod|`
+    local name = string.match(raw_line:sub(1, col), "([%w_]+)$")
+    if not name or name == "" then
+        return
+    end
+
+    -- local snippet = (M.snippets[""] or {})[name] or M.snippets[name] or nil
+    local snippet = find_snippet(vim.bo.filetype, name)
+    if snippet then
+        if snippet.text then
+            -- remove the snippet name
+            local line = raw_line:sub(1, col - #name) .. raw_line:sub(col + 1)
+            vim.api.nvim_set_current_line(line)
+            vim.api.nvim_win_set_cursor(0, {row, col - #name})
+
+            vim.snippet.expand(snippet.text)
+        elseif snippet.func then
+            snippet.func()
+        end
+    else
+        vim.notify("Invalid snippet '" .. name .. "'", vim.log.levels.WARN)
+    end
 end
 
 --- Automatically maps pairs "{}" -> "{|}" with | being the cursor, works for
