@@ -189,27 +189,42 @@ end
 
 function M.fuzzy_snippets()
     local lines = {}
+    local snippets = {}
 
-    for _, key in ipairs(vim.api.nvim_buf_get_keymap(0, "n")) do
-        -- filter the snippets
-        if vim.startswith(key.lhs, const.snippet_key) and vim.endswith(key.lhs, const.snippet_key) then
-            local desc = ""
-            if key.desc then
-                desc = " - " .. key.desc
-            end
-
-            -- remove commas
-            table.insert(lines, key.lhs:sub(2):sub(1, -2) .. desc)
+    for name, snippet in pairs(utils.snippets["global"]) do
+        local line = name
+        if snippet.desc then
+            line = line .. " - " .. snippet.desc
         end
+
+        table.insert(lines, line)
+        table.insert(snippets, { filetype = "global", name = name })
+    end
+
+    for name, snippet in pairs(utils.snippets[vim.bo.filetype] or {}) do
+        local line = name
+        if snippet.desc then
+            line = line .. " - " .. snippet.desc
+        end
+
+        table.insert(lines, line)
+        table.insert(snippets, { filetype = vim.bo.filetype, name = name })
     end
 
     local function select(index)
         if index then
+            local info = snippets[index]
+            local snippet = utils.snippets[info.filetype][info.name]
+
             -- close the fuzzy first so its doesnt run in wrong buffer
             fuzzy.close()
 
-            -- just run the command, its the simplest way
-            vim.cmd("normal " .. const.snippet_key .. lines[index] .. const.snippet_key)
+            -- TODO this should probably be a function in utils (or even better in core.snippet)
+            if snippet.text then
+                vim.snippet.expand(snippet.text)
+            elseif snippet.func then
+                snippet.func()
+            end
         end
     end
 

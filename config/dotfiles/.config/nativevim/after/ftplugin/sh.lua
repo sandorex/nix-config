@@ -7,17 +7,16 @@ vim.bo.makeprg = "shellcheck -f gcc %"
 core.map_autopairs({ '""', "''", "()", "[]", "{}", "``" })
 
 -- snippets
-local ftype = "sh"
-core.snippet2(ftype, "env", "#!/usr/bin/env bash")
-core.snippet2(ftype, "shebang", "#!/usr/bin/env bash")
-core.snippet2(ftype, "cddir", [[cd "\$(dirname "\${BASH_SOURCE[0]}")" || exit 1]])
-core.snippet2(ftype, "dir", [[DIR=\$(realpath "\$(dirname "\${BASH_SOURCE[0]}")")]])
-core.snippet2(ftype, "isroot", [[
+core.snippet("env", "#!/usr/bin/env bash")
+core.snippet("shebang", "#!/usr/bin/env bash")
+core.snippet("cddir", [[cd "\$(dirname "\${BASH_SOURCE[0]}")" || exit 1]])
+core.snippet("dir", [[DIR=\$(realpath "\$(dirname "\${BASH_SOURCE[0]}")")]])
+core.snippet("isroot", [[
 if [ "\$(id -u)" -ne 0 ]; then
     $0
 fi
 ]])
-core.snippet2(ftype, "parseargs", [[
+core.snippet("parseargs", [[
 POSITIONAL_ARGS=()
 while [ \$# -gt 0 ]; do
     case \$1 in

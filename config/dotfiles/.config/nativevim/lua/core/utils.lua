@@ -53,16 +53,13 @@ function M.global_snippet(name, text, desc)
     define_snippet("global", name, text, desc)
 end
 
---- @deprecated
-function M.snippet(...) end
-
---- Defines a snippet for current buffer
-function M.snippet2(ftype, name, text, desc)
-    define_snippet(ftype, name, text, desc)
+--- Defines a snippet (if ftype is not provided then defaults to `vim.bo.filetype`)
+function M.snippet(name, text, desc, ftype)
+    define_snippet(ftype or vim.bo.filetype, name, text, desc)
 end
 
---- Try to expand snippet under cursor
-function M.try_snippet()
+--- Try to expand snippet under cursor or provided one
+function M.try_expand_snippet()
     local row, col = unpack(vim.api.nvim_win_get_cursor(0))
     local raw_line = vim.api.nvim_get_current_line()
 

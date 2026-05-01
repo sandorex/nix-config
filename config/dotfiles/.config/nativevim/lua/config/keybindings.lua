@@ -37,9 +37,9 @@ map("n", "<leader>q", deprecated("Use <c-w>c to close window or ZZ to close/quit
 map("n", "<leader>u", function() require("undotree").open() end, { desc = "Open undotree plugin" })
 map("n", "<s-u>", "<cmd>redo<cr>", { desc = "Redo" })
 
-map("i", "<c-,>", utils.try_snippet, { desc = "Expand snippet" })
 -- with single snippet key show fuzzy picker
-map("n", const.snippet_key, "<cmd>FuzzySnippet<cr>", { desc = "Select snippet (fuzzy)" })
+map("n", "<c-,>", "<cmd>FuzzySnippet<cr>", { desc = "Select snippet (fuzzy)" })
+map("i", "<c-,>", utils.try_expand_snippet, { desc = "Expand snippet" })
 
 -- easy system clipboard copy / paste by prefixing with <leader>
 map({"n", "v"}, "<leader>y", '"+y', { desc = "Copy to system clipboard" })
