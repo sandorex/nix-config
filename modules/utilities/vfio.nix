@@ -61,12 +61,12 @@ in
         # NOTE information online is spotty but seems to reduce overhead for host devices
         "iommu=pt"
       ]
-      ++ lib.optionals (byId != []) "vfio-pci.ids=${ lib.concatStringsSep "," (map toString byId) }";
+      ++ lib.optionals (byId != []) "vfio-pci.ids=${ lib.concatStringsSep "," byId }";
 
       # have to manually override the driver as i cannot set order in which kernel
       # modules load
       boot.initrd.preDeviceCommands = ''
-        GROUPS="${ builtins.concatStringsSep " " byGroup }"
+        GROUPS="${ builtins.concatStringsSep " " (map toString byGroup) }"
         PATHS="${ builtins.concatStringsSep " " byPath }"
 
         for group in $GROUPS; do
