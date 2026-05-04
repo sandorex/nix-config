@@ -19,8 +19,16 @@
     (lib.mkIf config.my.libvirtd.enable {
       virtualisation.libvirtd = {
         enable = true;
+
+        # do not autostart VMs
+        onBoot = "ignore";
+
+        # shutdown VMs on host shutdown
+        onShutdown = "shutdown";
+
         qemu.vhostUserPackages = with pkgs; [ virtiofsd ];
       };
+
       programs.virt-manager.enable = true;
 
       # allow user to use libvirtd without sudo

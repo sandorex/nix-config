@@ -9,5 +9,6 @@
     ./serial.nix
     ./garbage.nix
     ./flatpak.nix
+    ./vfio.nix
   ];
 }
