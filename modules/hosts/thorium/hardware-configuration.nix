@@ -22,7 +22,7 @@
   #  ids    1002:1638 1002:1637
   my.vfio = {
     enable = true;
-    byGroup = [ "16" "17" ];
+    byGroup = [ 16 17 ];
   };
 
   specialisation.no-passthrough.configuration = {

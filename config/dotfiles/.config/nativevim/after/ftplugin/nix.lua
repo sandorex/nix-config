@@ -9,6 +9,15 @@ opt.expandtab = true
 core.map_autopairs({ '""', "{}", "[]", "()" })
 
 -- snippets
+core.snippet("option", [[
+lib.mkOption {
+  description = "${0:Something}";
+  type = with lib.types; listOf str;
+  default = [];
+  example = [ "" ];
+}
+]])
+core.snippet("option", [[lib.mkEnableOption "${0:Something}"]])
 core.snippet("flake", [[
 {
   inputs = {

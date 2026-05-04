@@ -32,7 +32,7 @@ in
       default = [];
       type = with lib.types; listOf int;
       description = "Pass whole IOMMU groups";
-      example = [ "16" "17" ];
+      example = [ 16 17 ];
     };
 
     lookingGlass = {
@@ -61,7 +61,7 @@ in
         # NOTE information online is spotty but seems to reduce overhead for host devices
         "iommu=pt"
       ]
-      ++ lib.optionals (byId != []) "vfio-pci.ids=${ lib.concatStringsSep "," byId }";
+      ++ lib.optionals (byId != []) "vfio-pci.ids=${ lib.concatStringsSep "," (map toString byId) }";
 
       # have to manually override the driver as i cannot set order in which kernel
       # modules load
