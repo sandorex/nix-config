@@ -44,6 +44,11 @@ local function define_snippet(ftype, name, text_or_fn, desc)
     M.snippets[ftype][name] = entry
 end
 
+--- Returns all snippets with filetype specific snippets being prioritized
+function M.get_snippets()
+    return vim.tbl_extend("force", M.snippets["global"], M.snippets[vim.bo.filetype] or {})
+end
+
 local function find_snippet(ftype, name)
     return (M.snippets[ftype] or {})[name] or M.snippets["global"][name] or nil
 end

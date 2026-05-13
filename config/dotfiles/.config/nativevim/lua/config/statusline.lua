@@ -31,48 +31,59 @@ local mode_hl = {
     ["t"]  = "%#StatuslineTerminalAccent#",
 }
 
--- fallback color
-vim.api.nvim_set_hl(0, 'StatusLineAccent', {
-    fg = "#82AAFF",
-    bg = "#1E2030",
-    bold = true,
-})
+local function refresh_hl()
+    -- fallback color
+    vim.api.nvim_set_hl(0, 'StatusLineAccent', {
+        fg = "#82AAFF",
+        bg = "#1E2030",
+        bold = true,
+    })
 
-vim.api.nvim_set_hl(0, 'StatusLineNormalAccent', {
-    fg = "#1E2030",
-    bg = "#82AAFF",
-    bold = true,
-})
+    vim.api.nvim_set_hl(0, 'StatusLineNormalAccent', {
+        fg = "#1E2030",
+        bg = "#82AAFF",
+        bold = true,
+    })
 
-vim.api.nvim_set_hl(0, 'StatusLineInsertAccent', {
-    fg = "#1E2030",
-    bg = "#98F096",
-    bold = true
-})
+    vim.api.nvim_set_hl(0, 'StatusLineInsertAccent', {
+        fg = "#1E2030",
+        bg = "#98F096",
+        bold = true
+    })
 
-vim.api.nvim_set_hl(0, 'StatusLineVisualAccent', {
-    fg = "#1E2030",
-    bg = "#B767EB",
-    bold = true
-})
+    vim.api.nvim_set_hl(0, 'StatusLineVisualAccent', {
+        fg = "#1E2030",
+        bg = "#B767EB",
+        bold = true
+    })
 
-vim.api.nvim_set_hl(0, 'StatusLineReplaceAccent', {
-    fg = "#1E2030",
-    bg = "#FF5656",
-    bold = true
-})
+    vim.api.nvim_set_hl(0, 'StatusLineReplaceAccent', {
+        fg = "#1E2030",
+        bg = "#FF5656",
+        bold = true
+    })
 
-vim.api.nvim_set_hl(0, 'StatusLineCommandAccent', {
-    fg = "#1E2030",
-    bg = "#F0A17A",
-    bold = true
-})
+    vim.api.nvim_set_hl(0, 'StatusLineCommandAccent', {
+        fg = "#1E2030",
+        bg = "#F0A17A",
+        bold = true
+    })
 
-vim.api.nvim_set_hl(0, 'StatusLineTerminalAccent', {
-    fg = "#1E2030",
-    bg = "#D5E1FB",
-    bold = true
-})
+    vim.api.nvim_set_hl(0, 'StatusLineTerminalAccent', {
+        fg = "#1E2030",
+        bg = "#D5E1FB",
+        bold = true
+    })
+
+    vim.api.nvim_set_hl(0, 'StatusLineFilename', {
+        fg = "#8AADF4",
+    })
+end
+
+-- apply after colorscheme change
+vim.api.nvim_create_autocmd("ColorScheme", { pattern = "*", callback = refresh_hl })
+
+refresh_hl()
 
 local function mode()
     -- use first two characters only
@@ -98,7 +109,7 @@ end
 local function filetype()
     if #vim.bo.filetype ~= 0 then
         -- highlight the filetype
-        return "%#Type#" .. vim.bo.filetype .. "%* "
+        return "%#StatusLineFilename#" .. vim.bo.filetype .. "%* "
     else
         return ""
     end
@@ -107,14 +118,9 @@ end
 local function diagnostics()
     local counts = vim.diagnostic.count(0)
 
-    -- if no diagnostics show LSP flag if running
+    -- show nothing if there is no diagnostics
     if vim.tbl_isempty(counts) then
-        local attached_clients = vim.lsp.get_clients({ bufnr = 0 })
-        if #attached_clients == 0 then
-            return ""
-        else
-            return "[LSP]"
-        end
+        return ""
     end
 
     local severity_map = {
@@ -138,7 +144,7 @@ end
 local function progress()
     -- vim.ui.progress_status is 0.12 only
     if vim.ui.progress_status then
-        return "%#DiagnosticSignWarn#" .. vim.ui.progress_status() .. "%*"
+        return vim.ui.progress_status()
     end
 
     return ""
@@ -148,7 +154,7 @@ local function flags()
     -- %w           - preview flag [preview]
     -- %m           - modified flag [+] / [-]
     -- %r           - readonly flag [RO]
-    -- diagnostics  - lsp diagnostics [E1 W1 I1 H1] or [LSP]
+    -- diagnostics  - lsp diagnostics [E1 W1 I1 H1]
     local str = vim.api.nvim_eval_statusline("%w%m%r", {}).str .. diagnostics()
 
     -- show with padding only if it is not empty
@@ -171,6 +177,7 @@ function _G.my_statusline()
            "%0l:%0c %P " -- line:col progress%
 end
 
+-- redraw status on lsp progress
 vim.cmd("autocmd LspProgress * redrawstatus")
 
 vim.o.statusline = "%{%v:lua._G.my_statusline()%}"

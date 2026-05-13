@@ -1,5 +1,5 @@
 -- general options
-vim.o.completeopt = "menu,menuone,noinsert,popup,fuzzy" -- modern completion menu
+vim.o.completeopt = "menu,menuone,noinsert,noselect,popup,fuzzy" -- modern completion menu
 
 vim.o.foldmethod = 'indent' -- fold using indents by default
 vim.o.foldenable = true     -- enable fold

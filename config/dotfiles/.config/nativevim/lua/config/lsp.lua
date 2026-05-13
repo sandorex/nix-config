@@ -3,6 +3,22 @@ vim.api.nvim_create_user_command("LspLog", function()
     vim.cmd(":edit " .. log_file)
 end, { desc = "Opens the LSP log file" })
 
+vim.api.nvim_create_user_command("LspList", function()
+    local clients = vim.lsp.get_clients({ bufnr = 0 })
+
+    local output = {}
+    for _, lsp in ipairs(clients) do
+        local buffers = {}
+        for key, _ in pairs(lsp.attached_buffers) do
+            table.insert(buffers, key)
+        end
+
+        table.insert(output, lsp.config.name .. " [" .. vim.fn.join(buffers, ", ") .. "]")
+    end
+
+    print(vim.fn.join(output, "\n"))
+end, { desc = "List all LSPs and their buffers" })
+
 vim.api.nvim_create_autocmd("LspAttach", {
     group = vim.api.nvim_create_augroup("UserLspAttach", { clear = true }),
     callback = function(ev)
