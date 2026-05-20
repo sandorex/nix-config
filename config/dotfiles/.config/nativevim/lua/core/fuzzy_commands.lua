@@ -13,6 +13,23 @@ function M.fuzzy_buffer()
         return
     end
 
+    local function map(buf)
+        local name
+        if vim.startswith(buf.name, "/") then
+            -- shorten the filename if in home or CWD
+            name = vim.fn.fnamemodify(buf.name, ':~:.')
+        elseif not buf.name or buf.name == "" then
+            -- unnamed buffers should still be visible
+            name = "[unnamed]"
+        else
+            -- just use the current name?
+            name = buf.name
+        end
+
+        -- show if buffer is modified and modified
+        return name, name .. (buf.changed == 1 and " [+]" or "")
+    end
+
     local function switch(index)
         if index == nil then
             return
@@ -41,19 +58,7 @@ function M.fuzzy_buffer()
         title = "Select buffer (fuzzy)",
         update = "instant", -- there will never be too many buffers
         options = sorted_bufs,
-        map = function(buf)
-            local name
-            if vim.startswith(buf.name, "/") then
-                -- shorten the filename if in home or CWD
-                name = vim.fn.fnamemodify(buf.name, ':~:.')
-            else
-                -- name can be empty for temporary buffers
-                name = buf.name or "[unnamed]"
-            end
-
-            -- show if buffer is modified and unsaved
-            return name, name .. (buf.changed == 1 and " [+]" or "")
-        end,
+        map = map,
         keymap = {
             { lhs = "<CR>", rhs = function() switch(fuzzy.get_selected_index()) end },
             { lhs = "<M-d>", rhs = function() delete(fuzzy.get_selected_index()) end },

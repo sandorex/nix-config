@@ -55,9 +55,13 @@ map("n", "<C-b>", "<cmd>FuzzyBuffer<cr>", { desc = "Choose buffer" })
 map("n", "<M-b>", "<cmd>bdelete<cr>", { desc = "Delete current buffer" })
 
 -- tab stuff
--- imitate ]b [b for switching buffers
-map("n", "]t", "<cmd>tabnext<cr>", { desc = "Goto next tab" })
-map("n", "[t", "<cmd>tabprevious<cr>", { desc = "Goto previous tab" })
+-- quickly switch between tabs
+for i = 1, 9 do
+    map("n", "<M-" .. i .. ">", i .. "gt", { desc = "Goto tab " .. i })
+end
+
+map("n", "<M-]>", "<cmd>tabnext<cr>", { desc = "Goto next tab" })
+map("n", "<M-[>", "<cmd>tabprevious<cr>", { desc = "Goto previous tab" })
 
 -- make <Up>/<Down> respect word wrap but not when count is used
 map("i", "<Up>", "v:count == 0 ? '<C-o>gk' : '<C-o>k'", { expr = true, silent = true })
@@ -97,24 +101,6 @@ end, { desc = "Surround selection" })
 
 -- terminal
 map("t", "<c-\\><c-\\>", "<c-\\><c-n>", { desc = "Exit terminal insert mode" })
-
--- creates a function that just goes to the buffer indexed by last usage
-local function goto_buff(index)
-    return function()
-        local buffers = utils.get_buffers_by_last_used()
-        if #buffers <= 0 or #buffers < index then
-            vim.notify("Buffer index " .. index .. " out of range", vim.log.levels.WARN)
-        else
-            vim.cmd("buffer " .. buffers[index].buf)
-        end
-    end
-end
-
-map("n", "<M-1>", goto_buff(1), { desc = "Goto last used buffer" })
-map("n", "<M-2>", goto_buff(2), { desc = "Goto second last used buffer" })
-map("n", "<M-3>", goto_buff(3), { desc = "Goto third last used buffer" })
-map("n", "<M-4>", goto_buff(4), { desc = "Goto fourth last used buffer" })
-map("n", "<M-5>", goto_buff(5), { desc = "Goto fifth last used buffer" })
 
 -------------------------------------------------------------------------------
 -- Fuzzy related                                                             --
