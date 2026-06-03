@@ -1,0 +1,35 @@
+#!/usr/bin/env bash
+# checks network status and logs to stdout and file
+#
+# it outputs CSV format with minimal dependencies (awk ping)
+
+DELAY=5
+GATEWAY=192.168.1.1
+PINGABLE=(1.1.1.1  8.8.8.8)
+PING_TIMEOUT=4 # seconds
+PING_TIMEOUT_MS="$(( PING_TIMEOUT * 1000 ))"
+
+results_file="${1:?Error no output file provided}"
+
+# ping ip and if it exceeds timeout then just print the timeout
+do_ping() {
+    local latency
+    latency=$(ping -W "$PING_TIMEOUT" -c 1 "$1" | awk -F'[= ]' '/time=/ { print $(NF-1) }') || true
+    printf "%s" "${latency:-$PING_TIMEOUT_MS}"
+}
+
+# all latency is in millis
+# TIMESTAMP,GATEWAY LATENCY,PINGABLE LATENCY..
+while true; do
+    output="$(do_ping $GATEWAY)"
+
+    # ping each defined ip
+    for ip in "${PINGABLE[@]}"; do
+        latency=$(do_ping "$ip")
+        output="$output,$latency"
+    done
+
+    echo "$(date --iso-8601=seconds),$output" | tee -a "$results_file"
+    sleep "$DELAY"
+done
+

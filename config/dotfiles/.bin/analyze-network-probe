@@ -1,0 +1,111 @@
+#!/usr/bin/env nu
+
+# [(date now), (date now)] | each { { date: ($in | format date "%Y-%m-%d"), time: ($in | format date "%H:%M:%S") } }
+
+def gather [] {
+    open network-log.txt
+      | from csv -n
+      | rename datetime gateway cloudflare google
+}
+
+# def filter_bad [] {
+#     where { $in.gateway > 50 or $in.cloudflare > 100 or $in.google > 100 }
+# }
+#
+# def "main all" [] {
+#     print "all stats"
+# }
+#
+# def "main month" [] {
+#     let today = (date now)
+#     let now = ($today | format date "%Y-%m")
+#
+#     print $"Stats for this month \(($today | format date "%Y-%m"))"
+#     gather
+#       | where { ($in.datetime | format date "%Y-%m") == $now }
+#       | filter_bad
+#       | update datetime { format date "%d %H:%M:%S" }
+# }
+#
+# def "main week" [] {
+#     let today = (date now)
+#     let day = ($today | format date "%u" | into int) # get day (0 = monday)
+#     let start = ($today + (1 - $day | into duration -u day))
+#     let end = ($today + (7 - $day | into duration -u day))
+#
+#     print $"Stats for this week \(($start | format date "%Y-%m-%d") - ($end | format date "%Y-%m-%d"))"
+#     gather
+#       | where {
+#         let datetime = $in.datetime | into datetime
+#         $datetime >= $start and $datetime <= $end
+#       }
+#       | filter_bad
+#       | update datetime { format date "%H:%M:%S" }
+# }
+#
+# # TODO calculate downtime
+# def "main day" [] {
+#     # let now = (date now | format date "%Y-%m-%d")
+#     # print $"Stats for today \(($now))"
+#     # gather
+#     #   | where { ($in.datetime | format date "%Y-%m-%d") == $now }
+#     #   | filter_bad
+#     #   | update datetime { format date "%H:%M:%S" }
+#
+#
+#     69
+# }
+
+# TODO read from input or file
+def main [
+    --csv,
+] {
+    # TODO make latency a milliseconds unit
+    # TODO gather should convert datetime into actual datetime
+    let entries = gather | update datetime { into datetime }
+
+    mut data = []
+    mut output = []
+
+    for i in 0..<($entries | length) {
+        let entry = $entries | get $i
+
+        if $entry.gateway > 500 or $entry.cloudflare > 500 or $entry.google > 500 {
+            $data ++= [$entry]
+        } else {
+            if $data != [] {
+                let start = ($data | first).datetime
+                let end = ($data | last).datetime
+                let maxima = $data | select gateway cloudflare google | math max
+                $output ++= [
+                    {
+                        start: ($start | format date "%Y-%m-%d %H:%M:%S"),
+                        end: ($end | format date "%Y-%m-%d %H:%M:%S"),
+                        duration: (($end - $start) | into duration),
+                        gateway_max: $maxima.gateway,
+                        cloudflare_max: $maxima.cloudflare,
+                        google_max: $maxima.google,
+                    }
+                ]
+
+                # reset list
+                $data = []
+            }
+        }
+    }
+
+    if $csv {
+        $output
+            # duration has to be in this format for librecalc to read
+            | update duration { into int | into datetime | format date "%H:%M:%S" }
+            | to csv
+    } else {
+        $output | table -e | print
+
+        # print stats like interruption count and duration without network
+        {
+            interruptions: ($output | length),
+            duration: ($output | select duration | math sum | get duration)
+        } | table -e | print
+    }
+}
