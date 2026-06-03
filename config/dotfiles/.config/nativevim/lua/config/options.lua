@@ -73,3 +73,5 @@ vim.opt.path:append { "**2" }
 -- hide `-- INSERT --` from messages as i have it in statusline
 vim.o.showmode = false
 
+-- disables annoying dumb indent scripts that keep breaking comment indentation
+vim.cmd("filetype indent off")

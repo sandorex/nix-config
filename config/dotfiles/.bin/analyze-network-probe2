@@ -1,0 +1,101 @@
+#!/usr/bin/env nu
+
+# global datetime format
+$env.config.datetime_format = {
+    normal: "%+",
+    table: "%Y-%m-%d %H:%M:%S"
+}
+
+# default for latency threshold
+const LATENCY_BAD = 200
+
+# assumes there is at least 4 second delay between pings
+const DELAY = 4sec
+
+# Analyzes CSV file from network-probe script for gather data about network interruptions
+def main [
+    --csv                                  # Output CSV instead of formatted data
+    --date: datetime (-d)                  # Filter out entries for this date only
+    --latency: number (-l) = $LATENCY_BAD  # Bad latency threshold
+    --delay: duration = $DELAY             # Delay between pings (for rounding up missed pings)
+    input: path                            # CSV file to analyze (no header)
+] {
+    let entries = open --raw $input
+        | from csv -n
+        | group-by { $in.column0 | math ceil }
+        | values
+        | par-each {|it|
+            # remove the datetime so it can accept any number of IPs
+            reject ($it | columns | first)
+                # flip it so first column is the column names and second coulumn are values (latencies)
+                | transpose -r
+                # add datetime column
+                | insert 0 { datetime: ($it.column0 | math avg | math floor | into datetime --format "%s") }
+                | into record
+        }
+        | do {
+            let entries = $in
+            match $date {
+                null => $entries
+                # filter only the requested date
+                _ => ($entries | where {
+                    ($in.datetime | format date "%Y%m%d") == ($date | format date "%Y%m%d")
+                })
+            }
+        }
+
+    mut data = []
+    mut output = []
+
+    for i in 0..<($entries | length) {
+        let entry = $entries | get $i
+
+        # at least two latencies need to be above threshold
+        if (($entry | reject datetime | values | where {|x| $x > $latency } | length) >= 2) {
+            $data ++= [$entry]
+        } else {
+            if $data != [] {
+                let last = $data | last
+                let start = ($data | first).datetime
+                let end = $last.datetime + $delay + ($last | reject datetime | values | math max | into duration -u ms)
+                let duration = ($end - $start)
+
+                # clamp missed durations so there is no entries with 0 seconds duration
+                let duration = if $duration < $delay { $delay } else { $duration }
+
+                let maxima = $data | reject datetime | math max
+                $output ++= [
+                    {
+                        start: $start,
+                        end: $end,
+                        duration: $duration,
+                        ...$maxima
+                    }
+                ]
+
+                # reset list
+                $data = []
+            }
+        }
+    }
+
+    if ($output | length) == 0 {
+        print "No interruptions found.."
+        exit
+    }
+
+    if $csv {
+        $output
+            # duration has to be in this format for librecalc to read
+            | update duration { into int | into datetime | format date "%H:%M:%S" }
+            | to csv
+    } else {
+        $output | table -e | print
+
+        # print stats like interruption count and duration without network
+        {
+            interruptions: ($output | length),
+            duration: ($output | select duration | math sum | get duration)
+        } | table -e | print
+    }
+}
