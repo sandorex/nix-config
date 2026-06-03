@@ -1,68 +1,39 @@
 #!/usr/bin/env nu
+# Script for analyzing network interruptions from simple csv file that `network-probe` script
+# generates
 
-# [(date now), (date now)] | each { { date: ($in | format date "%Y-%m-%d"), time: ($in | format date "%H:%M:%S") } }
-
-def gather [] {
-    open network-log.txt
-      | from csv -n
-      | rename datetime gateway cloudflare google
+# global datetime format
+$env.config.datetime_format = {
+    normal: "%+",
+    table: "%Y-%m-%d %H:%M:%S"
 }
 
-# def filter_bad [] {
-#     where { $in.gateway > 50 or $in.cloudflare > 100 or $in.google > 100 }
-# }
-#
-# def "main all" [] {
-#     print "all stats"
-# }
-#
-# def "main month" [] {
-#     let today = (date now)
-#     let now = ($today | format date "%Y-%m")
-#
-#     print $"Stats for this month \(($today | format date "%Y-%m"))"
-#     gather
-#       | where { ($in.datetime | format date "%Y-%m") == $now }
-#       | filter_bad
-#       | update datetime { format date "%d %H:%M:%S" }
-# }
-#
-# def "main week" [] {
-#     let today = (date now)
-#     let day = ($today | format date "%u" | into int) # get day (0 = monday)
-#     let start = ($today + (1 - $day | into duration -u day))
-#     let end = ($today + (7 - $day | into duration -u day))
-#
-#     print $"Stats for this week \(($start | format date "%Y-%m-%d") - ($end | format date "%Y-%m-%d"))"
-#     gather
-#       | where {
-#         let datetime = $in.datetime | into datetime
-#         $datetime >= $start and $datetime <= $end
-#       }
-#       | filter_bad
-#       | update datetime { format date "%H:%M:%S" }
-# }
-#
-# # TODO calculate downtime
-# def "main day" [] {
-#     # let now = (date now | format date "%Y-%m-%d")
-#     # print $"Stats for today \(($now))"
-#     # gather
-#     #   | where { ($in.datetime | format date "%Y-%m-%d") == $now }
-#     #   | filter_bad
-#     #   | update datetime { format date "%H:%M:%S" }
-#
-#
-#     69
-# }
+# default for latency threshold
+const LATENCY_BAD = 200
 
-# TODO read from input or file
+# assumes there is at least 4 second delay between pings
+const DELAY = 4sec
+
+# Analyzes CSV file from network-probe script for gather data about network interruptions
 def main [
-    --csv,
+    --csv,                                  # Output CSV instead of formatted data
+    --date: datetime (-d),                  # Filter out entries for this date only
+    --latency: number (-l) = $LATENCY_BAD,  # Bad latency threshold
+    --delay: duration = $DELAY              # Delay between pings (for rounding up missed pings)
+    input: path,                            # CSV file to analyze (no header)
 ] {
-    # TODO make latency a milliseconds unit
-    # TODO gather should convert datetime into actual datetime
-    let entries = gather | update datetime { into datetime }
+    let entries = open $input
+        | from csv -n # no headers
+        | rename datetime gateway cloudflare google
+        | update datetime { into datetime }
+        | do {
+            let entries = $in
+            match $date {
+                null => $entries
+                # filter only the requested date
+                _ => ($entries | where { ($in.datetime | format date "%Y%m%d") == ($date | format date "%Y%m%d") } )
+            }
+        }
 
     mut data = []
     mut output = []
@@ -70,18 +41,27 @@ def main [
     for i in 0..<($entries | length) {
         let entry = $entries | get $i
 
-        if $entry.gateway > 500 or $entry.cloudflare > 500 or $entry.google > 500 {
+        if $entry.gateway > $latency or $entry.cloudflare > $latency or $entry.google > $latency {
             $data ++= [$entry]
         } else {
             if $data != [] {
+                let last = $data | last
                 let start = ($data | first).datetime
-                let end = ($data | last).datetime
+                let end = $last.datetime + $delay + (
+                    # taking into account the last ping
+                    [$last.gateway $last.cloudflare $last.google] | math max | into duration -u ms
+                )
+                let duration = ($end - $start)
+
+                # clamp missed durations so there is no entries with 0 seconds duration
+                let duration = if $duration < $delay { $delay } else { $duration }
+
                 let maxima = $data | select gateway cloudflare google | math max
                 $output ++= [
                     {
-                        start: ($start | format date "%Y-%m-%d %H:%M:%S"),
-                        end: ($end | format date "%Y-%m-%d %H:%M:%S"),
-                        duration: (($end - $start) | into duration),
+                        start: $start,
+                        end: $end,
+                        duration: $duration,
                         gateway_max: $maxima.gateway,
                         cloudflare_max: $maxima.cloudflare,
                         google_max: $maxima.google,
@@ -92,6 +72,10 @@ def main [
                 $data = []
             }
         }
+    }
+    if ($output | length) == 0 {
+        print "No interruptions found.."
+        exit
     }
 
     if $csv {
