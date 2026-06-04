@@ -1,18 +1,43 @@
 #!/usr/bin/env bash
-# experimental version of network-probe which does the pinging in parallel
+# probes multiple IPs and outputs JSON object per line for analysis
+#
+# this script has only single dependency: ping
+
+set -eo pipefail
 
 IPS=(192.168.1.1 1.1.1.1 8.8.8.8)
+PING_TIMEOUT=2 # seconds
+PING_TIMEOUT_MS="$(( PING_TIMEOUT * 1000 ))"
 
-while IFS= read -r line; do
-    if [[ "$line" =~ \[([0-9]+\.[0-9]+)\].+\ from\ ([0-9\.]+):.+\ time=([0-9\.]+)\ ms.* ]]; then
-        echo "${BASH_REMATCH[1]},${BASH_REMATCH[2]},${BASH_REMATCH[3]}"
-    elif [[ "$line" =~ \[([0-9]+\.[0-9]+)\].+\ from\ ([0-9\.]+):.+ ]]; then
-        # destination unreachable
-        echo "${BASH_REMATCH[1]},${BASH_REMATCH[2]},4000"
-    fi
-done < <(
+while :; do
+    SECONDS=0
+
+    # print single timestamp (avoid external commands)
+    printf "{ \"timestamp\": \"%(%Y-%m-%dT%H:%M:%S%z)T\"" -1
     for i in "${IPS[@]}"; do
-        ping -W 2 -D "$i" -i 4 &
-    done
-)
+        {
+            line=$(ping -D -W "$PING_TIMEOUT" -c 1 "${i:?}") || true
 
+            # NOTE time is not measured if the target is unreachable or timeout is reached
+            latency="$PING_TIMEOUT_MS"
+            if [[ "$line" =~ .+\ time=([0-9\.]+)\ ms.* ]]; then
+                latency="${BASH_REMATCH[1]}"
+            fi
+
+            # print in json format
+            echo -n ", \"$i\": $latency"
+        } &
+    done
+
+    # wait for all pings
+    wait
+
+    # finish the json object and start newline
+    echo " }"
+
+    # sleep if the ping was fast
+    elapsed=$SECONDS
+    if (( $elapsed < $PING_TIMEOUT )); then
+        sleep $(( $PING_TIMEOUT - $elapsed ))
+    fi
+done | tee -a "${1:?No output file provided}"
