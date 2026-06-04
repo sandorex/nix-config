@@ -21,28 +21,9 @@ def main [
     input: path                            # CSV file to analyze (no header)
 ] {
     let entries = open --raw $input
-        | from csv -n
-        | group-by { $in.column0 | math ceil }
-        | values
-        | par-each {|it|
-            # remove the datetime so it can accept any number of IPs
-            reject ($it | columns | first)
-                # flip it so first column is the column names and second coulumn are values (latencies)
-                | transpose -r
-                # add datetime column
-                | insert 0 { datetime: ($it.column0 | math avg | math floor | into datetime --format "%s") }
-                | into record
-        }
-        | do {
-            let entries = $in
-            match $date {
-                null => $entries
-                # filter only the requested date
-                _ => ($entries | where {
-                    ($in.datetime | format date "%Y%m%d") == ($date | format date "%Y%m%d")
-                })
-            }
-        }
+        | lines
+        | each { from json }
+        | update timestamp { into datetime }
 
     mut data = []
     mut output = []
@@ -51,19 +32,19 @@ def main [
         let entry = $entries | get $i
 
         # at least two latencies need to be above threshold
-        if (($entry | reject datetime | values | where {|x| $x > $latency } | length) >= 2) {
+        if (($entry | reject timestamp | values | where {|x| $x > $latency } | length) >= 2) {
             $data ++= [$entry]
         } else {
             if $data != [] {
                 let last = $data | last
-                let start = ($data | first).datetime
-                let end = $last.datetime + $delay + ($last | reject datetime | values | math max | into duration -u ms)
+                let start = ($data | first).timestamp
+                let end = $last.timestamp + $delay + ($last | reject timestamp | values | math max | into duration -u ms)
                 let duration = ($end - $start)
 
                 # clamp missed durations so there is no entries with 0 seconds duration
                 let duration = if $duration < $delay { $delay } else { $duration }
 
-                let maxima = $data | reject datetime | math max
+                let maxima = $data | reject timestamp | math max
                 $output ++= [
                     {
                         start: $start,
