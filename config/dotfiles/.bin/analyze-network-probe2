@@ -9,8 +9,8 @@ $env.config.datetime_format = {
 # default for latency threshold
 const LATENCY_BAD = 200
 
-# assumes there is at least 4 second delay between pings
-const DELAY = 4sec
+# assumes there is at least n second delay between pings
+const DELAY = 2sec
 
 # Analyzes CSV file from network-probe script for gather data about network interruptions
 def main [

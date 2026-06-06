@@ -9,7 +9,23 @@ IPS=(192.168.1.1 1.1.1.1 8.8.8.8)
 PING_TIMEOUT=2 # seconds
 PING_TIMEOUT_MS="$(( PING_TIMEOUT * 1000 ))"
 
-while :; do
+output_dir="${1:?No output directory provided}"
+
+# make sure output exists
+mkdir -p "$output_dir" || true
+if [[ ! -d "$output_dir" ]]; then
+    echo "Output path '${output_dir}' is not a directory"
+    exit 1
+fi
+
+gen_filename() {
+    printf "$output_dir/%(%Y-%m-%d)T.log" -1
+}
+output_file="$(gen_filename)"
+echo "Output file: $output_file"
+
+log() {
+    # reset seconds counter
     SECONDS=0
 
     # print single timestamp (avoid external commands)
@@ -40,4 +56,20 @@ while :; do
     if (( $elapsed < $PING_TIMEOUT )); then
         sleep $(( $PING_TIMEOUT - $elapsed ))
     fi
-done | tee -a "${1:?No output file provided}"
+}
+
+while :; do
+    # swap files at midnight
+    printf -v timestamp "%(%H:%M)T" -1
+    if [[ "$timestamp" == "00:00" ]]; then
+        file="$(gen_filename)"
+        if [[ "$(gen_filename)" != "$output_file" ]]; then
+            output_file="$file"
+            echo "Output file: $output_file"
+        fi
+    fi
+
+    line="$(log)"
+    echo "$line"
+    echo "$line" >> "$output_file"
+done
