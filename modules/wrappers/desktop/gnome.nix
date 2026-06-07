@@ -18,6 +18,7 @@
   config = lib.mkMerge [
     (lib.mkIf config.my.gnome.enable {
       my.gui = true;
+      system.switch.inhibitors.desktop = lib.mkForce "gnome";
 
       services.xserver.enable = true;
       services.xserver.desktopManager.gnome.enable = true;

@@ -56,25 +56,21 @@
     qbittorrent
     arduino-ide
 
-    my.irscrutinizer
-    my.alass
-
     ffmpeg
     yt-dlp  # youtube downloader
     nushell # the best shell
     buildah # container builder thingy
     gvisor  # container runtime thingy
 
-    pkgsUnstable.mindustry # unstable is more recent
-
+    btop           # tui system monitor
     rofi           # for some scripts
     mpv            # scriptable media player
     proycon-wayout # wayland text widget thingy
   ];
 
-  fonts.packages = with pkgs; [
-    nerd-fonts.bigblue-terminal # funky pixel-y font
-  ];
+  # fonts.packages = with pkgs; [
+  #   nerd-fonts.bigblue-terminal # funky pixel-y font
+  # ];
 
   # # install zerotier but do not autostart it
   # services.zerotierone.enable = true;

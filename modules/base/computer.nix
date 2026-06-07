@@ -1,4 +1,4 @@
-{ config, hostname, ... }:
+{ config, hostname, lib, ... }:
 
 # common on all configuration except installers
 
@@ -7,6 +7,8 @@
     # import all the other modules
     ../default.nix
   ];
+
+  system.switch.inhibitors.base = lib.mkDefault "computer";
 
   networking.hostName = hostname;
   networking.networkmanager.enable = true;

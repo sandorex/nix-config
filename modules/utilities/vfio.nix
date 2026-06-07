@@ -4,7 +4,6 @@
 
 let
   enable = config.my.vfio.enable;
-  byId = config.my.vfio.byId;
   byPath = config.my.vfio.byPath;
   byGroup = config.my.vfio.byGroup;
 
@@ -14,13 +13,6 @@ in
 {
   options.my.vfio = {
     enable = lib.mkEnableOption "Enable pci passthrough (wont do anything if no devices are set)";
-    byId = lib.mkOption {
-      default = [];
-      type = with lib.types; listOf str;
-      description = "Pass each device by its product and vendor id (not recommended)";
-      example = [ "1002:1638" "1002:1637" ];
-    };
-
     byPath = lib.mkOption {
       default = [];
       type = with lib.types; listOf str;
@@ -56,31 +48,46 @@ in
       ];
 
       boot.kernelParams = [
+        # TODO this is AMD only
         "amd_iommu=on"
 
         # NOTE information online is spotty but seems to reduce overhead for host devices
         "iommu=pt"
-      ]
-      ++ lib.optionals (byId != []) "vfio-pci.ids=${ lib.concatStringsSep "," byId }";
+      ];
 
-      # have to manually override the driver as i cannot set order in which kernel
-      # modules load
-      boot.initrd.preDeviceCommands = ''
-        GROUPS="${ builtins.concatStringsSep " " (map toString byGroup) }"
-        PATHS="${ builtins.concatStringsSep " " byPath }"
+      # NOTE this was originally preDeviceCommands in NixOS 25.11
+      # manually override the driver as i cannot set order in which kernel modules load
+      systemd.services.vfio = {
+        description = "Force vfio for devices";
+        wantedBy = [ "sysinit.target" ];
+        after = [ "systemd-modules-load.service" ];
+        before = [ "systemd-udevd.service" ];
+        serviceConfig.Type = "oneshot";
+        unitConfig.DefaultDependencies = "no";
 
-        for group in $GROUPS; do
-          for device in /sys/kernel/iommu_groups/$group/devices/*; do
-            echo "vfio-pci" > "$device/driver_override"
+        enableStrictShellChecks = true;
+        script = ''
+          GROUPS=(${ builtins.concatStringsSep " " (map toString byGroup) })
+          PATHS=(${ builtins.concatStringsSep " " byPath })
+
+          for group in "''${GROUPS[@]}"; do
+            for device in "/sys/kernel/iommu_groups/$group/devices"/*; do
+              PATHS+=("$device")
+            done
           done
-        done
 
-        for device in $PATHS; do
-          echo "vfio-pci" > "$device/driver_override"
-        done
+          for path in "''${PATHS[@]}"; do
+            name="$(basename "$device")"
+            echo "Unbinding driver $name"
+            echo "$name" > "$path/driver/unbind"
 
-        modprobe -i vfio-pci
-      '';
+            echo "Binding $device to vfio-pci"
+            echo "$name" > "/sys/bus/pci/drivers/vfio-pci/bind"
+          done
+
+          ${pkgs.kmod}/bin/modprobe -i vfio-pci
+        '';
+      };
     }
 
     # looking glass windows "monitor" thingy

@@ -7,6 +7,7 @@
 
   config = lib.mkIf config.my.sway.enable {
     my.gui = true;
+    system.switch.inhibitors.desktop = lib.mkForce "swaywm";
 
     programs.sway = {
       enable = true;

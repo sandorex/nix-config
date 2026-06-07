@@ -80,5 +80,8 @@
       # disable flatpak as it wont have space to install it in the vm
       my.flatpak.enable = lib.mkForce false;
     };
+
+    # remove warning in nixos 26.05
+    boot.zfs.forceImportRoot = false;
   };
 }

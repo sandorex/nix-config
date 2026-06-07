@@ -14,6 +14,7 @@ in
 
   config = lib.mkIf cfg.enable {
     my.gui = true;
+    system.switch.inhibitors.desktop = lib.mkForce "hyprland";
 
     environment.systemPackages = with pkgs; [
       # theming

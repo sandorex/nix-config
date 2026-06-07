@@ -18,6 +18,7 @@
   config = lib.mkMerge [
     (lib.mkIf config.my.cinnamon.enable {
       my.gui = true;
+      system.switch.inhibitors.desktop = lib.mkForce "cinnamon";
 
       services.xserver.enable = true;
       services.libinput.enable = true;

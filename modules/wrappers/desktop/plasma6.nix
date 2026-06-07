@@ -18,6 +18,7 @@
   config = lib.mkMerge [
     (lib.mkIf config.my.kde.enable {
       my.gui = true;
+      system.switch.inhibitors.desktop = lib.mkForce "kde";
 
       services.xserver.enable = true;
       services.desktopManager.plasma6.enable = true;

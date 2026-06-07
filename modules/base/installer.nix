@@ -1,4 +1,4 @@
-{ ... }:
+{ lib, ... }:
 
 # common across all installers
 
@@ -7,4 +7,6 @@
     # import all the other modules
     ../default.nix
   ];
+
+  system.switch.inhibitors.base = lib.mkForce "installer";
 }

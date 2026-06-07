@@ -24,6 +24,7 @@ in
 
   config = lib.mkIf config.my.wayfire.enable {
     my.gui = true;
+    system.switch.inhibitors.desktop = lib.mkForce "wayfire";
 
     programs.wayfire.enable = true;
     programs.wayfire.plugins = with pkgs.wayfirePlugins; [

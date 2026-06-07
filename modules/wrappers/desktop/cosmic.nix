@@ -11,6 +11,7 @@
 
   config = lib.mkIf config.my.cosmic.enable {
     my.gui = true;
+    system.switch.inhibitors.desktop = lib.mkForce "cosmic";
 
     services.desktopManager.cosmic.enable = true;
     services.displayManager.cosmic-greeter.enable = true;
