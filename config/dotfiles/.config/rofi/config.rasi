@@ -1,5 +1,3 @@
-@theme "spotlight-dark.rasi"
-
 configuration {
     /* focus on hover */
     hover-select: true;
@@ -8,6 +6,15 @@ configuration {
     me-select-entry: "";
     me-accept-entry: [ MousePrimary, MouseDPrimary ];
 
+    /* cancel on click outside the window (does not seem to work on KDE) */
+    click-to-exit: true;
+
     /* cancel using escape or mouse right click */
     kb-cancel: [ MouseSecondary, Escape ];
+
+    /* show icons in drun and window modes */
+    show-icons: true;
 }
+
+// default theme override with `-theme launchpad`
+@theme "spotlight-dark"

@@ -2,8 +2,9 @@
   "custom/start": {
     "format": "  <span font='12'> </span>",
     "tooltip": false,
-    "on-click": "rofi -show drun -show-icons",
+    "on-click": "rofi -show drun -theme launchpad",
     "on-click-middle": "../scripts/window-title-toggle.sh toggle",
+    "on-click-right": "rofi -show drun",
   },
   "group/brightness": {
     "orientation": "horizontal",

@@ -1,0 +1,87 @@
+// Small theme that pops up in top right corner for gnome action centar-like thingy
+//
+// Original theme: spotlight-dark by Newman Sanchez (https://github.com/newmanls)
+
+* {
+    // TODO replace font
+    font:   "Montserrat 13";
+
+    bg0:    #242424;
+    bg1:    #7E7E7E;
+    bg2:    #0860f2;
+
+    fg0:    #DEDEDE;
+    fg1:    #FFFFFF;
+    fg2:    #DEDEDE80;
+
+    background-color:   transparent;
+    text-color:         @fg0;
+
+    margin:     0;
+    padding:    0;
+    spacing:    0;
+}
+
+window {
+    background-color:   @bg0;
+
+    width: 280px;
+    location: north east;
+    y-offset: 5;
+    x-offset: -5;
+
+    border-radius:  8;
+    border: 2;
+    border-color: @fg2;
+}
+
+inputbar {
+    enabled: false;
+}
+
+element-icon, element-text {
+    vertical-align: 0.5;
+}
+
+message {
+    border:             2px 0 0;
+    border-color:       @bg1;
+    background-color:   @bg1;
+}
+
+textbox {
+    padding:    8px 24px;
+}
+
+listview {
+    lines:      10;
+    columns:    1;
+    fixed-height:   false;
+}
+
+element {
+    padding:            8px 16px;
+    spacing:            16px;
+    background-color:   transparent;
+}
+
+element normal active {
+    text-color: @bg2;
+}
+
+element alternate active {
+    text-color: @bg2;
+}
+
+element selected normal, element selected active {
+    background-color:   @bg2;
+    text-color:         @fg1;
+}
+
+element-icon {
+    size:   1em;
+}
+
+element-text {
+    text-color: inherit;
+}

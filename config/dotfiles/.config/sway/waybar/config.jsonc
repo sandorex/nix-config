@@ -2,7 +2,7 @@
   // "output": "HDMI-A-1", // show only on main monitor
   "height": 24,
   "spacing": 4,
-  "reload_style_on_change": true, // used for tweaking
+  // "reload_style_on_change": true, // used for tweaking
   "modules-left": [
     "custom/start",
     "sway/workspaces",

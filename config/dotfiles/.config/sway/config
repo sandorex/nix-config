@@ -30,36 +30,30 @@ output "MS Telematica SNN 0x00000001" pos 0 1080 res 1920x1080
 output * bg #181A27 solid_color
 # output $mon1 bg city.png stretch
 
+bar {
+    font pango:UbuntuMono Nerd Font, NotoSans 11
+    position top
+    # output $mon2
+    # tray_output none
+    # TODO use variable
+    separator_symbol " | "
+    status_command i3blocks -c ~/.config/sway/i3blocks.toml
+    # tray_output primary
+
+    colors {
+        statusline #ffffff
+        background #323232
+        inactive_workspace #32323200 #32323200 #5c5c5c
+    }
+}
+
+
 ### INPUT ###
 include inputs.conf
 
 primary_selection disabled
 
-### BAR ###
-# TODO swaybar does not support right clicking tray icons...
-# NOTE keeps crashing so its useless
-# bar {
-#     # show only on second monitor to show the workspace
-#     # output $mon2
-#     font pango:UbuntuMono Nerd Font, NotoSans 11
-#     position top
-#     # tray_output none
-#     # TODO use variable
-#     status_command i3blocks -c ~/.config/sway/i3blocks.toml
-#     # status_command i3status-rs ~/.config/sway/i3status.toml
-#     # tray_output primary
-#
-#     colors {
-#         statusline #ffffff
-#         background #323232
-#         inactive_workspace #32323200 #32323200 #5c5c5c
-#     }
-# }
-
 seat * hide_cursor 8000
-
-# gaps outer 15
-# gaps inner 15
 
 # remove title but leave border on focused window
 default_border pixel
@@ -220,32 +214,14 @@ mode "resize" {
 
 bindsym $mod+r mode "resize"
 
-# NOTE: swaymsg '[workspace=".*"] border normal' works on all windows!!
-# TODO this could be menu with options like
-# send to workspace
-# fullscreen
-# etc
-
-# fullscreen on middle mouse button or kill on titlebar
-bindsym --whole-window --exclude-titlebar button2 fullscreen toggle
+# kill window using middle mouse button on titlebar
 bindsym button2 kill
-# bindsym --whole-window button2 exec notify-send "key released"
-# mode "mouse" {
-#     bindsym --whole-window button3 move drag
-#
-#     # Return to default mode
-#     bindsym Return mode "default"
-#     bindsym Escape mode "default"
-# }
-#
-# bindsym $mod+m mode "mouse"
 
 # sway does not want to set XDG_CURRENT_DESKTOP
 exec systemctl --user set-environment XDG_CURRENT_DESKTOP=sway XDG_SESSION_DESKTOP=sway
 exec systemctl --user import-environment XDG_CURRENT_DESKTOP XDG_SESSION_DESKTOP
 
 # execute waybar
-exec sh -c "cd $basedir/waybar; waybar -c config.jsonc"
-# exec ~/.config/waybar/waybar.sh
+exec $basedir/waybar.sh
 
 # exec mako # it seems to be already running?
