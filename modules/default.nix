@@ -79,6 +79,9 @@
 
       # disable flatpak as it wont have space to install it in the vm
       my.flatpak.enable = lib.mkForce false;
+
+      # no use for vfio in a VM
+      my.vfio.enable = lib.mkForce false;
     };
 
     # remove warning in nixos 26.05

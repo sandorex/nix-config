@@ -13,6 +13,7 @@ in
 {
   options.my.vfio = {
     enable = lib.mkEnableOption "Enable pci passthrough (wont do anything if no devices are set)";
+
     byPath = lib.mkOption {
       default = [];
       type = with lib.types; listOf str;
@@ -62,30 +63,54 @@ in
         wantedBy = [ "sysinit.target" ];
         after = [ "systemd-modules-load.service" ];
         before = [ "systemd-udevd.service" ];
-        serviceConfig.Type = "oneshot";
+        serviceConfig = {
+          Type = "oneshot";
+          RemainAfterExit = "yes"; # without this it will run twice
+        };
+
         unitConfig.DefaultDependencies = "no";
 
         enableStrictShellChecks = true;
         script = ''
-          GROUPS=(${ builtins.concatStringsSep " " (map toString byGroup) })
+          IOMMU_GROUPS=(${ builtins.concatStringsSep " " (map toString byGroup) })
           PATHS=(${ builtins.concatStringsSep " " byPath })
 
-          for group in "''${GROUPS[@]}"; do
-            for device in "/sys/kernel/iommu_groups/$group/devices"/*; do
-              PATHS+=("$device")
+          for group in "''${IOMMU_GROUPS[@]}"; do
+            for device in /sys/kernel/iommu_groups/"$group"/devices/*; do
+              if [[ -e "$device" ]]; then
+                PATHS+=("$device")
+              fi
             done
           done
 
-          for path in "''${PATHS[@]}"; do
-            name="$(basename "$device")"
-            echo "Unbinding driver $name"
-            echo "$name" > "$path/driver/unbind"
-
-            echo "Binding $device to vfio-pci"
-            echo "$name" > "/sys/bus/pci/drivers/vfio-pci/bind"
-          done
-
+          # load vfio module before binding it
           ${pkgs.kmod}/bin/modprobe -i vfio-pci
+
+          for path in "''${PATHS[@]}"; do
+            if [[ ! -e "$path" ]]; then
+              echo "Device $path does not exist"
+              continue
+            fi
+
+            id="$(basename "$path")"
+
+            # do not replace the driver twice
+            if [[ "$(basename "$(readlink "$path/driver")")" == "vfio-pci" ]]; then
+              echo "$id is already using vfio-pci"
+              continue
+            fi
+
+            echo "Forcing vfio-pci driver for $path"
+
+            # unbind old driver (if any)
+            [[ -e "$path/driver/unbind" ]] && echo "$id" > "$path/driver/unbind"
+
+            # allow vfio-pci to bind to this driver
+            echo "vfio-pci" > "$path/driver_override"
+
+            # bind new driver (does not work without driver_override!)
+            echo "$id" > "/sys/bus/pci/drivers/vfio-pci/bind"
+          done
         '';
       };
     }
