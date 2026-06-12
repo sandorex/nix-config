@@ -36,7 +36,6 @@ vim.o.updatetime = 500   -- save swap file after 0.5s
 vim.o.ignorecase = true  -- case-insensitive search
 vim.o.smartcase = true   -- , until search pattern contains upper case characters
 
--- NOTE smartindent prevents indenting lines that start with '#'
 vim.o.smartindent = false
 vim.o.shiftround = true  -- round indent to multiple of 'shiftwidth'
 vim.o.shiftwidth = 0     -- 0 to follow the 'tabstop' value
@@ -73,5 +72,3 @@ vim.opt.path:append { "**2" }
 -- hide `-- INSERT --` from messages as i have it in statusline
 vim.o.showmode = false
 
--- disables annoying dumb indent scripts that keep breaking comment indentation
-vim.cmd("filetype indent off")

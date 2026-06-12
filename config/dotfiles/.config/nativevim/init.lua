@@ -6,8 +6,12 @@ end
 -- load catppuccin at start
 vim.cmd("colorscheme catppuccin_macchiato")
 
+-- builtin plugins
+vim.cmd("packadd! yuck.vim")
+
 -- load lazy core commands
 require("core")
 
 -- load the config
 require("config")
+
