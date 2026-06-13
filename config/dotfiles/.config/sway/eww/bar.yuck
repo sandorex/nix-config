@@ -1,0 +1,135 @@
+(defwindow bar
+  :monitor 0
+  :windowtype "dock"
+  :exclusive true
+  :geometry (geometry :x "0%"
+                      :y "0%"
+                      :width "100%"
+                      :height "10px"
+                      :anchor "top center")
+  (centerbox :orientation "h"
+    (left)
+    (center)
+    (right)))
+
+(defwidget left []
+  (workspaces))
+
+(defwidget launcher [icon cmd]
+  (button :class "launcher"
+          :onclick "notify-send launcher \"${cmd}\""
+    icon))
+
+(defvar launchers_visible false)
+(defwidget center []
+  (box :class "right"
+       :orientation "h"
+       :space-evenly false
+       :halign "end"
+    (box :class "launcher" " ")
+    ; (scale :class "launcher" :marks "X" :value 30.0 :min 0.0 :max 100.0 :orientation "h" :draw-value true)
+    (launcher :icon " " :cmd "editor")
+    (launcher :icon " " :cmd "file manager")
+    (launcher :icon " " :cmd "terminal")
+    (launcher :icon "󰈹 " :cmd "browser") ; TODO placeholder find generic browser icon?
+    ))
+
+(defwidget right []
+  (box :class "sidestuff"
+       :orientation "h"
+       :space-evenly false
+       :halign "end"
+    (volume)
+    (bluetooth)
+    ; (brightness)
+    (network)
+    (systemtray)
+    (time)
+    (extras)))
+
+(deflisten workspaces :initial "[]" "eww/workspaces")
+
+(defwidget workspaces []
+  (box :class "workspaces"
+       :orientation "h"
+       :space-evenly true
+       :halign "start"
+       :spacing 10
+    (for ws in workspaces
+      (button :class "${ ws.focused ? "focused" : "" } ${ ws.visible ? "visible" : "" }"
+              :onclick "swaymsg workspace ${ws.name}"
+              {ws.name}))))
+
+; TODO test
+(defwidget cpu_temp [name]
+  (label :class "indicator" :text "${EWW_TEMPS[name]}"))
+
+(defwidget cpu_usage []
+  (label :class "indicator" :text  "  ${ceil(EWW_CPU.avg)}%"))
+
+(defvar blue_light_filter true)
+(defwidget blue_light_filter []
+  (button :class "indicator" "${ blue_light_filter ? "" : "" }"))
+
+(defwidget brightness []
+  (button :class "indicator" "󰃠"))
+
+(defwidget memory []
+  (label :class "indicator" :text  "   ${
+      formatbytes(floor(EWW_RAM.used_mem), true, "si")
+    } / ${
+      formatbytes(floor(EWW_RAM.total_mem), true, "si")
+    }"))
+
+; formatbytes
+(defvar volume_visible false)
+(deflisten volume :initial `{ "volume": 50, "is_bluetooth": false }` "eww/volume monitor")
+(defwidget volume []
+  (eventbox :onclick "eww/volume left"
+            :onmiddleclick "eww/volume middle"
+            :onrightclick "eww/volume right"
+            :onscroll `eww/volume "{}"`
+            :onhover "${EWW_CMD} update volume_visible=true"
+            :onhoverlost "${EWW_CMD} update volume_visible=false"
+    (label :class "indicator ${ volume.muted ? "muted" : "" }"
+           :text "${ volume.muted ? "󰖁" : volume.is_bluetooth ? "󰂰" : "󰕾" }${ volume_visible ? " ${volume.volume}%" : "" }")))
+
+; TODO open rofi ?
+(deflisten bluetooth :initial `{ "status": "unknown" }` "eww/bluetooth")
+(defwidget bluetooth []
+  (label :class "indicator"
+         :visible { bluetooth.status == "unknown" ? false : true }
+         :text "${ bluetooth.status == "off" ? "󰂲 " : (bluetooth.connected ? "󰂱 " : "") }"))
+
+; make it green when connected
+; middle mouse button to toggle network connection
+; left click open nmtui or something?
+(deflisten network :initial `{ "status": "ethernet" }` "eww/network")
+(defwidget network []
+  (label :class "indicator network-${ network.status }"
+         :tooltip "${network.status == "wifi" ? "${network.ssid} ${network.ssid} dB" : ""}"
+         :text "${
+      network.status == "ethernet" ? " " :
+      network.status == "wifi" ? " " :
+      network.status == "linked" ? "󰲝 " :
+      network.status == "disabled" ? "󰲜 " :
+      network.status == "disconnected" ? "󰱟 " :
+      "󰲊 " ; fallback
+    }"))
+
+(defwidget systemtray []
+  (systray :class "tray"
+           :orientation "v"
+           :icon-size 16
+           :spacing 5))
+
+(defwidget time []
+  (button :class "time"
+          :onclick "notify-send time yep"
+    "${formattime(EWW_TIME, "%a %m/%d %H:%m")}"))
+
+(defwidget extras []
+  (button :class "indicator extras"
+          :onclick "notify-send extras left"
+          :onmiddleclick "notify-send extras middle" ; toggle titles?
+    "󰇙"))

@@ -1,0 +1,15 @@
+#!/usr/bin/env bash
+
+# Function to get the current focused workspace ID
+get_active_workspace() {
+    swaymsg --raw -t get_workspaces | jq -c
+    # | jq -r '.[] | select(.focused==true) | .name'
+}
+
+# Print current state immediately
+get_active_workspace
+
+# Listen to the Sway IPC socket for workspace changes
+swaymsg -t subscribe -m '["workspace"]' | while read -r _; do
+    get_active_workspace
+done

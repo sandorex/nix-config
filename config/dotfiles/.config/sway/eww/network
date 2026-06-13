@@ -1,0 +1,47 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+print_state() {
+    local info=$(nmcli -t -f TYPE,STATE,DEVICE device)
+
+    # check if all devices are disabled
+    local disabled_count="$(echo "$info" | grep -c '^unavailable$')"
+    local total_count="$(echo "$info" | wc -l)"
+    if [[ "disabled_count" -eq "$total_count" ]]; then
+        printf '{"status":"disabled"}\n'
+        return
+    fi
+
+    # Check for Wi-Fi connected 
+    while IFS=: read -r dev_type dev_state dev_name; do
+        if [[ "$dev_type" == "wifi" && "$dev_state" == "connected" ]]; then
+            nmcli -t -f ACTIVE,SSID,SIGNAL, dev wifi | awk -F: '$1 == "yes" { print "{\"status\":\"wifi\",\"ssid\":\"" $2 "\",\"signal\":" $3 "}"; exit }'
+            return
+        fi
+    done <<< "$info"
+
+    # Check for Ethernet connected
+    while IFS=: read -r dev_type dev_state dev_name; do
+        if [[ "$dev_type" == "ethernet" && "$dev_state" == "connected" ]]; then
+            printf '{"status":"ethernet"}\n'
+            return
+        fi
+    done <<< "$info"
+
+    # Check for linked but not connected interfaces 
+    while IFS=: read -r dev_type dev_state dev_name; do
+        if [[ "$dev_state" == "connected" ]]; then
+            printf '{"status":"linked"}\n'
+            return
+        fi
+    done <<< "$info"
+
+    printf '{"status":"disconnected"}\n'
+}
+
+print_state
+
+nmcli monitor | grep --line-buffered -E "disconnected|connected$" | while read -r _; do
+    print_state
+done

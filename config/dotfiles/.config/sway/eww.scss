@@ -1,0 +1,107 @@
+$bg: #3a3a3a;
+$fg: white;
+$fg_hover: #D35D6E;
+
+$indicator_padding: 8px;
+
+* {
+  all: unset; // Unsets everything so you can style everything from scratch
+  font-family: "UbuntuMono Nerd Font";
+  font-size: 16px;
+}
+
+.bar {
+  background-color: $bg;
+  color: $fg;
+  padding: 4px;
+}
+
+.workspaces button:hover {
+  color: $fg_hover;
+}
+
+.workspaces button, .launcher {
+  padding: 0 4px;
+}
+
+.focused {
+  color: white;
+  background-color: gray;
+}
+
+// color workspaces on other displays
+.workspaces > *.visible:not(.focused) {
+  color: blue;
+  background-color: red;
+}
+
+.indicator {
+  margin: 0 $indicator_padding;
+}
+
+.launcher:hover {
+  color: red;
+}
+
+.muted {
+  color: red;
+}
+
+.tray {
+  // remove padding so its invisible when there are no icons
+  margin: 0;
+}
+
+// ensure the tray icons fit properly
+.tray image {
+  margin-right: $indicator_padding;
+}
+
+// System Tray
+.tray menu {
+  padding: 5px 5px;
+  background-color: #333333;
+
+  >menuitem {
+    font-family: JetBrainsMono NF;
+    font-size: 14px;
+    padding: 2px 5px;
+    color: #BBBBBB;
+
+    &:disabled label {
+      color: #000000;
+    }
+
+    &:hover {
+      background-color: #222222;
+    }
+  }
+
+  separator {
+    background-color: #FFFFFF;
+    padding-top: 1px;
+
+    &:last-child {
+      padding: unset;
+    }
+  }
+}
+
+.trayicon {
+  background-repeat: no-repeat;
+  background-size: 25px;
+  min-height: 25px;
+  min-width: 7px;
+  margin: 0.2rem 0 0.2rem 0;
+}
+
+tooltip {
+    background-color: #333333;
+    border: 1px solid #3e424f;
+    padding: 15px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.2);
+
+    label {
+        color: #abb2bf;
+    }
+}
