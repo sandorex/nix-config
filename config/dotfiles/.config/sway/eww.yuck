@@ -1,1 +1,8 @@
 (include "eww/bar.yuck")
+
+(include "eww/volume.yuck")
+(include "eww/network.yuck")
+(include "eww/bluetooth.yuck")
+(include "eww/workspaces.yuck")
+(include "eww/datetime.yuck")
+(include "eww/extras.yuck")

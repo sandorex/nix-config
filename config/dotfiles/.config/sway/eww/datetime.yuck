@@ -1,0 +1,24 @@
+; condensed day of the week
+(defvar DAY_FORMAT `[ "M", "T", "W", "H", "F", "S", "U" ]`)
+(defwidget datetime []
+  (button :class "time"
+          :onclick "${EWW_CMD} open datetime-popup"
+    "${DAY_FORMAT[formattime(EWW_TIME, "%u")]}${formattime(EWW_TIME, "%d/%m %H:%m")}"))
+
+(defwindow datetime-popup
+  :monitor 0
+  :stacking "overlay"
+  :geometry (geometry :y "-30px" ; NOTE bar height
+                      :width "150px"
+                      :anchor "top right")
+  (datetime-popup :window "datetime-popup"
+                  :bar-height 30))
+
+(defwidget datetime-popup [window bar-height]
+  (eventbox :onhoverlost "${EWW_CMD} close ${window}"
+    (box :orientation "v"
+         :space-evenly false
+      (button :style "min-height: ${bar-height}px"
+              :onclick "${EWW_CMD} close ${window}")
+      (box :class "container"
+        (calendar :class "cal")))))

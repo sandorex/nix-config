@@ -1,0 +1,8 @@
+(deflisten bluetooth :initial `{ "status": "unknown" }` "eww/bluetooth")
+(defwidget bluetooth []
+  (button :class "indicator"
+          :visible { bluetooth.status == "unknown" ? false : true }
+          :onclick "notify-send bluetooth left"
+          :onmiddleclick "notify-send bluetooth middle"
+          :onrightclick "notify-send bluetooth right"
+          "${ bluetooth.status == "off" ? "󰂲 " : (bluetooth.connected ? "󰂱 " : "") }"))

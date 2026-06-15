@@ -1,0 +1,11 @@
+(deflisten workspaces :initial "[]" "eww/workspaces")
+(defwidget workspaces []
+  (box :class "workspaces"
+       :orientation "h"
+       :space-evenly true
+       :halign "start"
+       :spacing 10
+    (for ws in workspaces
+      (button :class "${ ws.focused ? "focused" : "" } ${ ws.visible ? "visible" : "" }"
+              :onclick "swaymsg workspace ${ws.name}"
+              {ws.name}))))

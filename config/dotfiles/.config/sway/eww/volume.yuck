@@ -1,0 +1,31 @@
+; TODO add revealer for the volume
+
+;; contains volume related widgets
+(defvar volume_visible false)
+(deflisten volume :initial `{ "volume": 50, "is_bluetooth": false }` "eww/volume monitor")
+(defwidget volume []
+  (eventbox :onclick "eww/volume left"
+            :onmiddleclick "eww/volume middle"
+            :onrightclick "eww/volume right"
+            :onscroll `eww/volume "{}"`
+            :onhover "${EWW_CMD} update volume_visible=true"
+            :onhoverlost "${EWW_CMD} update volume_visible=false"
+    (box :orientation "h"
+         :space-evenly false
+         :class "indicator"
+         :style "margin-right: 0"
+      :class "${ volume.muted ? "volume-muted" : "" }"
+
+      (label 
+             :text "${ volume.muted ? "󰖁" : volume.is_bluetooth ? "󰂰" : "󰕾" }"
+             :style "padding-right: 8px; padding-left: 4px" ; makes both labels roughly same size
+             :visible {!volume_visible})
+      (label :text " ${volume.volume}%"
+             :visible {volume_visible})
+    )
+  ))
+
+; ; TODO slider is invisible
+; (defwidget volume_slider []
+;   (scale :class "volume slider ${ volume.is_bluetooth ? "volume-muted" : "" }" :min 0 :max 100 :value {volume.volume})
+;   )

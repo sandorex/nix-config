@@ -16,7 +16,7 @@ print_state() {
     # Check for Wi-Fi connected 
     while IFS=: read -r dev_type dev_state dev_name; do
         if [[ "$dev_type" == "wifi" && "$dev_state" == "connected" ]]; then
-            nmcli -t -f ACTIVE,SSID,SIGNAL, dev wifi | awk -F: '$1 == "yes" { print "{\"status\":\"wifi\",\"ssid\":\"" $2 "\",\"signal\":" $3 "}"; exit }'
+            nmcli -t -f ACTIVE,SSID,SIGNAL, dev wifi | awk -F: '$1 == "yes" { print "{\"status\":\"wifi\",\"ssid\":\"" $2 "\",\"signal\":" $3 ",\"dev\":\"'$dev_state'\"}"; exit }'
             return
         fi
     done <<< "$info"
@@ -24,7 +24,7 @@ print_state() {
     # Check for Ethernet connected
     while IFS=: read -r dev_type dev_state dev_name; do
         if [[ "$dev_type" == "ethernet" && "$dev_state" == "connected" ]]; then
-            printf '{"status":"ethernet"}\n'
+            printf '{"status":"ethernet",\"dev\":\"%s\"}\n' "$dev_name"
             return
         fi
     done <<< "$info"
@@ -32,7 +32,7 @@ print_state() {
     # Check for linked but not connected interfaces 
     while IFS=: read -r dev_type dev_state dev_name; do
         if [[ "$dev_state" == "connected" ]]; then
-            printf '{"status":"linked"}\n'
+            printf '{"status":"linked", \"dev\": \"%s\"}\n' "$dev_name"
             return
         fi
     done <<< "$info"

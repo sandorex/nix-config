@@ -2,8 +2,6 @@
 
 set -euo pipefail
 
-# TODO differentiate between powered: no and no adapters
-# TODO bluetoothctl may hang if there are no bluetooth adapters?
 print_state() {
     # bluetoothctl hangs if there are no adapters and --timeout can be minimum
     # of one second and that is very slow

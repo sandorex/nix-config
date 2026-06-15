@@ -1,0 +1,85 @@
+(defwidget extras []
+  (button :class "indicator extras"
+          :onclick "${EWW_CMD} open extras-popup"
+          ; :onclick "notify-send extras left"
+          :onmiddleclick "notify-send extras middle" ; toggle titles?
+    "󰇙"))
+
+(defwindow extras-popup
+  :monitor 0
+  :stacking "overlay"
+  :geometry (geometry :y "-30px" ; NOTE bar height
+                      :anchor "top right")
+  (extras-popup :window "extras-popup"
+                :bar-height 30))
+
+(defwidget extras-popup [window bar-height]
+  (eventbox :onhoverlost "${EWW_CMD} close ${window}"
+    (box :orientation "v"
+         :space-evenly false
+      (button :style "min-height: ${bar-height}px"
+              :onclick "${EWW_CMD} close ${window}")
+      (box :class "container"
+           :orientation "v"
+           :space-evenly false
+        (for item in {EXTRAS_ITEMS}
+          (button :onclick `notify-send extras "${item.label}"`
+              (box :orientation "h"
+                   :space-evenly false
+                   :hexpand true
+                   :class "item"
+                ; TODO should i set icon theme?
+                ; (image :icon "${item.icon}" :halign "start")
+                (label :class "icon" :text "${item.icon}" :halign "start")
+                (label :text "${item.label}" :halign "center" :hexpand true)
+              )
+            ))
+        (box :orientation "h"
+             :space-evenly false
+             :hexpand true
+             :halign "center"
+             :class "power-item-container"
+          (button :class "power-item"
+                  :onclick `notify-send extras "shutdown"`
+            (label :xalign 0.4 :text ""))
+          (button :class "power-item"
+                  :onclick `notify-send extras "sleep"`
+            (label :text "󰤄"))
+          (button :class "power-item"
+                  :onclick `notify-send extras "reboot"`
+            (label :xalign 0.45 :text ""))
+        )
+        ))))
+
+(defvar EXTRAS_ITEMS `[
+  {
+    "label": "Titlebar",
+    "icon": "",
+    "cmd": "title"
+  },
+  {
+    "label": "Brightness",
+    "icon": "󰃟",
+    "cmd": "brightness"
+  },
+  {
+    "label": "Update",
+    "icon": "󰚰",
+    "cmd": "update"
+  },
+  {
+    "label": "Restart WM",
+    "icon": "󰜉",
+    "cmd": "restart-wm"
+  },
+  {
+    "label": "Log Out",
+    "icon": "󰗽",
+    "cmd": "logout"
+  },
+  {
+    "label": "Lock",
+    "icon": "",
+    "cmd": "lock"
+  }
+]`)

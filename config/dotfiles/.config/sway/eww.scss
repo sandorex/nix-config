@@ -43,7 +43,7 @@ $indicator_padding: 8px;
   color: red;
 }
 
-.muted {
+.volume-muted {
   color: red;
 }
 
@@ -104,4 +104,65 @@ tooltip {
     label {
         color: #abb2bf;
     }
+}
+
+.datetime-popup .container {
+  background-color: $bg;
+}
+
+.cal {
+  padding: 5px;
+  color: rgb(205,212,246);
+
+  &.header {
+    color: rgb(219,193,117);
+  }
+
+  &.button {
+    color: rgb(219,193,117);
+    &:hover {
+      color: rgb(230,100,100);
+    }
+  }
+
+  &:indeterminate {
+    color: rgba(205,212,246,0.4);
+  }
+
+  &.highlight {
+    color: rgb(245,162,96);
+  }
+}
+
+.extras-popup .container {
+  background-color: $bg;
+  padding: 5px;
+
+  *.item {
+    padding: 5px 8px;
+    min-width: 150px;
+    margin: 4px 0;
+  }
+
+  .power-item-container {
+    margin-top: 8px;
+  }
+
+  .power-item {
+    min-width: 45px;
+    min-height: 32px;
+  }
+
+  .power-item:not(:last-child):not(:first-child) {
+    margin: 0 15px;
+  }
+
+  .icon {
+    margin-right: 20px;
+  }
+
+  // only eventbox can have hover
+  >*:hover, button:hover {
+    background-color: $fg_hover;
+  }
 }

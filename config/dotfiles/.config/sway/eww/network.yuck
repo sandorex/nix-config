@@ -1,0 +1,15 @@
+; make it green when connected
+; middle mouse button to toggle network connection
+; left click open nmtui or something?
+(deflisten network :initial `{ "status": "ethernet" }` "eww/network")
+(defwidget network []
+  (label :class "indicator network-${ network.status }"
+         :tooltip "${network.dev ?: ""}${network.status == "wifi" ? " ${network.ssid} ${network.signal} dB" : ""}"
+         :text "${
+      network.status == "ethernet" ? " " :
+      network.status == "wifi" ? " " :
+      network.status == "linked" ? "󰲝 " :
+      network.status == "disabled" ? "󰲜 " :
+      network.status == "disconnected" ? "󰱟 " :
+      "󰲊 " ; fallback
+    }"))
