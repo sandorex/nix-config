@@ -85,7 +85,7 @@ in
       XCURSOR_THEME = cursorName;
     };
 
-    dotfiles.enabled = with config.dotfiles.configs; [
+    my.dotfiles.enabled = with config.my.dotfiles.configs; [
       wayfire
       waybar
       rofi

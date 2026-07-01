@@ -5,17 +5,8 @@ let
 in
 {
   options.my.zsh = {
-    enable = lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Enable Z shell";
-    };
-
-    isDefault = lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Make Z shell the default for all users (including root)";
-    };
+    enable = lib.mkEnableOption "Enable Z shell";
+    isDefault = lib.mkEnableOption "Make Z shell the default for all users (including root)";
   };
 
   config = lib.mkIf cfg.enable {
@@ -28,7 +19,7 @@ in
     # set for main user if not default
     users.users.${config.my.user}.shell = lib.mkIf (!cfg.isDefault) pkgs.zsh;
 
-    dotfiles.enabled = with config.dotfiles.configs; [
+    my.dotfiles.enabled = with config.my.dotfiles.configs; [
       zsh
     ];
   };

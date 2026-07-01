@@ -1,13 +1,7 @@
 { config, lib, pkgs, ... }:
 
 {
-  options = {
-    my.gaming.enable = lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Enable gaming support (steam and stuff)";
-    };
-  };
+  options.my.gaming.enable = lib.mkEnableOption "Enable gaming support (steam and stuff)";
 
   config = lib.mkIf config.my.gaming.enable {
     programs.steam.enable = true;
@@ -15,7 +9,7 @@
       mangohud
     ];
 
-    dotfiles.enabled = with config.dotfiles.configs; [
+    my.dotfiles.enabled = with config.my.dotfiles.configs; [
       # add mangohud config
       mangohud
     ];

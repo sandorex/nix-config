@@ -59,7 +59,7 @@ in
         wl-clipboard  # clipboard on wayland
       ]);
 
-      dotfiles.enabled = with config.dotfiles.configs; lib.optionals dotfiles [
+      my.dotfiles.enabled = with config.my.dotfiles.configs; lib.optionals dotfiles [
         git
         bin
         bash
@@ -101,7 +101,7 @@ in
 
       my.flatpak.install = [];
 
-      dotfiles.enabled = with config.dotfiles.configs; lib.optionals dotfiles [
+      my.dotfiles.enabled = with config.my.dotfiles.configs; lib.optionals dotfiles [
         kitty
         easyeffects
         # qalculate # TODO do i even have a rule for this?
@@ -121,7 +121,7 @@ in
         shellcheck
       ];
 
-      dotfiles.enabled = with config.dotfiles.configs; lib.optionals dotfiles [
+      my.dotfiles.enabled = with config.my.dotfiles.configs; lib.optionals dotfiles [
         lsd # theme so everything is readable
       ];
     })

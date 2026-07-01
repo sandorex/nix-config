@@ -27,7 +27,7 @@
   # enable automatic garbage collection
   my.gc.enable = true;
 
-  dotfiles.enabled = with config.dotfiles.configs; [
+  my.dotfiles.enabled = with config.my.dotfiles.configs; [
     bin # contains scripts and stuff
   ];
 }

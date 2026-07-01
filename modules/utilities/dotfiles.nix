@@ -1,7 +1,7 @@
 { config, lib, flake, ... }:
 
 let
-  inherit (builtins) map attrNames readDir readFile isString filter split replaceStrings concatStringsSep;
+  inherit (builtins) attrNames readDir readFile isString filter split replaceStrings concatStringsSep;
 
   rulesDir = "${flake}/config/rules";
 
@@ -24,7 +24,7 @@ let
   ];
 in
 {
-  options = {
+  options.my = {
     dotfiles.configs = lib.mkOption {
       default = (lib.genAttrs ruleList
         (rule: lib.pipe "${rulesDir}/${rule}.conf" [
@@ -59,9 +59,9 @@ in
         }
       ];
     }
-    (lib.mkIf (config.dotfiles.enabled != []) {
+    (lib.mkIf (config.my.dotfiles.enabled != []) {
       systemd.user.tmpfiles.users.${config.my.user}.rules = (
-        lib.pipe config.dotfiles.enabled [
+        lib.pipe config.my.dotfiles.enabled [
           lib.flatten
 
           # concat all lists into one string
