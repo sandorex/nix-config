@@ -41,7 +41,7 @@
 
     pipewire.enable = true;
     kde.enable = true;
-    sddm.enable = true;
+    plasma-login-manager.enable = true;
   };
 
   environment.systemPackages = with pkgs; [
@@ -66,6 +66,8 @@
     rofi           # for some scripts
     mpv            # scriptable media player
     proycon-wayout # wayland text widget thingy
+
+    nvtopPackages.amd # gpu usage monitor
   ];
 
   # fonts.packages = with pkgs; [

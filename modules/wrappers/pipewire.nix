@@ -23,10 +23,21 @@
         # fixes crackling sound (games running through proton often have it)
         # https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/3190
         # https://gitlab.freedesktop.org/pipewire/pipewire/-/issues/3198
+        #
+        # the latency in audio (quantum / rate * 1000)
+        # can also be set in pw-metadata or using `PULSE_LATENCY_MSEC`
         quantum-fix = {
           "context.properties" = {
-            "default.clock.quantum" = 1024;      # default 1024
-            "default.clock.min-quantum" = 1024;  # default 32
+            "default.clock.rate" = 48000;
+            "default.clock.allowed-rates" = [48000];
+
+            # default latency is 16.66ms
+            "default.clock.quantum" = 800;       # default 1024
+
+            # minimal latency is 5.33ms
+            "default.clock.min-quantum" = 256;   # default 32
+
+            # max latency 21.33ms
             "default.clock.max-quantum" = 1024;  # default 8192
           };
         };

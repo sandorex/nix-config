@@ -1,18 +1,10 @@
 { config, pkgs, lib, ... }:
 
 {
-  options = {
-    my.kde.enable = lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Enable KDE Plasma desktop";
-    };
-
-    my.sddm.enable = lib.mkOption {
-      default = false;
-      type = lib.types.bool;
-      description = "Use SDDM display manager";
-    };
+  options.my = {
+    kde.enable = lib.mkEnableOption "Enable KDE Plasma desktop";
+    sddm.enable = lib.mkEnableOption "Use SDDM display manager";
+    plasma-login-manager.enable = lib.mkEnableOption "Use Plasma Login Manager display manager";
   };
 
   config = lib.mkMerge [
@@ -39,6 +31,10 @@
 
     {
       services.displayManager.sddm.enable = config.my.sddm.enable;
+    }
+
+    {
+      services.displayManager.plasma-login-manager.enable = config.my.plasma-login-manager.enable;
     }
   ];
 }

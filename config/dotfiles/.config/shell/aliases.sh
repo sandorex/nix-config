@@ -11,9 +11,17 @@ if [[ -z "$ZSH_VERSION" ]]; then
     compdef() { :; }
 fi
 
+# quickly switch to the bg job
 alias z=fg
+alias 1="%1"
+alias 2="%2"
+alias 3="%3"
+alias 4="%4"
+alias 5="%5"
+
+alias v=nvim; compdef v=nvim
 alias a=arcam
-alias g='git'
+alias g='git'; compdef g=git
 alias f="$FILE_MANAGER"
 alias mv='mv -i' # safe mv, ask on overwrite
 alias yeet=shred
@@ -43,18 +51,11 @@ else
     function ll() { command ls -alFht --color=auto "$@"; }
 fi
 
-if command -v zellij &>/dev/null; then
-    alias z='zellij'
-
-    # quickly spin up a layout
-    alias zl='zellij --layout'
-fi
-
 # make dot without arguments list directory, otherwise just pass args through
 _dot() {
     if [ "$#" -eq 0 ]; then
         # as im not using an alias above this should use proper arguments with
-        # no duplicated codes
+        # no duplicated code
         ls
     else
         \. "$@"
@@ -64,11 +65,18 @@ _dot() {
 alias -- '-'='cd -'
 alias -- '.'='_dot'
 alias -- '..'='cd ..'
+alias -- '...'='cd ../..'
+alias -- '....'='cd ../../..'
 
 alias diff='diff --report-identical-files --color=auto'
 alias grep='grep --color=auto'
 alias isodate="date +'%Y%m%dT%H%M'"
 alias qr="qrencode -t UTF8"
+
+# call lua interpreter builtin into neovim
+nlua() {
+    nvim --clean -l "$@"
+}
 
 # function aliases
 rcp() {
@@ -89,14 +97,6 @@ rcp() {
         "$@"
 }; compdef rcp=rsync
 
-# fuzzy cd, requires fd
-fcd() {
-    local dir
-    # im using cd here as fd acts weirdly with an argument
-    # using fzf exact match as it makes more sense
-    dir="$(test -n "$1" && cd "$1"; fd -td -tl --follow --max-depth 5 | fzf --exact)" && cd "${dir:?}"
-}
-
 # enter distrobox by default
 dbx() {
     if [[ "$#" == 0 ]]; then
@@ -104,5 +104,5 @@ dbx() {
     else
         command distrobox "$@"
     fi
-}
+}; compdef dbx=distrobox
 

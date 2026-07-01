@@ -12,7 +12,6 @@
   config = lib.mkIf config.my.gaming.enable {
     programs.steam.enable = true;
     environment.systemPackages = with pkgs; [
-      lutris
       mangohud
     ];
 
@@ -28,9 +27,10 @@
     boot.initrd.kernelModules = [ "ntsync" ];
 
     my.flatpak.install = [
-      "com.usebottles.bottles"      # general purpose proton/wine launcher
-      "com.heroicgameslauncher.hgl" # GOG/Epic games launcher
-      "net.davidotek.pupgui2"       # proton-qt, manging proton versions
+      "com.usebottles.bottles"                        # general purpose proton/wine launcher
+      "com.heroicgameslauncher.hgl"                   # GOG/Epic games launcher
+      "net.davidotek.pupgui2"                         # proton-qt, manging proton versions
+      "org.freedesktop.Platform.VulkanLayer.MangoHud" # mangohud for flatpak
     ];
   };
 }
