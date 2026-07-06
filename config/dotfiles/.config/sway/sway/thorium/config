@@ -1,0 +1,33 @@
+include inputs
+
+# TODO replace these with port names as TV sometimes replaces the monitor and keybindings wont work
+# Dell and MS Telematica are connected through a HDMI switch
+output "Dell Inc. DELL U2414H 292K46B839FL"      pos 0 1080 res 1920x1080
+output "MS Telematica SNN 0x00000001"            pos 0 1080 res 1920x1080
+
+output "ASUSTek COMPUTER INC VA249 KCLMQS107820" pos 0 0    res 1920x1080
+
+## Keybindings ##
+# NOTE: this overwrites the default keybinding so --no-warn is required
+# switch workspaces per monitor
+bindsym --no-warn $mod+1 workspace number 1; move workspace to output $mon1
+bindsym --no-warn $mod+2 workspace number 2; move workspace to output $mon1
+bindsym --no-warn $mod+3 workspace number 3; move workspace to output $mon1
+bindsym --no-warn $mod+4 workspace number 4; move workspace to output $mon1
+bindsym --no-warn $mod+5 workspace number 5; move workspace to output $mon1
+bindsym --no-warn $mod+6 workspace number 6; move workspace to output $mon1
+bindsym --no-warn $mod+7 workspace number 7; move workspace to output $mon1
+bindsym --no-warn $mod+8 workspace number 8; move workspace to output $mon1
+bindsym --no-warn $mod+9 workspace number 9; move workspace to output $mon1
+
+bindsym $mod+F1 workspace number 1; move workspace to output $mon2
+bindsym $mod+F2 workspace number 2; move workspace to output $mon2
+bindsym $mod+F3 workspace number 3; move workspace to output $mon2
+bindsym $mod+F4 workspace number 4; move workspace to output $mon2
+bindsym $mod+F5 workspace number 5; move workspace to output $mon2
+bindsym $mod+F6 workspace number 6; move workspace to output $mon2
+bindsym $mod+F7 workspace number 7; move workspace to output $mon2
+bindsym $mod+F8 workspace number 8; move workspace to output $mon2
+bindsym $mod+F9 workspace number 9; move workspace to output $mon2
+
+# vim: ft=swayconfig

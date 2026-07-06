@@ -1,0 +1,8 @@
+set $mod Mod4
+set $term kitty
+set $files thunar
+
+# TODO find replacement for rofi
+set $menu rofi -show drun -i | xargs swaymsg exec --
+
+# vim: ft=swayconfig

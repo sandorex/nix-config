@@ -10,7 +10,7 @@ Rectangle {
     width: workspaces.implicitWidth
     height: workspaces.implicitHeight
 
-    color: mode === "default" ? "transparent" : "red"
+    color: mode === "default" ? "transparent" : "#5E81AC"
 
     // listen when sway mode changes
     I3IpcListener {
@@ -29,6 +29,7 @@ Rectangle {
         color: Theme.colorFg
 
         font.family: Theme.fontFamily
+        font.bold: true
         text: workspacesRoot.mode === "default" ? "" : workspacesRoot.mode
     }
 

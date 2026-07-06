@@ -2,7 +2,6 @@
 //@ pragma UseQApplication
 
 import QtQuick
-import QtQuick.Controls
 import Quickshell
 import Quickshell.I3
 import Quickshell.Widgets
@@ -26,6 +25,7 @@ PanelWindow {
         SwayWorkspacesExtra {}
     }
 
+    // TODO notifications and launchers?
     // center
     Row {
         anchors.centerIn: parent
@@ -46,10 +46,18 @@ PanelWindow {
 
         spacing: 6
 
-        Volume {}
+        Bluetooth {
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+        }
+
+        Volume {
+            anchors.top: parent.top
+            anchors.bottom: parent.bottom
+        }
 
         Rectangle {
-            implicitHeight: 34
+            implicitHeight: 32
             implicitWidth: trayRow.implicitWidth
             border.width: 0
             color: "transparent"
