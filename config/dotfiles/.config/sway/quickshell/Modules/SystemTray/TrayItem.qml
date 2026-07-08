@@ -42,23 +42,6 @@ MouseArea {
         anchor.item: root
     }
 
-    // NOTE removing the background
-    // Rectangle {
-    //     id: bg
-    //     anchors.centerIn: parent
-    //     width: 24
-    //     height: 24
-    //     // radius: 8
-    //     // color: root.menuOpening ? Qt.rgba(1, 1, 1, 0.62) : (root.containsMouse ? Qt.rgba(1, 1, 1, 0.52) : Qt.rgba(1, 1, 1, 0.42))
-    //     // border.color: root.menuOpening ? Qt.rgba(1, 1, 1, 0.80) : (root.containsMouse ? Qt.rgba(1, 1, 1, 0.66) : Qt.rgba(1, 1, 1, 0.34))
-    //     // border.width: 1
-    //     scale: root.menuOpening ? 1.08 : (root.containsMouse ? 1.04 : 1.0)
-    //
-    //     Behavior on color { ColorAnimation { duration: 140 } }
-    //     Behavior on border.color { ColorAnimation { duration: 140 } }
-    //     Behavior on scale { NumberAnimation { duration: 140; easing.type: Easing.OutCubic } }
-    // }
-
     Image {
         id: content
         anchors.centerIn: parent

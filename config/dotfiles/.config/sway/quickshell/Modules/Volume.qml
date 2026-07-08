@@ -38,13 +38,12 @@ MouseArea {
     }
 
     Text {
-        readonly property int volume: Math.round(Pipewire.defaultAudioSink?.audio?.volume ?? 0 * 100)
-        readonly property bool muted: Pipewire.defaultAudioSink?.audio?.muted ?? false
+        property int volume: Math.round((Pipewire.defaultAudioSink?.audio?.volume ?? 0) * 100)
+        property bool muted: Pipewire.defaultAudioSink?.audio?.muted ?? false
 
         id: text
 
         anchors.verticalCenter: parent.verticalCenter
-        padding: 6
 
         text: mouseArea.containsMouse
             ? `${volume}%`
@@ -53,7 +52,7 @@ MouseArea {
             : "󰕾"
 
         font.family: Theme.fontFamily
-        font.pixelSize: 16
+        font.pixelSize: 18
         color: muted ? "red" : "white"
     }
 }

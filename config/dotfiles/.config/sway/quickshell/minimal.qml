@@ -10,9 +10,8 @@ import Quickshell.Wayland
 import Quickshell.Widgets
 
 import "Modules" as Modules
+import "Minimal" as Minimal
 
-// TODO show OSD on volume change and workspace change!
-// https://git.outfoxxed.me/quickshell/quickshell-examples/src/branch/master/volume-osd/shell.qml
 ShellRoot {
     // global clock that updates every minute
     SystemClock {
@@ -28,125 +27,14 @@ ShellRoot {
         blockLoading: true
     }
 
-    // TODO this needs to be its own file
-    // show OSD when workspace is switched
-    Scope {
-        id: workspaceOSD
+    // OSDs for nicer experience
+    Minimal.SwayWorkspaceOSD {}
+    Minimal.SwayModeOSD {}
+    Minimal.PipewireVolumeOSD {}
 
-        property bool showWorkspace: false
-
-        Timer {
-            id: workspaceOSDTimer
-            interval: 500
-            onTriggered: workspaceOSD.showWorkspace = false
-        }
-
-        I3IpcListener {
-            subscriptions: ["workspace"]
-            onIpcEvent: function (e) {
-                if (e.type === "workspace") {
-                    workspaceOSD.showWorkspace = true
-                    workspaceOSDTimer.restart()
-                }
-            }
-        }
-
-        LazyLoader {
-            active: workspaceOSD.showWorkspace
-
-            PanelWindow {
-                implicitWidth: 200
-                implicitHeight: 200
-
-                WlrLayershell.layer: WlrLayer.Overlay
-                exclusionMode: ExclusionMode.Ignore
-
-                color: "transparent"
-
-                // click through it as its OSD
-                mask: Region {}
-
-                Rectangle {
-                    anchors.centerIn: parent
-
-                    implicitWidth: osdText.width + 40
-                    implicitHeight: osdText.height
-                    radius: 5
-                    color: "black"
-
-                    Text {
-                        id: osdText
-
-                        anchors.centerIn: parent
-
-                        text: I3.focusedWorkspace?.name ?? "?"
-
-                        font.pixelSize: 72
-                        font.bold: true
-                        font.family: Theme.fontFamily
-                        color: "white"
-                    }
-                }
-            }
-        }
-    }
-
-    Scope {
-        id: modeOSD
-
-        property string mode: "default"
-
-        I3IpcListener {
-            subscriptions: ["mode"]
-            onIpcEvent: function (e) {
-                if (e.type === "mode") {
-                    modeOSD.mode = JSON.parse(e.data ?? "{}").change ?? "default"
-                }
-            }
-        }
-
-        LazyLoader {
-            active: modeOSD.mode !== "default"
-
-            PanelWindow {
-                implicitWidth: 200
-                implicitHeight: 100
-
-                anchors.bottom: true
-                margins.bottom: screen.height / 8
-                WlrLayershell.layer: WlrLayer.Overlay
-                exclusionMode: ExclusionMode.Ignore
-
-                color: "transparent"
-
-                // click through it as its OSD
-                mask: Region {}
-
-                Rectangle {
-                    anchors.centerIn: parent
-
-                    implicitWidth: modeOSDText.width + 40
-                    implicitHeight: modeOSDText.height
-                    radius: 10
-                    color: "black"
-
-                    Text {
-                        id: modeOSDText
-
-                        anchors.centerIn: parent
-
-                        text: modeOSD.mode
-
-                        font.bold: true
-                        font.family: Theme.fontFamily
-                        font.pixelSize: 42
-                        fontSizeMode: Text.Fit
-                        minimumPixelSize: 24
-                        color: "white"
-                    }
-                }
-            }
-        }
+    Minimal.PowerMenu {
+        id: powerMenu
+        buttons: options.powerIcons
     }
 
     Variants {
@@ -155,37 +43,30 @@ ShellRoot {
         Item {
             required property var modelData
 
-            // TODO these could be abstracted?
-            PanelWindow {
-                screen: modelData
-
-                anchors { right: true; top: true }
-
-                implicitWidth: 10
-                implicitHeight: 10
-                color: "transparent"
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onEntered: win.visible = true
+            Minimal.HotCorner {
+                anchors {
+                    top: true
+                    right: true
                 }
+
+                screen: modelData
+                win: win
             }
 
-            PanelWindow {
-                screen: modelData
-
-                anchors { right: true; bottom: true }
-
-                implicitWidth: 10
-                implicitHeight: 10
-                color: "transparent"
-
-                MouseArea {
-                    anchors.fill: parent
-                    hoverEnabled: true
-                    onEntered: win.visible = true
+            Minimal.HotCorner {
+                anchors {
+                    bottom: true
+                    right: true
                 }
+
+                screen: modelData
+                win: win
+            }
+
+            Timer {
+                id: winHideTimer
+                interval: 350
+                onTriggered: win.visible = false
             }
 
             PanelWindow {
@@ -201,33 +82,28 @@ ShellRoot {
                 WlrLayershell.layer: WlrLayer.Overlay
                 exclusionMode: ExclusionMode.Ignore
 
-                // show current workspace in the center
-                Text {
-                    anchors.centerIn: parent
-
-                    text: I3.focusedWorkspace?.name ?? "?"
-
-                    color: Qt.rgba(1.0, 1.0, 1.0, 0.10)
-                    font.pixelSize: 120
-                    font.bold: true
-                    font.family: Theme.fontFamily
-                }
-
-                // limit the hover handler to the right edge of screen
+                // hide with the delay when outside the bar
+                // NOTE: this was done cause opening a systemtray menu caused it to hide
                 Item {
-                    anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
-                    width: 60
+                    anchors.right: parent.right
+                    anchors.left: parent.left
 
-                    HoverHandler {
-                        onHoveredChanged: {
-                            if (!hovered) win.visible = false
-                        }
+                    anchors.rightMargin: sidebar.width
+
+                    MouseArea {
+                        anchors.fill: parent
+                        hoverEnabled: true
+
+                        onEntered: winHideTimer.restart()
+                        onExited: winHideTimer.stop()
                     }
                 }
 
                 Rectangle {
+                    id: sidebar
+
                     anchors.right: parent.right
                     anchors.top: parent.top
                     anchors.bottom: parent.bottom
@@ -262,24 +138,21 @@ ShellRoot {
                             }
                         }
 
-                        Item { height: 10; }
+                        // TODO just make the power icon open a dialog with options
+                        Text {
+                            Layout.alignment: Qt.AlignHCenter
 
-                        // TODO make the power icons collapsed by default or smth they ugly
-                        Repeater {
-                            model: options.powerIcons
+                            color: "#cdd6f4"
+                            font.pixelSize: 20
+                            font.family: Theme.fontFamily
 
-                            Text {
-                                Layout.alignment: Qt.AlignHCenter
+                            text: "󰤆"
 
-                                color: "#cdd6f4"
-                                font.pixelSize: 20
-                                font.family: Theme.fontFamily
-
-                                text: modelData.icon
-
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: console.log(modelData.exec)
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: {
+                                    win.visible = false
+                                    powerMenu.show = true
                                 }
                             }
                         }
@@ -290,14 +163,48 @@ ShellRoot {
                         anchors.bottom: parent.bottom
                         anchors.bottomMargin: 5
 
-                        spacing: 5
+                        spacing: 10
 
                         Column {
                             Layout.alignment: Qt.AlignHCenter
 
-                            spacing: 5
+                            spacing: parent.spacing
 
                             Modules.SystemTray {}
+                        }
+
+                        Modules.Volume {
+                            Layout.alignment: Qt.AlignHCenter
+                        }
+
+                        Text {
+                            Layout.alignment: Qt.AlignHCenter
+
+                            color: "#cdd6f4"
+                            font.pixelSize: 20
+                            font.family: Theme.fontFamily
+
+                            text: "󰂯"
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: console.log(modelData.exec)
+                            }
+                        }
+
+                        Text {
+                            Layout.alignment: Qt.AlignHCenter
+
+                            color: "#cdd6f4"
+                            font.pixelSize: 18
+                            font.family: Theme.fontFamily
+
+                            text: "󰃠"
+
+                            MouseArea {
+                                anchors.fill: parent
+                                onClicked: console.log(modelData.exec)
+                            }
                         }
 
                         Column {

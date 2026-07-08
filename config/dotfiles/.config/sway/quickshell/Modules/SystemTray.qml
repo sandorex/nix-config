@@ -4,7 +4,6 @@ import Quickshell.DBusMenu
 
 import "SystemTray"
 
-// TODO add wrapper
 Repeater {
     model: SystemTray.items
 
