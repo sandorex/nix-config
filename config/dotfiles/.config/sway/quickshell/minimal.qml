@@ -4,6 +4,7 @@
 import QtQuick
 import QtQuick.Layouts
 import Quickshell
+import Quickshell.Io
 import Quickshell.I3
 import Quickshell.Wayland
 import Quickshell.Widgets
@@ -13,54 +14,141 @@ import "Modules" as Modules
 // TODO show OSD on volume change and workspace change!
 // https://git.outfoxxed.me/quickshell/quickshell-examples/src/branch/master/volume-osd/shell.qml
 ShellRoot {
-    // TODO maybe hide all windows in sway so the backgronud becomes visible so i dont have to do fancy
-    // tricks to show it?
-    // PanelWindow {
-    //     id: edgeTrigger
-    //
-    //     anchors { right: true; top: true }
-    //
-    //     implicitWidth: 10
-    //     implicitHeight: 10
-    //     color: "transparent"
-    //
-    //     MouseArea {
-    //         anchors.fill: parent
-    //         hoverEnabled: true
-    //
-    //         onEntered: mainWindow.visible = true
-    //     }
-    // }
+    // global clock that updates every minute
+    SystemClock {
+        id: clock
+        precision: SystemClock.Minutes
+    }
 
-    // PanelWindow {
-    //     id: mainWindow
-    //     visible: false
-    //     implicitWidth: 300
-    //     implicitHeight: 600
-    //
-    //     anchors { right: true; top: true }
-    //
-    //     // Handle hiding the window when the mouse leaves
-    //     HoverHandler {
-    //         onHoveredChanged: {
-    //             if (!hovered) mainWindow.visible = false
-    //         }
-    //     }
-    //
-    //     // Window content
-    //     Rectangle {
-    //         anchors.fill: parent
-    //         color: "black"
-    //         Text {
-    //             anchors.centerIn: parent
-    //             color: "white"
-    //             text: "Side Window"
-    //         }
-    //     }
-    // }
+    // load icons from static file
+    readonly property var options: JSON.parse(jsonFile.text())
+    FileView {
+        id: jsonFile
+        path: Qt.resolvedUrl("./minimal.json")
+        blockLoading: true
+    }
 
-    // TODO just load it on mouse in the corner so it does not to be visible on each monitor
-    // shown on each monitor in the background
+    // TODO this needs to be its own file
+    // show OSD when workspace is switched
+    Scope {
+        id: workspaceOSD
+
+        property bool showWorkspace: false
+
+        Timer {
+            id: workspaceOSDTimer
+            interval: 500
+            onTriggered: workspaceOSD.showWorkspace = false
+        }
+
+        I3IpcListener {
+            subscriptions: ["workspace"]
+            onIpcEvent: function (e) {
+                if (e.type === "workspace") {
+                    workspaceOSD.showWorkspace = true
+                    workspaceOSDTimer.restart()
+                }
+            }
+        }
+
+        LazyLoader {
+            active: workspaceOSD.showWorkspace
+
+            PanelWindow {
+                implicitWidth: 200
+                implicitHeight: 200
+
+                WlrLayershell.layer: WlrLayer.Overlay
+                exclusionMode: ExclusionMode.Ignore
+
+                color: "transparent"
+
+                // click through it as its OSD
+                mask: Region {}
+
+                Rectangle {
+                    anchors.centerIn: parent
+
+                    implicitWidth: osdText.width + 40
+                    implicitHeight: osdText.height
+                    radius: 5
+                    color: "black"
+
+                    Text {
+                        id: osdText
+
+                        anchors.centerIn: parent
+
+                        text: I3.focusedWorkspace?.name ?? "?"
+
+                        font.pixelSize: 72
+                        font.bold: true
+                        font.family: Theme.fontFamily
+                        color: "white"
+                    }
+                }
+            }
+        }
+    }
+
+    Scope {
+        id: modeOSD
+
+        property string mode: "default"
+
+        I3IpcListener {
+            subscriptions: ["mode"]
+            onIpcEvent: function (e) {
+                if (e.type === "mode") {
+                    modeOSD.mode = JSON.parse(e.data ?? "{}").change ?? "default"
+                }
+            }
+        }
+
+        LazyLoader {
+            active: modeOSD.mode !== "default"
+
+            PanelWindow {
+                implicitWidth: 200
+                implicitHeight: 100
+
+                anchors.bottom: true
+                margins.bottom: screen.height / 8
+                WlrLayershell.layer: WlrLayer.Overlay
+                exclusionMode: ExclusionMode.Ignore
+
+                color: "transparent"
+
+                // click through it as its OSD
+                mask: Region {}
+
+                Rectangle {
+                    anchors.centerIn: parent
+
+                    implicitWidth: modeOSDText.width + 40
+                    implicitHeight: modeOSDText.height
+                    radius: 10
+                    color: "black"
+
+                    Text {
+                        id: modeOSDText
+
+                        anchors.centerIn: parent
+
+                        text: modeOSD.mode
+
+                        font.bold: true
+                        font.family: Theme.fontFamily
+                        font.pixelSize: 42
+                        fontSizeMode: Text.Fit
+                        minimumPixelSize: 24
+                        color: "white"
+                    }
+                }
+            }
+        }
+    }
+
     Variants {
         model: Quickshell.screens
 
@@ -113,15 +201,11 @@ ShellRoot {
                 WlrLayershell.layer: WlrLayer.Overlay
                 exclusionMode: ExclusionMode.Ignore
 
-                // TODO remove this once OSD for workspace change works
                 // show current workspace in the center
                 Text {
-                    // TODO I3.monitorFor does not work
-                    property I3Monitor i3monitor: I3.monitors.values.find((m) => m.name === modelData.name)
-
                     anchors.centerIn: parent
 
-                    text: i3monitor?.activeWorkspace?.name ?? "?"
+                    text: I3.focusedWorkspace?.name ?? "?"
 
                     color: Qt.rgba(1.0, 1.0, 1.0, 0.10)
                     font.pixelSize: 120
@@ -129,17 +213,7 @@ ShellRoot {
                     font.family: Theme.fontFamily
                 }
 
-                // hide when mouse leaves edge of screen
-                // MouseArea {
-                //     anchors.right: parent.right
-                //     anchors.top: parent.top
-                //     anchors.bottom: parent.bottom
-                //     width: 60
-                //
-                //     hoverEnabled: true
-                //     onExited: win.visible = false
-                // }
-
+                // limit the hover handler to the right edge of screen
                 Item {
                     anchors.right: parent.right
                     anchors.top: parent.top
@@ -153,86 +227,105 @@ ShellRoot {
                     }
                 }
 
-                // TODO add background here
-                ColumnLayout {
+                Rectangle {
                     anchors.right: parent.right
                     anchors.top: parent.top
-                    anchors.margins: 5
+                    anchors.bottom: parent.bottom
 
-                    spacing: 10
+                    implicitWidth: 50
 
-                    // abstract this, maybe a repeater with json file for each exec command
-                    Text {
-                        color: "#cdd6f4"
-                        font.pixelSize: 20
-                        font.family: Theme.fontFamily
+                    color: "black"
 
-                        text: " 󱏊 " // 󱏊  - titlebars on / 󰓫 - titlebars off
+                    ColumnLayout {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.top: parent.top
+                        anchors.topMargin: 15
 
-                        MouseArea {
-                            onClicked: console.log("first")
+                        spacing: 20
+
+                        Repeater {
+                            model: options.icons
+
+                            Text {
+                                Layout.alignment: Qt.AlignHCenter
+
+                                color: "#cdd6f4"
+                                font.pixelSize: 20
+                                font.family: Theme.fontFamily
+
+                                text: modelData.icon
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: console.log(modelData.exec)
+                                }
+                            }
+                        }
+
+                        Item { height: 10; }
+
+                        // TODO make the power icons collapsed by default or smth they ugly
+                        Repeater {
+                            model: options.powerIcons
+
+                            Text {
+                                Layout.alignment: Qt.AlignHCenter
+
+                                color: "#cdd6f4"
+                                font.pixelSize: 20
+                                font.family: Theme.fontFamily
+
+                                text: modelData.icon
+
+                                MouseArea {
+                                    anchors.fill: parent
+                                    onClicked: console.log(modelData.exec)
+                                }
+                            }
                         }
                     }
 
-                    Text {
-                        color: "#cdd6f4"
-                        font.pixelSize: 20
-                        font.family: Theme.fontFamily
+                    ColumnLayout {
+                        anchors.horizontalCenter: parent.horizontalCenter
+                        anchors.bottom: parent.bottom
+                        anchors.bottomMargin: 5
 
-                        text: " B "
+                        spacing: 5
+
+                        Column {
+                            Layout.alignment: Qt.AlignHCenter
+
+                            spacing: 5
+
+                            Modules.SystemTray {}
+                        }
+
+                        Column {
+                            Layout.alignment: Qt.AlignHCenter
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+
+                                text: Qt.formatDateTime(clock.date, "hh:mm")
+
+                                color: "#cdd6f4"
+                                font.pixelSize: 16
+                                font.bold: true
+                                font.family: Theme.fontFamily
+                            }
+
+                            Text {
+                                anchors.horizontalCenter: parent.horizontalCenter
+
+                                text: Qt.formatDateTime(clock.date, "dd/MM")
+
+                                color: "#cdd6f4"
+                                font.pixelSize: 12
+                                font.bold: true
+                                font.family: Theme.fontFamily
+                            }
+                        }
                     }
-
-                    Item { height: 40; }
-
-                    Text {
-                        color: "#cdd6f4"
-                        font.pixelSize: 20
-                        font.family: Theme.fontFamily
-
-                        text: " 󰗽 "
-                    }
-
-                    Text {
-                        color: "#cdd6f4"
-                        font.pixelSize: 20
-                        font.family: Theme.fontFamily
-
-                        text: "  "
-                    }
-
-                    Text {
-                        color: "#cdd6f4"
-                        font.pixelSize: 20
-                        font.family: Theme.fontFamily
-
-                        text: "  "
-                    }
-
-                    Text {
-                        color: "#cdd6f4"
-                        font.pixelSize: 20
-                        font.family: Theme.fontFamily
-
-                        text: " 󰤄 "
-                    }
-
-                    Text {
-                        color: "#cdd6f4"
-                        font.pixelSize: 20
-                        font.family: Theme.fontFamily
-
-                        text: " 󰤆 "
-                    }
-                }
-
-                ColumnLayout {
-                    anchors.right: parent.right
-                    anchors.bottom: parent.bottom
-                    anchors.margins: 5
-
-                    spacing: 5
-
-                    Modules.SystemTray {}
                 }
 
                 // TODO make it blend into background more, maybe grayscale effect?
@@ -297,53 +390,6 @@ ShellRoot {
                 //                 }
                 //             }
                 //         }
-                //     }
-                // }
-
-                Text {
-                    id: clockText
-
-                    anchors.top: parent.top
-                    anchors.horizontalCenter: parent.horizontalCenter
-                    anchors.margins: 5
-
-                    color: "#cdd6f4"
-                    font.pixelSize: 16
-                    font.family: Theme.fontFamily
-
-                    Timer {
-                        interval: 10000
-                        running: true
-                        repeat: true
-                        triggeredOnStart: true
-                        onTriggered: clockText.text = Qt.formatDateTime(new Date(), "dd/MM hh:mm")
-                    }
-                }
-
-                // // additional information
-                // ColumnLayout {
-                //     spacing: 4
-                //     anchors.right: parent.right
-                //     anchors.bottom: parent.bottom
-                //
-                //     Text {
-                //         text: "Yes"
-                //
-                //         Layout.alignment: Qt.AlignRight
-                //
-                //         color: "white"
-                //         font.pixelSize: 18
-                //         font.family: Theme.fontFamily
-                //     }
-                //
-                //     Text {
-                //         text: "16h22m3s"
-                //
-                //         Layout.alignment: Qt.AlignRight
-                //
-                //         color: "white"
-                //         font.pixelSize: 18
-                //         font.family: Theme.fontFamily
                 //     }
                 // }
             }
