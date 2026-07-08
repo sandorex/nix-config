@@ -5,7 +5,6 @@ import Quickshell
 import Quickshell.Wayland
 import qs
 
-// TODO its not closing properly..
 Scope {
     id: root
 
@@ -15,32 +14,47 @@ Scope {
     LazyLoader {
         active: root.show
 
+        // TODO this could be abstracted into its own file, as i plan to use it for many things
         PanelWindow {
             id: win
 
+            // no background
             color: "transparent"
 
+            // fullscreen
+            anchors { top: true; bottom: true; left: true; right: true }
             WlrLayershell.layer: WlrLayer.Overlay
-            exclusionMode: ExclusionMode.Ignore
-            focusable: true
+            exclusiveZone: 0
 
-            implicitWidth: layout.width + 35
-            implicitHeight: layout.height + 20
+            // triggers on second enter (so mouse can get to the window)
+            MouseArea {
+                property bool triggered: false
+
+                anchors.fill: parent
+                hoverEnabled: true
+                onEntered: {
+                    if (triggered) {
+                        root.show = false
+                        triggered = false
+                    } else {
+                        triggered = true
+                    }
+                }
+
+                // last priority
+                z: -10
+            }
 
             Rectangle {
-                anchors.fill: parent
+                implicitWidth: layout.width + 35
+                implicitHeight: layout.height + 20
+                anchors.centerIn: parent
                 color: Theme.colorBg
                 radius: 30
 
                 MouseArea {
                     anchors.fill: parent
-                    onExited: {
-                        console.log("egege")
-                        root.show = false
-                    }
-                    onEntered: {
-                        console.log("enter")
-                    }
+                    hoverEnabled: true
                 }
             }
 
@@ -72,9 +86,10 @@ Scope {
                         MouseArea {
                             id: mouseArea
                             anchors.fill: parent
+                            acceptedButtons: Qt.LeftButton
                             hoverEnabled: true
                             onClicked: {
-                                console.log(modelData.exec) // TODO
+                                Quickshell.execDetached(modelData.exec)
                                 root.show = false
                             }
                         }

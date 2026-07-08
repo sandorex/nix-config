@@ -2,29 +2,29 @@
   "icons": [
     {
       "icon": "󰓫",
-      "exec": "B"
+      "exec": ["notify-send", "minimal", "title-toggle"]
     }
   ],
   "powerIcons": [
     {
       "icon": "󰗽",
-      "exec": "B"
+      "exec": ["notify-send", "minimal", "logout"]
     },
     {
       "icon": "",
-      "exec": "B"
+      "exec": ["notify-send", "minimal", "lock"]
     },
     {
       "icon": "󰤄",
-      "exec": "B"
+      "exec": ["notify-send", "minimal", "sleep"]
     },
     {
       "icon": "",
-      "exec": "B"
+      "exec": ["notify-send", "minimal", "restart"]
     },
     {
       "icon": "󰤆",
-      "exec": "B"
+      "exec": ["notify-send", "minimal", "poweroff"]
     }
   ]
 }

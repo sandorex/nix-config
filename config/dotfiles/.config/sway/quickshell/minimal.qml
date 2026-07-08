@@ -133,12 +133,12 @@ ShellRoot {
 
                                 MouseArea {
                                     anchors.fill: parent
-                                    onClicked: console.log(modelData.exec)
+                                    onClicked: Quickshell.execDetached(modelData.exec)
                                 }
                             }
                         }
 
-                        // TODO just make the power icon open a dialog with options
+                        // power icon opens the power menu
                         Text {
                             Layout.alignment: Qt.AlignHCenter
 
