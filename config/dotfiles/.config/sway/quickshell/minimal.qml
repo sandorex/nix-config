@@ -5,9 +5,11 @@ import QtQuick
 import QtQuick.Layouts
 import Quickshell
 import Quickshell.Io
-import Quickshell.I3
 import Quickshell.Wayland
 import Quickshell.Widgets
+import Quickshell.Bluetooth
+
+import qs.components
 
 import "Modules" as Modules
 import "Minimal" as Minimal
@@ -32,9 +34,9 @@ ShellRoot {
     Minimal.SwayModeOSD {}
     Minimal.PipewireVolumeOSD {}
 
-    Minimal.PowerMenu {
+    Minimal.LazyIconMenu {
         id: powerMenu
-        buttons: options.powerIcons
+        icons: options.powerIcons
     }
 
     Variants {
@@ -98,6 +100,7 @@ ShellRoot {
 
                         onEntered: winHideTimer.restart()
                         onExited: winHideTimer.stop()
+                        onClicked: win.visible = false
                     }
                 }
 
@@ -122,38 +125,26 @@ ShellRoot {
                         Repeater {
                             model: options.icons
 
-                            Text {
+                            ClickableIcon {
                                 Layout.alignment: Qt.AlignHCenter
 
-                                color: "#cdd6f4"
                                 font.pixelSize: 20
-                                font.family: Theme.fontFamily
-
                                 text: modelData.icon
 
-                                MouseArea {
-                                    anchors.fill: parent
-                                    onClicked: Quickshell.execDetached(modelData.exec)
-                                }
+                                onLeftClick: Quickshell.execDetached(modelData.exec)
                             }
                         }
 
                         // power icon opens the power menu
-                        Text {
+                        ClickableIcon {
                             Layout.alignment: Qt.AlignHCenter
 
-                            color: "#cdd6f4"
                             font.pixelSize: 20
-                            font.family: Theme.fontFamily
-
                             text: "󰤆"
 
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: {
-                                    win.visible = false
-                                    powerMenu.show = true
-                                }
+                            onLeftClick: {
+                                win.visible = false
+                                powerMenu.show = true
                             }
                         }
                     }
@@ -167,43 +158,38 @@ ShellRoot {
 
                         Column {
                             Layout.alignment: Qt.AlignHCenter
+                            spacing: 2
 
-                            spacing: parent.spacing
-
+                            // TODO systemtray should be redone so i could pass Layout.alignment
                             Modules.SystemTray {}
                         }
 
                         Modules.Volume {
                             Layout.alignment: Qt.AlignHCenter
+                            width: 30
+                            height: 30
                         }
 
-                        Text {
+                        ClickableIcon {
                             Layout.alignment: Qt.AlignHCenter
+                            width: 30
+                            height: 30
 
-                            color: "#cdd6f4"
+                            // hide unless there is bluetooth
+                            visible: Bluetooth.defaultAdapter
+
                             font.pixelSize: 20
-                            font.family: Theme.fontFamily
+                            text: Bluetooth.defaultAdapter?.state === BluetoothAdapterState.ENABLED
+                                ? Bluetooth.devices.values.length == 0
+                                    ? "󰂯"
+                                    : "󰂱"
+                                : "󰂲"
 
-                            text: "󰂯"
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: console.log(modelData.exec)
-                            }
-                        }
-
-                        Text {
-                            Layout.alignment: Qt.AlignHCenter
-
-                            color: "#cdd6f4"
-                            font.pixelSize: 18
-                            font.family: Theme.fontFamily
-
-                            text: "󰃠"
-
-                            MouseArea {
-                                anchors.fill: parent
-                                onClicked: console.log(modelData.exec)
+                            // TODO disable on middle click
+                            // right click open some kind of gui, overskride?
+                            // left click open rofi bluetooth script
+                            onLeftClick: {
+                                console.log("bluetooth")
                             }
                         }
 

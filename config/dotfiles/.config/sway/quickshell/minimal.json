@@ -3,6 +3,10 @@
     {
       "icon": "󰓫",
       "exec": ["notify-send", "minimal", "title-toggle"]
+    },
+    {
+      "icon": "󰃠",
+      "exec": ["notify-send", "minimal", "brightness"]
     }
   ],
   "powerIcons": [
