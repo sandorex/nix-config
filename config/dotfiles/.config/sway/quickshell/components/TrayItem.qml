@@ -4,6 +4,9 @@ import Quickshell
 MouseArea {
     id: root
 
+    signal menuOpened()
+    signal menuClosed()
+
     required property var modelData
     property string rawIconName: modelData && modelData.icon ? String(modelData.icon) : ""
 
@@ -40,6 +43,9 @@ MouseArea {
         id: menuAnchor
         menu: modelData.menu
         anchor.item: root
+
+        onOpened: root.menuOpened()
+        onClosed: root.menuClosed()
     }
 
     Image {

@@ -1,8 +1,16 @@
 {
   "icons": [
     {
+      "icon": "",
+      "exec": ["notify-send", "minimal", "favorite app launcher"]
+    },
+    {
       "icon": "󰓫",
       "exec": ["notify-send", "minimal", "title-toggle"]
+    },
+    {
+      "icon": "󰺢",
+      "exec": ["notify-send", "minimal", "volume normalization"]
     },
     {
       "icon": "󰃠",

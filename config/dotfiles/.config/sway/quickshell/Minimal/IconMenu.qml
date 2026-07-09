@@ -35,31 +35,12 @@ OverlayPopup {
         Repeater {
             model: icons
 
-            Rectangle {
-                height: 60
-                width: 60
-                radius: width / 2
-
-                color: mouseArea.containsMouse ? Qt.lighter(Theme.colorBg, 2.25) : Theme.colorBg
-
-                Text {
-                    anchors.centerIn: parent
-
-                    text: modelData.icon ?? "?"
-                    color: Theme.colorFg
-                    font.pixelSize: 32
-                    font.family: Theme.fontFamily
-                }
-
-                MouseArea {
-                    id: mouseArea
-                    anchors.fill: parent
-                    acceptedButtons: Qt.LeftButton
-                    hoverEnabled: true
-                    onClicked: {
-                        Quickshell.execDetached(modelData.exec)
-                        root.close()
-                    }
+            ClickableIconHoverable {
+                text: modelData.icon ?? "?"
+                font.pixelSize: 32
+                onLeftClick: {
+                    Quickshell.execDetached(modelData.exec)
+                    root.close()
                 }
             }
         }

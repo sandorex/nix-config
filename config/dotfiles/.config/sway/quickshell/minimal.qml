@@ -8,6 +8,7 @@ import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
 import Quickshell.Bluetooth
+import Quickshell.Services.SystemTray
 
 import qs.components
 
@@ -33,12 +34,14 @@ ShellRoot {
     Minimal.SwayWorkspaceOSD {}
     Minimal.SwayModeOSD {}
     Minimal.PipewireVolumeOSD {}
+    Minimal.PipewireDeviceOSD {}
 
     Minimal.LazyIconMenu {
         id: powerMenu
         icons: options.powerIcons
     }
 
+    // TODO use lazyloader for the sidebar and just put activators on each monitor
     Variants {
         model: Quickshell.screens
 
@@ -71,8 +74,11 @@ ShellRoot {
                 onTriggered: win.visible = false
             }
 
+            // TODO could possibly be a OverlayPopup?
             PanelWindow {
                 id: win
+
+                property bool menuOpen: false
 
                 screen: modelData
 
@@ -98,7 +104,11 @@ ShellRoot {
                         anchors.fill: parent
                         hoverEnabled: true
 
-                        onEntered: winHideTimer.restart()
+                        onEntered: {
+                            if (!win.menuOpen) {
+                                winHideTimer.restart()
+                            }
+                        }
                         onExited: winHideTimer.stop()
                         onClicked: win.visible = false
                     }
@@ -125,22 +135,32 @@ ShellRoot {
                         Repeater {
                             model: options.icons
 
-                            ClickableIcon {
+                            ClickableIconHoverable {
                                 Layout.alignment: Qt.AlignHCenter
 
                                 font.pixelSize: 20
                                 text: modelData.icon
+
+                                backgroundColor: "transparent"
+
+                                width: 35
+                                height: 35
 
                                 onLeftClick: Quickshell.execDetached(modelData.exec)
                             }
                         }
 
                         // power icon opens the power menu
-                        ClickableIcon {
+                        ClickableIconHoverable {
                             Layout.alignment: Qt.AlignHCenter
 
                             font.pixelSize: 20
                             text: "󰤆"
+
+                            backgroundColor: "transparent"
+
+                            width: 35
+                            height: 35
 
                             onLeftClick: {
                                 win.visible = false
@@ -156,12 +176,15 @@ ShellRoot {
 
                         spacing: 10
 
-                        Column {
-                            Layout.alignment: Qt.AlignHCenter
-                            spacing: 2
+                        Repeater {
+                            model: SystemTray.items
 
-                            // TODO systemtray should be redone so i could pass Layout.alignment
-                            Modules.SystemTray {}
+                            TrayItem {
+                                Layout.alignment: Qt.AlignHCenter
+
+                                onMenuOpened: win.menuOpen = true
+                                onMenuClosed: win.menuOpen = false
+                            }
                         }
 
                         Modules.Volume {
@@ -220,71 +243,6 @@ ShellRoot {
                         }
                     }
                 }
-
-                // TODO make it blend into background more, maybe grayscale effect?
-                // global taskbar cause why not
-                // RowLayout {
-                //     anchors.bottom: parent.bottom
-                //     anchors.horizontalCenter: parent.horizontalCenter
-                //
-                //     spacing: 5
-                //
-                //     Repeater {
-                //         model: ToplevelManager.toplevels
-                //
-                //         Item {
-                //             width: 32
-                //             height: 32
-                //
-                //             // TODO show title on hover
-                //             // TODO hover effect
-                //             // TODO right click menu?
-                //             MouseArea {
-                //                 anchors.fill: parent
-                //                 onClicked: {
-                //                     modelData.activate()
-                //                 }
-                //             }
-                //
-                //             IconImage {
-                //                 anchors.centerIn: parent
-                //                 width: 24
-                //                 height: 24
-                //
-                //                 // find icon from the toplevel name
-                //                 source: {
-                //                     if (!modelData.appId) return Quickshell.iconPath("application-x-executable");
-                //
-                //                     let entry = DesktopEntries.heuristicLookup(modelData.appId);
-                //                     if (entry && entry.icon) {
-                //                         let path = Quickshell.iconPath(entry.icon, true);
-                //                         if (path) return path;
-                //                     }
-                //
-                //                     // Fixes "org.qbittorrent.qBittorrent" -> "qbittorrent"
-                //                     let cleanId = modelData.appId.toLowerCase();
-                //                     if (cleanId.includes(".")) {
-                //                         let parts = cleanId.split(".");
-                //                         cleanId = parts[parts.length - 1];
-                //                     }
-                //
-                //                     let pathFromCleanId = Quickshell.iconPath(cleanId, true);
-                //                     if (pathFromCleanId) return pathFromCleanId;
-                //
-                //                     if (modelData.title) {
-                //                         let titleEntry = DesktopEntries.heuristicLookup(modelData.title);
-                //                         if (titleEntry && titleEntry.icon) {
-                //                             let pathFromTitle = Quickshell.iconPath(titleEntry.icon, true);
-                //                             if (pathFromTitle) return pathFromTitle;
-                //                         }
-                //                     }
-                //
-                //                     return Quickshell.iconPath("application-x-executable");
-                //                 }
-                //             }
-                //         }
-                //     }
-                // }
             }
         }
     }

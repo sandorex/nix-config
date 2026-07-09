@@ -13,13 +13,19 @@ Scope {
         objects: [ Pipewire.defaultAudioSink ]
     }
 
+    // TODO track default source
     Connections {
         // NOTE: its important for this to be null if missing to prevent errors in console
         target: Pipewire.defaultAudioSink?.audio ?? null
 
         function onVolumeChanged() {
-            root.shouldShowOsd = true
-            hideTimer.restart()
+            // NOTE: this prevents popups on changes of source
+            if (root.lastId == Pipewire.defaultAudioSink.id) {
+                root.shouldShowOsd = true
+                hideTimer.restart()
+            }
+
+            root.lastId = Pipewire.defaultAudioSink.id
         }
 
         // track muted state as well
@@ -29,6 +35,7 @@ Scope {
         }
     }
 
+    property var lastId
     property bool shouldShowOsd: false
 
     Timer {
@@ -67,11 +74,11 @@ Scope {
                     Item { width: 2 }
 
                     Text {
-                      text: Pipewire.defaultAudioSink?.audio?.muted ? "󰝟" : "󰕾"
-                      color: Pipewire.defaultAudioSink?.audio?.muted ? "red" : Theme.colorFg
+                        text: Pipewire.defaultAudioSink?.audio?.muted ? "󰝟" : "󰕾"
+                        color: Pipewire.defaultAudioSink?.audio?.muted ? "red" : Theme.colorFg
 
-                      font.family: Theme.fontFamily
-                      font.pixelSize: 32
+                        font.family: Theme.fontFamily
+                        font.pixelSize: 32
                     }
 
                     Item { width: 2 }
