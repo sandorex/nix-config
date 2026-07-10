@@ -14,7 +14,7 @@ OverlayPopup {
     required property var icons
 
     // its in center so it would close upon opening
-    ignoreFirst: true
+    triggered: false
 
     Rectangle {
         implicitWidth: layout.width + 35
@@ -27,25 +27,26 @@ OverlayPopup {
             anchors.fill: parent
             hoverEnabled: true
         }
-    }
 
-    RowLayout {
-        id: layout
+        RowLayout {
+            id: layout
 
-        anchors.centerIn: parent
-        spacing: 25
+            anchors.centerIn: parent
+            spacing: 25
 
-        Repeater {
-            model: icons
+            Repeater {
+                model: icons
 
-            ClickableIconHoverable {
-                text: modelData.icon ?? "?"
-                font.pixelSize: 32
-                onLeftClick: {
-                    Quickshell.execDetached(modelData.exec)
-                    root.close()
+                ClickableIconHoverable {
+                    text: modelData.icon ?? "?"
+                    font.pixelSize: 32
+                    onLeftClick: {
+                        Quickshell.execDetached(modelData.exec)
+                        root.close()
+                    }
                 }
             }
         }
     }
+
 }

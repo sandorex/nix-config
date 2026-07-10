@@ -20,7 +20,7 @@ PanelWindow {
     signal gainedFocus()
 
     // ignore first time so mouse can enter the window first (used for popups)
-    property bool ignoreFirst: false
+    property bool triggered: true
 
     // no background
     color: "transparent"
@@ -33,15 +33,13 @@ PanelWindow {
     // NOTE: mouse area that triggers the hide timer if mouse leaves but on second leave
     // cause when mouse is not in center the window will close before mouse reaches it
     MouseArea {
-        property bool triggered: !root.ignoreFirst
-
         anchors.fill: parent
         hoverEnabled: true
         onEntered: {
-            if (triggered) {
+            if (root.triggered) {
                 root.lostFocus()
             } else {
-                triggered = true
+                root.triggered = true
             }
         }
 

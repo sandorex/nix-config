@@ -69,7 +69,11 @@ ShellRoot {
             onClose: root.close()
             onLostFocus: hideTimer.restart()
             onGainedFocus: hideTimer.stop()
-            onPowerMenu: powerMenu.show = true
+            onItemClicked: (item) => {
+                if (item == "power") {
+                    powerMenu.show = true
+                }
+            }
             onCanCloseChanged: (val) => root.canClose = val
         }
     }
