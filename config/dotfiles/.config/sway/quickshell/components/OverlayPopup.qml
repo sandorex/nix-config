@@ -19,6 +19,9 @@ PanelWindow {
     // the window has regained focus, reset the close timer
     signal gainedFocus()
 
+    // ignore first time so mouse can enter the window first (used for popups)
+    property bool ignoreFirst: false
+
     // no background
     color: "transparent"
 
@@ -30,7 +33,7 @@ PanelWindow {
     // NOTE: mouse area that triggers the hide timer if mouse leaves but on second leave
     // cause when mouse is not in center the window will close before mouse reaches it
     MouseArea {
-        property bool triggered: false
+        property bool triggered: !root.ignoreFirst
 
         anchors.fill: parent
         hoverEnabled: true

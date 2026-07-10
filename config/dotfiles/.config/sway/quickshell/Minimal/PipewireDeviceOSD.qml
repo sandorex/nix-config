@@ -64,22 +64,26 @@ Scope {
             // click through the window
             mask: Region {}
 
-            // TODO its fugly
             Rectangle {
                 id: rect
-                anchors.fill: parent
+                anchors.centerIn: parent
                 radius: height / 2
                 color: Theme.colorBg
 
+                height: 40
+                width: text.width + 35
+
                 Text {
+                    id: text
+
                     anchors.centerIn: parent
 
                     text: root.getText(root.isSink)
-
                     color: Theme.colorFg
 
                     font.family: Theme.fontFamily
                     font.pixelSize: 20
+                    font.bold: true
                 }
             }
         }

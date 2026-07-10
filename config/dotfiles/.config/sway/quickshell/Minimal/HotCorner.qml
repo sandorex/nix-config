@@ -2,12 +2,13 @@ import QtQuick
 import Quickshell
 
 PanelWindow {
+    id: root
+
+    signal triggered()
+
     required property var screen
-    required property var win
 
-    screen: screen
-
-    // anchors { right: true; top: true }
+    screen: screen ?? null
 
     implicitWidth: 10
     implicitHeight: 10
@@ -16,6 +17,6 @@ PanelWindow {
     MouseArea {
         anchors.fill: parent
         hoverEnabled: true
-        onEntered: win.visible = true
+        onEntered: root.triggered()
     }
 }

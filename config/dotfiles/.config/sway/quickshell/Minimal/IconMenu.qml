@@ -13,6 +13,9 @@ OverlayPopup {
 
     required property var icons
 
+    // its in center so it would close upon opening
+    ignoreFirst: true
+
     Rectangle {
         implicitWidth: layout.width + 35
         implicitHeight: layout.height + 20
