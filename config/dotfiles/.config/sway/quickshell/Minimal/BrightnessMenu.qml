@@ -36,10 +36,11 @@ OverlayPopup {
             Text {
                 Layout.alignment: Qt.AlignHCenter
 
-                text: `Monitor Brightness`
+                text: 'Monitor Brightness'
                 color: Theme.colorFg
                 font.family: Theme.fontFamily
                 font.pixelSize: 20
+                renderType: Text.NativeRendering
             }
 
             Repeater {
@@ -91,6 +92,8 @@ OverlayPopup {
                         color: Theme.colorFg
                         font.family: Theme.fontFamily
                         font.pixelSize: 16
+
+                        renderType: Text.NativeRendering
 
                         elide: Text.ElideRight
                         wrapMode: Text.NoWrap
@@ -162,6 +165,7 @@ OverlayPopup {
                         color: Theme.colorFg
                         font.family: Theme.fontFamily
                         font.pixelSize: 16
+                        renderType: Text.NativeRendering
                     }
                 }
             }
