@@ -11,6 +11,8 @@ import qs.components
 OverlayPopup {
     id: root
 
+    triggered: false
+
     Rectangle {
         anchors.centerIn: parent
         width: 370
@@ -116,7 +118,6 @@ OverlayPopup {
                         // every time it moves restart the timer
                         onMoved: delayTimer.restart()
 
-                        // TODO change color when disabled!
                         background: Rectangle {
                             x: control.leftPadding
                             y: control.topPadding + control.availableHeight / 2 - height / 2

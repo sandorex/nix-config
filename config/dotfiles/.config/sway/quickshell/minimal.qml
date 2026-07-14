@@ -7,7 +7,6 @@ import Quickshell
 import Quickshell.Io
 import Quickshell.Wayland
 import Quickshell.Widgets
-import Quickshell.Bluetooth
 import Quickshell.Services.SystemTray
 
 import qs.components
@@ -43,6 +42,10 @@ ShellRoot {
         icons: options.powerIcons
     }
 
+    Minimal.LazyBrightnessMenu {
+        id: brightnessMenu
+    }
+
     property bool showSidebar: false
     property bool canClose: true
 
@@ -70,8 +73,14 @@ ShellRoot {
             onLostFocus: hideTimer.restart()
             onGainedFocus: hideTimer.stop()
             onItemClicked: (item) => {
-                if (item == "power") {
-                    powerMenu.show = true
+                switch (item) {
+                    case "power":
+                        powerMenu.show = true
+                        break;
+                    case "brightness":
+                        brightnessMenu.show = true
+                        break;
+                    default:
                 }
             }
             onCanCloseChanged: (val) => root.canClose = val
@@ -104,7 +113,6 @@ ShellRoot {
                 screen: modelData
                 onTriggered: root.show()
             }
-
         }
     }
 }

@@ -11,10 +11,6 @@
     {
       "icon": "󰺢",
       "exec": ["notify-send", "minimal", "volume normalization"]
-    },
-    {
-      "icon": "󰃠",
-      "exec": ["notify-send", "minimal", "brightness"]
     }
   ],
   "powerIcons": [

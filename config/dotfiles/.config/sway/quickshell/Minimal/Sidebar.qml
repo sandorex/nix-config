@@ -65,6 +65,23 @@ OverlayPopup {
                 }
             }
 
+            ClickableIconHoverable {
+                Layout.alignment: Qt.AlignHCenter
+
+                font.pixelSize: 20
+                text: "󰃠"
+
+                backgroundColor: "transparent"
+
+                width: 35
+                height: 35
+
+                onLeftClick: {
+                    root.close()
+                    root.itemClicked("brightness")
+                }
+            }
+
             // power icon opens the power menu
             ClickableIconHoverable {
                 Layout.alignment: Qt.AlignHCenter

@@ -51,8 +51,8 @@ MouseArea {
     Image {
         id: content
         anchors.centerIn: parent
-        width: 18
-        height: 18
+        width: 20
+        height: 20
 
         cache: true
         asynchronous: false
