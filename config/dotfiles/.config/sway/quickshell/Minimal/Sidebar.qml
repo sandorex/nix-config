@@ -119,7 +119,7 @@ OverlayPopup {
                 visible: Bluetooth.defaultAdapter
 
                 font.pixelSize: 20
-                text: Bluetooth.defaultAdapter?.state === BluetoothAdapterState.ENABLED
+                text: BluetoothAdapterState.toString(Bluetooth.defaultAdapter?.state) == "Enabled"
                     ? Bluetooth.devices.values.length == 0
                         ? "󰂯"
                         : "󰂱"
