@@ -70,6 +70,11 @@
     nvtopPackages.amd # gpu usage monitor
   ];
 
+  services.udev.packages = with pkgs; [
+    # arduino and many related devices (like usbasp programmer) will be user accessible
+    platformio-core.udev
+  ];
+
   # fonts.packages = with pkgs; [
   #   nerd-fonts.bigblue-terminal # funky pixel-y font
   # ];
