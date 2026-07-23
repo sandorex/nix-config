@@ -57,6 +57,7 @@
     arduino-ide
 
     ffmpeg
+    mc      # midnight commander file manager
     yt-dlp  # youtube downloader
     nushell # the best shell
     buildah # container builder thingy
