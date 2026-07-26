@@ -84,32 +84,3 @@ _job-switch-reminder() {
 }
 zle -N _job-switch-reminder
 bindkey '^z' _job-switch-reminder
-
-_go_back() {
-    # save buffer
-    zle push-input
-
-    # change command
-    BUFFER="cd .."
-
-    # run command and automatically the buffer is restored
-    zle accept-line
-    zle redisplay
-}
-zle -N _go_back
-bindkey '^[,' _go_back
-
-_go_forward() {
-    # save buffer
-    zle push-input
-
-    # change command
-    BUFFER="cd -"
-
-    # run command and automatically the buffer is restored
-    zle accept-line
-    zle redisplay
-}
-zle -N _go_forward
-bindkey '^[.' _go_forward
-
