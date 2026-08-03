@@ -40,6 +40,7 @@ in
         file # file
         unzip
         unrar
+        qrencode # generate qr codes
 
         # editor
         helix

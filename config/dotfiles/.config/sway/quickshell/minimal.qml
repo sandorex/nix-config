@@ -65,26 +65,24 @@ ShellRoot {
         }
     }
 
-    LazyLoader {
-        active: root.showSidebar
+    Minimal.Sidebar {
+        visible: root.showSidebar
 
-        Minimal.Sidebar {
-            onClose: root.close()
-            onLostFocus: hideTimer.restart()
-            onGainedFocus: hideTimer.stop()
-            onItemClicked: (item) => {
-                switch (item) {
-                    case "power":
-                        powerMenu.show = true
-                        break;
-                    case "brightness":
-                        brightnessMenu.show = true
-                        break;
-                    default:
-                }
+        onClose: root.close()
+        onLostFocus: hideTimer.restart()
+        onGainedFocus: hideTimer.stop()
+        onItemClicked: (item) => {
+            switch (item) {
+                case "power":
+                    powerMenu.show = true
+                    break;
+                case "brightness":
+                    brightnessMenu.show = true
+                    break;
+                default:
             }
-            onCanCloseChanged: (val) => root.canClose = val
         }
+        onCanCloseChanged: (val) => root.canClose = val
     }
 
     // add hotcorners to each monitor

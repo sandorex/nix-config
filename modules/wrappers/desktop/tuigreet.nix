@@ -49,12 +49,13 @@ in
         waylandSessions = "${baseSessionsDir}/share/wayland-sessions";
 
         argsList = [
-          "--user-menu"        # choose user using a menu
-          "--asterisks"        # show * while typing password
-          "--time"             # show time
-          "--remember"         # remember last user
-          "--remember-session" # remember last session
+          "--user-menu"                                     # choose user using a menu
+          "--asterisks"                                     # show * while typing password
+          "--time"                                          # show time
+          "--remember"                                      # remember last user
+          "--remember-session"                              # remember last session
           "--sessions ${waylandSessions}:${xSessions}"
+          "--session-wrapper \"systemd-cat -t desktop --\"" # print all output to systemd
         ];
 
         args = lib.concatStringsSep " " argsList;
@@ -78,6 +79,7 @@ in
       enable = true;
       forceRun = true;
     };
+
     security.pam.services.greetd.kwallet = lib.mkIf config.my.tuigreet.kwallet.enable {
       enable = true;
       forceRun = true;

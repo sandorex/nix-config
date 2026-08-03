@@ -5,7 +5,7 @@
   imports = [
     ./desktop/plasma6.nix
     ./desktop/cinnamon.nix
-    # ./desktop/swaywm.nix # need to merge hyprland tweaks
+    ./desktop/swaywm.nix
     ./desktop/tuigreet.nix
     ./desktop/gnome.nix
     ./desktop/wayfire.nix

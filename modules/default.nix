@@ -82,6 +82,9 @@
 
       # no use for vfio in a VM
       my.vfio.enable = lib.mkForce false;
+
+      # cannot collect garbage in a VM
+      my.gc.enable = lib.mkForce false;
     };
 
     # remove warning in nixos 26.05

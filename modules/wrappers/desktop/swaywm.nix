@@ -14,28 +14,33 @@
       wrapperFeatures.gtk = true;
     };
 
+    # TODO
+    # # Allows storage devices to be controlled over D-Bus
+    # services.udisks2.enable = true;
+    # # Used as an abstraction over udisks2 by file managers
+    # services.gvfs.enable = true;
+    #
+    # services.gnome.gnome-keyring.enable = true;
+    # programs.seahorse.enable = true;
+    # programs.evince.enable = true;
+
+    # app secrets (alternative to KWallet)
+    services.gnome.gnome-keyring.enable = true;
+
     environment.systemPackages = with pkgs; [
-      # using kwallet
-      kdePackages.kwallet
-      kdePackages.kwallet-pam
-      kdePackages.kwalletmanager
-
-      adwaita-icon-theme
-
       # theming
-      kdePackages.breeze
-      kdePackages.breeze-gtk
       kdePackages.breeze-icons
       kdePackages.qt6ct
-      libsForQt5.qt5ct
+      yaru-theme # GTK theme
+      adwaita-icon-theme
       nwg-look
+      qt6Packages.qtstyleplugin-kvantum # kvantum theming
 
       networkmanagerapplet # networkmanager applet and nm-connection-editor
-      rofi-wayland # official rofi does not yet support wayland
+      rofi # official rofi does not yet support wayland
       pavucontrol # gui for audio
       playerctl # controlling players
       overskride # gui for bluetooth (blueman sucks)
-      waybar # the bar
       wev # key detection thingy
       grim # screenshot
       slurp # select region wayland (for grim)
@@ -49,19 +54,31 @@
       kdePackages.kate # text editor
       file-roller      # archive manager
       musicpod         # music player
-      xfce.thunar      # file manager
+      thunar           # file manager
+      lxqt.pcmanfm-qt  # file manager2
+
+      # the shell
+      quickshell
     ];
 
-    fonts.packages = with pkgs; [
-      # waybar
-      font-awesome
-      nerd-fonts.bigblue-terminal
-    ];
-
+    # TODO requires manually configuring qt6ct to use kvantum and breeze-icons, in kvantum manager set KvGnomeDark
     qt = {
       enable = true;
-      style = "breeze";
       platformTheme = "qt5ct";
+    };
+
+    # set gnome theme declaratively
+    programs.dconf.profiles.user = {
+      databases = [{
+        lockAll = true;
+        settings = {
+          "org/gnome/desktop/interface" = {
+            gtk-theme = "Yaru-purple-dark";
+            icon-theme = "Yaru-purple-dark";
+            color-scheme = "default";
+          };
+        };
+      }];
     };
 
     services.udisks2.enable = true;
@@ -79,22 +96,38 @@
         XDG_PICTURES_DIR="${home}/Pictures";
         XDG_PUBLICSHARE_DIR="${home}/Public";
         XDG_TEMPLATES_DIR="${home}/Templates";
+        XDG_PROJECTS_DIR="${home}/Projects";
         XDG_VIDEOS_DIR="${home}/Videos";
       };
 
-    programs.dconf.profiles.user = {
-      databases = [{
-        lockAll = true;
-        settings = {
-          "org/gnome/desktop/interface" = {
-            gtk-theme = "Adwaita";
-          };
+    # programs.dconf = {
+    #   enable = true;
+    #   profiles.user.databases = [{
+    #     lockAll = true;
+    #     settings = {
+    #       # NOTE: this was copied from KDE Plasma session using
+    #       # `dconf dump /org/gnome/desktop/interface`
+    #       "org/gnome/desktop/interface" = {
+    #         gtk-theme = "Breeze-Dark";
+    #         icon-theme = "breeze-dark";
+    #         color-scheme = "prefer-dark";
+    #         font-antialiasing="grayscale";
+    #         font-hinting="slight";
+    #         font-name="Noto Sans,  10";
+    #         font-rgba-order="rgb";
+    #       };
+    #     };
+    #   }];
+    # };
 
-          "org/gnome/desktop/interface" = {
-            color-scheme = "prefer-dark";
-          };
-        };
-      }];
+    xdg.portal = {
+      enable = true;
+      wlr.enable = true;
+      extraPortals = [
+        # wlr portal does not implement most things
+        pkgs.xdg-desktop-portal-gtk
+      ];
+      # xdgOpenUsePortal = true # https://github.com/NixOS/nixpkgs/issues/160923
     };
   };
 }

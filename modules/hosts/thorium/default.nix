@@ -54,7 +54,6 @@
     orca-slicer
     cura-appimage
     qbittorrent
-    arduino-ide
 
     ffmpeg
     mc      # midnight commander file manager
@@ -69,6 +68,7 @@
     proycon-wayout # wayland text widget thingy
 
     nvtopPackages.amd # gpu usage monitor
+    my.breezex # cursor theme
   ];
 
   services.udev.packages = with pkgs; [
@@ -100,7 +100,6 @@
     "com.obsproject.Studio"
     "md.obsidian.Obsidian"  # notes
     "com.stremio.Stremio"
-
     "org.freecad.FreeCAD"   # CAD software
     "org.kde.kdenlive"      # video editor
   ];
@@ -114,7 +113,7 @@
     "net.lutris.Lutris"
   ];
 
-  dotfiles.enabled = with config.dotfiles.configs; [
+  my.dotfiles.enabled = with config.my.dotfiles.configs; [
     zsh
     helix
     rofi

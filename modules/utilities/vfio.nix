@@ -49,8 +49,11 @@ in
       ];
 
       boot.kernelParams = [
-        # TODO this is AMD only
+        # amd
         "amd_iommu=on"
+
+        # intel
+        "intel_iommu=on"
 
         # NOTE information online is spotty but seems to reduce overhead for host devices
         "iommu=pt"
