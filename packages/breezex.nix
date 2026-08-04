@@ -1,14 +1,15 @@
 { pkgs
 , lib
+, ...
 }:
 
-pkgs.stdenv.mkDerivation rec {
+pkgs.stdenvNoCC.mkDerivation rec {
   name = "BreezeX-Light";
   version = "2.0.1";
   phases = [ "installPhase" ];
   installPhase = ''
     mkdir -p $out/share/icons
-    cp ${./BreezeX/BreezeX-Light} $out/share/icons/${name}
+    cp -r ${./BreezeX/BreezeX-Light} $out/share/icons/${name}
   '';
 
   meta = {

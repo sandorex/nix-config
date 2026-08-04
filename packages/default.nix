@@ -9,6 +9,7 @@
   alass = pkgs.callPackage ./alass.nix inputs;
   QuickPiperAudiobook = pkgs.callPackage ./quick-piper-audiobook.nix inputs;
   nix-index = pkgs.callPackage ./nix-index.nix inputs;
+  breezex = pkgs.callPackage ./breezex.nix inputs;
 
   # TODO i don't think this should be tied to any python version
   pywayfire = pkgs.python3.pkgs.callPackage ./pywayfire.nix {};
