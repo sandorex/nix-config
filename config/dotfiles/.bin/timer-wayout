@@ -3,11 +3,7 @@
 
 set -euo pipefail
 
-# file used to store PID of running wayout widget
-TIMER_FILE="/tmp/.timer-wayout"
-
-# how often to update wayout widget
-UPDATE_INTERVAL=10
+LOCKFILE="/tmp/.timer-wayout"
 
 wayout_cmd=""
 if command -v wayout &>/dev/null; then
@@ -19,75 +15,65 @@ else
     exit 1
 fi
 
-# kill old timer if its running
-if [[ -f "$TIMER_FILE" ]]; then
-    echo "Killing old timer.."
-    pid="$(cat "$TIMER_FILE")"
+# if already running kill the running instance and quit
+exec 200<>"$LOCKFILE"
+if ! flock -n 200; then
+    read pid <&200
+    echo "Process $pid already running, terminating it.."
 
     # send INT signal then KILL
     kill -INT "-$pid" &>/dev/null || true
-    sleep 2s
+    sleep 1s
     kill -KILL "-$pid" &>/dev/null || true
-fi
 
-# if no arguments just quit after killing old timer
-if [[ "$#" -eq 0 ]]; then
-    echo "No time specified.. quitting.."
     exit 0
 fi
+echo "$$" >&"200" # write PID
 
-# write current pid into timer file
-echo "$$" > "$TIMER_FILE"
-
-# convert human time to unix timestamp using `date` command
-end_time="$(date --date="$*" +'%s')"
-
-function cleanup() {
-    rm -f "$TIMER_FILE"
-}
-trap cleanup EXIT INT
+# reset seconds counter
+SECONDS=0
 
 function display() {
-    passed=0
-    diff="$(( end_time - $(date +'%s') ))"
-
-    if (( diff < 0 )); then
-        diff=$(( diff * -1 ))
-        passed=1
-    fi
-
     # print human readable time
-    T="$diff"
+    T="$SECONDS"
     D=$((T/60/60/24))
     H=$((T/60/60%24))
     M=$((T/60%60))
-    S=$((T%60))
+    S=$((T))
     rel_time=""
     (( D > 0 )) && rel_time="$rel_time${D}d "
     (( H > 0 )) && rel_time="$rel_time${H}h "
     (( M > 0 )) && rel_time="$rel_time${M}m "
 
+    # show minute when its less than a minute
     if [[ -z "$rel_time" ]]; then
-        rel_time="$rel_time${S}s "
+        rel_time="1m "
     fi
 
-    if [[ "$passed" -eq 1 ]]; then
-        # turn red when time has passed
-        printf '%s\n' "<span foreground=\"red\">${rel_time% }</span>"
+    # remove any leftover spaces
+    rel_time="${rel_time% }"
+
+    color=""
+    if (( T >= (60) )); then
+        color="red"
+    elif (( T >= (45) )); then
+        color="#FF8900F0" # slightly transparent orange
+    elif (( T >= (30) )); then
+        color="#FFFF00AF" # transparent yellow
+    fi
+
+    if [[ -n "$color" ]]; then
+        printf '%s\n' "<span foreground=\"$color\">$rel_time</span>"
     else
-        printf '%s\n' "${rel_time% }"
+        printf '%s\n' "$rel_time"
     fi
 }
 
-# display to null so it quits before starting wayout
-display &>/dev/null
-
 while :; do
     display
-    echo "<BREAK>"
-    sleep "$UPDATE_INTERVAL"
+    sleep 1m
 done | "$wayout_cmd" \
-    --feed-delimiter "<BREAK>" \
+    --feed-line \
     --font "Noto Sans 9" \
     --height 30 \
     --width 50 \
