@@ -54,11 +54,11 @@ function display() {
     rel_time="${rel_time% }"
 
     color=""
-    if (( T >= (60) )); then
+    if (( T >= (60 * 60) )); then
         color="red"
-    elif (( T >= (45) )); then
+    elif (( T >= (45 * 60) )); then
         color="#FF8900F0" # slightly transparent orange
-    elif (( T >= (30) )); then
+    elif (( T >= (30 * 60) )); then
         color="#FFFF00AF" # transparent yellow
     fi
 
