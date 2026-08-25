@@ -6,6 +6,7 @@
 
 set -eo pipefail
 
+# TODO set env var for npm or smth cause theres no execution rights in ~/.npm
 args=(
     --quiet
 
@@ -57,6 +58,37 @@ whitelist_ro=(
     # allow nix config (to allow running flake shells)
     "$HOME/nix-config"
 )
+
+POSITIONAL_ARGS=()
+while [ $# -gt 0 ]; do
+    case $1 in
+        --rw)
+            whitelist+=("$2")
+            shift 2
+            ;;
+        --ro)
+            whitelist_ro+=("$2")
+            shift 2
+            ;;
+        --)
+            # save rest as args
+            POSITIONAL_ARGS+=("$@")
+            break
+            ;;
+        -*)
+            args+=("$1")
+            shift
+            ;;
+        *)
+            # save positional arg
+            POSITIONAL_ARGS+=("$1")
+            shift
+            ;;
+    esac
+done
+
+# restore positional parameters
+set -- "${POSITIONAL_ARGS[@]}"
 
 for path in "${whitelist[@]}"; do
     args+=("--whitelist=$path")

@@ -60,4 +60,10 @@ vim.lsp.enable {
     "rust_analyzer",
     "basedpyright",
     "nixd",
+    "clangd",
+
+    -- vscode-langservers-extracted
+    "html",
+    "cssls",
+    -- "eslint" -- TODO depends on lspconfig
 }

@@ -34,6 +34,7 @@ in
         # common preinstalled linux commands
         python3 # for scripting
         bc # cli calculator
+        libqalculate # better cli calculator
         pciutils # lspci
         usbutils # lsusb
         bind.dnsutils # dig
@@ -51,6 +52,9 @@ in
 
         # search packages, nicer cli for nixos commands
         nh
+
+        # NTFS driver
+        ntfs3g
 
         my.nix-index # find nix files from index
       ]
@@ -72,7 +76,6 @@ in
     (lib.mkIf standard {
       environment.systemPackages = with pkgs; [
         nixd # nix lsp
-        pkgsUnstable.devenv # devenv 2.0 is not in stable
       ];
     })
 

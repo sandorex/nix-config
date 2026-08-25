@@ -5,6 +5,8 @@ function log() {
     echo "$(tput setaf 3):: $*$(tput sgr0)"
 }
 
+# TODO add nix
+
 if command -v pkcon &>/dev/null; then
     log "System updates"
     pkcon get-updates

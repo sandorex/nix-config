@@ -141,9 +141,9 @@ def pair_menu():
 
 def device_menu(device):
     data = [
-        "Disconnect" if device.connected else "Connect",
-        "Unpair",
-        "Back"
+        "Disconnect\0icon\x1flist-remove" if device.connected else "Connect",
+        "Unpair\0icon\x1flist-remove",
+        "Back\0icon\x1fgo-previous"
     ]
 
     index = rofi("\n".join(data))
@@ -168,13 +168,14 @@ def main():
     # style the devices for rofi
     devices = get_devices()
     data = []
+    icon = "\0icon\x1fdialog-question"
     for device in get_devices():
         if device.connected:
-            data.append(f"<b>{device.name}</b>")
+            data.append(f"<b>{device.name}</b>{icon}")
         else:
-            data.append(f"<span foreground=\"gray\">{device.name}</span>")
+            data.append(f"<span foreground=\"gray\">{device.name}</span>{icon}")
 
-    data.append(f"<span foreground=\"#e6d7ff\">Pair a new device</span>")
+    data.append(f"<span foreground=\"#e6d7ff\">Pair a new device</span>\0icon\x1flist-add")
 
     index = rofi("\n".join(data))
 

@@ -1,2 +1,2 @@
 [Context]
-filesystems=~/slowmf/Torrent:ro;
+filesystems=~/slowmf/Torrent:ro;/home/sandorex/slowmf/Bottles:create;

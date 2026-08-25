@@ -12,13 +12,15 @@ const LATENCY_BAD = 200
 # assumes there is at least n second delay between pings
 const DELAY = 2sec
 
-# Analyzes CSV file from network-probe script for gather data about network interruptions
+# TODO date is not implemented, do not read whole file just find entries with date and stop after the date changes
+
+# Analyzes file from network-probe script
 def main [
     --csv                                  # Output CSV instead of formatted data
-    --date: datetime (-d)                  # Filter out entries for this date only
+    # --date: datetime (-d)                  # Filter out entries for this date only
     --latency: number (-l) = $LATENCY_BAD  # Bad latency threshold
     --delay: duration = $DELAY             # Delay between pings (for rounding up missed pings)
-    input: path                            # CSV file to analyze (no header)
+    input: path                            # File to analyze (json object per line)
 ] {
     let entries = open --raw $input
         | lines
