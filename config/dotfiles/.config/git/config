@@ -39,8 +39,12 @@
     ds = diff --staged # show only files to be commited
     ll = "log --graph --all --pretty=format:\"%C(magenta)%h %C(white) %an  %ar%C(blue)  %D%n%s%n\""
     l = "log --date=iso --format='%C(auto) %h %d %s %Cgreen [%ad]'"
+    e = add --edit
     p = add --patch
     i = add --interactive
+    ia = add --intent-to-add
+
+    rs = restore --staged
 
     graph = log --oneline --decorate --all --graph
 
