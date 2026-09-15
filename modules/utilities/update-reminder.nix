@@ -35,7 +35,7 @@ in
       wantedBy = [ "graphical-session.target" ];
       partOf = [ "${serviceName}.service" ];
       timerConfig = {
-        OnCalendar = "Sunday";
+        OnCalendar = "daily";
         Persistent = "true";
 
         # do not start on boot

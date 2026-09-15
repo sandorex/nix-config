@@ -1,7 +1,7 @@
 { config, lib, flake, pkgs, hostname, ... }:
 
 let
-  inherit (builtins) filter attrNames readDir map mapAttrs;
+  inherit (builtins) filter attrNames readDir mapAttrs;
   inherit (lib) filterAttrs;
 
   enabled = config.my.flatpak.enable;
@@ -76,7 +76,8 @@ in
         ''
         # if there are flatpaks to install run the service to not slow down activation script
         + lib.optionalString (flatpaks != []) ''
-          ${pkgs.systemd}/bin/systemctl --user start "${serviceName}"
+          echo "Ensure flatpaks are installed"
+          ${pkgs.systemd}/bin/systemctl --user --no-block start "${serviceName}"
         '';
         deps = [];
       };
@@ -120,6 +121,9 @@ in
       # access ruleAttrs using the name
       (map (x: ruleAttrs.${x} or (throw "Invalid flatpak override '${x}'")))
 
+      # TODO this should be merged into one system where clobber is optional as this could get into
+      # a weird quasi state where most overrides are applied but not all!
+      #
       # convert into tmpfiles syntax
       # NOTE does not clobber
       (map (x: "L$ %h/.local/share/flatpak/overrides/${x.name} - - - - ${x.path}"))

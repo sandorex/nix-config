@@ -24,7 +24,10 @@
       "com.usebottles.bottles"                        # general purpose proton/wine launcher
       "com.heroicgameslauncher.hgl"                   # GOG/Epic games launcher
       "net.davidotek.pupgui2"                         # proton-qt, manging proton versions
-      "org.freedesktop.Platform.VulkanLayer.MangoHud" # mangohud for flatpak
+
+      # TODO idk which version is needed for bottles and hgl
+      # NOTE must be full version or the automatic install will fail with multiple choices
+      "runtime/org.freedesktop.Platform.VulkanLayer.MangoHud/x86_64/26.08" # mangohud for flatpak
     ];
   };
 }
