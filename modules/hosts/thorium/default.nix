@@ -1,4 +1,4 @@
-{ flake, config, pkgs, pkgsUnstable, ... }:
+{ flake, config, pkgs, pkgsUnstable, lib, ... }:
 
 {
   imports = [
@@ -69,6 +69,8 @@
 
     nvtopPackages.amd # gpu usage monitor
     my.breezex # cursor theme
+
+    btrfs-progs # btrfs tools
   ];
 
   services.udev.packages = with pkgs; [
