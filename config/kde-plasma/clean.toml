@@ -74,6 +74,11 @@ section = [
 regex.key = [
     # on nixos its versioned so it will change every update
     "^SlidePaths$",
+
+    # these change often
+    "^popupWidth$",
+    "^popupHeight$",
+    "^PreloadWeight$",
 ]
 
 # listing other files that are important even though there is nothing to clean
