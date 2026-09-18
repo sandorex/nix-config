@@ -15,7 +15,7 @@ let
   #   @root/var/tmp
   #
   #   @home
-  #   @home/sandorex/.local/share/Steam
+  #   @home/sandorex/.local/share/Steam (compression=none)
   #   @home/sandorex/Downloads
   #   @home/sandorex/.cache
   main = {

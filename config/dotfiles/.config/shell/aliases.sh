@@ -71,7 +71,7 @@ alias -- '....'='cd ../../..'
 alias diff='diff --report-identical-files --color=auto'
 alias grep='grep --color=auto'
 alias isodate="date +'%Y%m%dT%H%M'"
-alias qr="qrencode -t UTF8"
+alias qr="qrencode -t ansiutf8"
 
 # call lua interpreter builtin into neovim
 nlua() {

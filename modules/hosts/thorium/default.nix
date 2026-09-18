@@ -100,10 +100,12 @@
 
   my.flatpak.install = [
     "com.obsproject.Studio"
-    "md.obsidian.Obsidian"  # notes
     "com.stremio.Stremio"
-    "org.freecad.FreeCAD"   # CAD software
-    "org.kde.kdenlive"      # video editor
+    "md.obsidian.Obsidian"
+    "org.freecad.FreeCAD"
+    "org.kde.kdenlive"
+    "com.discordapp.Discord"
+    "org.pipewire.Helvum"
   ];
 
   # apply flatpak permission overrides
