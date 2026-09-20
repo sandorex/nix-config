@@ -66,6 +66,8 @@ listview {
   spacing:  48px;
   columns:  6;
   fixed-columns: true;
+  // place icons in rows instead of columns
+  flow: horizontal;
 }
 
 element, element-text, element-icon {

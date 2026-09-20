@@ -1,0 +1,19 @@
+#!/usr/bin/env bash
+
+initium_args=()
+rofi_args=()
+
+if [[ "$1" == "favorites" ]]; then
+    # big fullscreen theme
+    rofi_args+=("-theme" "launchpad")
+
+    # sort favorites first
+    initium_args+=("--sort-tag" "favorite")
+fi
+
+rofi -kb-accept-alt "" \
+     -kb-custom-1 "Shift+Return" \
+     -kb-custom-2 "F1" \
+     "${rofi_args[@]}" \
+     -modi "s:initium ${initium_args[*]} rofi" \
+     -show s

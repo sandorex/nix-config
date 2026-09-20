@@ -14,6 +14,9 @@ configuration {
 
     /* show icons in drun and window modes */
     show-icons: true;
+
+    /* do not prefix each item with mode name */
+    combi-hide-mode-prefix: true;
 }
 
 // default theme override with `-theme launchpad`
