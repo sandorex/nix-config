@@ -86,6 +86,8 @@
   # services.zerotierone.enable = true;
   # systemd.services.zerotierone.wantedBy = lib.mkForce [];
 
+  programs.kdeconnect.enable = true;
+
   # manual sandboxing
   programs.firejail.enable = true;
 
@@ -118,6 +120,7 @@
   ];
 
   my.dotfiles.enabled = with config.my.dotfiles.configs; [
+    assets
     zsh
     helix
     rofi
