@@ -52,13 +52,13 @@
           {
             matches = [
               {
-                node.name = "~alsa_output.*";
+                "node.name" = "~alsa_output.*";
               }
             ];
             actions = {
               update-props = {
                 # suspend after 1 minute
-                session.suspend-timeout-seconds = (1 * 60);
+                "session.suspend-timeout-seconds" = (1 * 60);
               };
             };
           }

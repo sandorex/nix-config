@@ -29,6 +29,27 @@
     byGroup = [ 16 17 ];
   };
 
+  services.pipewire.wireplumber.extraConfig = {
+    thorium-bluetooth = {
+      "monitor.bluez.rules" = [
+        # FIIO BTR11 volume control is quite wonky
+        # also helps with the crackling by adjusting the volume on the dac
+        {
+          matches = [
+            {
+              "device.description" = "FIIO BTR11";
+            }
+          ];
+          actions = {
+            update-props = {
+              "bluez5.hw-volume" = [ ];
+            };
+          };
+        }
+      ];
+    };
+  };
+
   specialisation.no-passthrough.configuration = {
     # disable passthrough
     my.vfio.enable = lib.mkForce false;
