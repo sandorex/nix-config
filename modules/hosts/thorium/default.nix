@@ -51,8 +51,8 @@
     })
     libreoffice
     krita
+    inkscape
     orca-slicer
-    cura-appimage
     qbittorrent
 
     ffmpeg
