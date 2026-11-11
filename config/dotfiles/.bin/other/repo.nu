@@ -10,7 +10,7 @@ def --wrapped main [...command: string] {
     let basedir = if $nu.os-info.name == 'windows' {
         # TODO untested
         # just use global per-user path
-        "~\AppData\LocalLow\semiwork\Repo"
+        "~/AppData/LocalLow/semiwork/Repo"
     } else {
         # get path from PWD as steam sets it properly
         # steamapps/common/REPO -> steamapps/compatdata/3241660/...

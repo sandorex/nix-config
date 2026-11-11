@@ -1,0 +1,159 @@
+{
+  "Revision": "0.6.7",
+  "Profiles": [
+    {
+      "Tablet": "Wacom CTL-472",
+      "OutputMode": {
+        "Path": "OpenTabletDriver.Desktop.Output.LinuxArtistMode",
+        "Settings": [],
+        "Enable": true
+      },
+      "Filters": [
+        {
+          "Path": "Hover_Distance_Limiter.Hover_Distance_Limiter",
+          "Settings": [
+            {
+              "Property": "Hover_min",
+              "Value": 14
+            },
+            {
+              "Property": "Hover_max",
+              "Value": 255
+            },
+            {
+              "Property": "NearProximity",
+              "Value": false
+            },
+            {
+              "Property": "Pressure_min",
+              "Value": 0
+            },
+            {
+              "Property": "Pressure_max",
+              "Value": 16384
+            },
+            {
+              "Property": "Pen",
+              "Value": false
+            },
+            {
+              "Property": "Eraser",
+              "Value": false
+            }
+          ],
+          "Enable": false
+        },
+        {
+          "Path": "Flip_Axes.Flip_Area_Axes",
+          "Settings": [
+            {
+              "Property": "Flip_X",
+              "Value": false
+            },
+            {
+              "Property": "Flip_Y",
+              "Value": false
+            }
+          ],
+          "Enable": false
+        },
+        {
+          "Path": "Flip_Axes.Flip_Tablet_Axes",
+          "Settings": [
+            {
+              "Property": "Flip_X",
+              "Value": true
+            },
+            {
+              "Property": "Flip_Y",
+              "Value": true
+            }
+          ],
+          "Enable": true
+        }
+      ],
+      "AbsoluteModeSettings": {
+        "Display": {
+          "Width": 1920.0,
+          "Height": 2160.0,
+          "X": 960.0,
+          "Y": 1080.0,
+          "Rotation": 0.0
+        },
+        "Tablet": {
+          "Width": 152.0,
+          "Height": 95.0,
+          "X": 76.0,
+          "Y": 47.5,
+          "Rotation": 0.0
+        },
+        "EnableClipping": true,
+        "EnableAreaLimiting": false,
+        "LockAspectRatio": false
+      },
+      "RelativeModeSettings": {
+        "XSensitivity": 12.0,
+        "YSensitivity": 12.0,
+        "RelativeRotation": 0.0,
+        "RelativeResetDelay": "00:00:00.1000000"
+      },
+      "Bindings": {
+        "TipActivationThreshold": 1.0,
+        "TipButton": {
+          "Path": "OpenTabletDriver.Desktop.Binding.AdaptiveBinding",
+          "Settings": [
+            {
+              "Property": "Binding",
+              "Value": "Tip"
+            }
+          ],
+          "Enable": true
+        },
+        "EraserActivationThreshold": 1.0,
+        "EraserButton": {
+          "Path": "OpenTabletDriver.Desktop.Binding.AdaptiveBinding",
+          "Settings": [
+            {
+              "Property": "Binding",
+              "Value": "Eraser"
+            }
+          ],
+          "Enable": true
+        },
+        "PenButtons": [
+          {
+            "Path": "OpenTabletDriver.Desktop.Binding.AdaptiveBinding",
+            "Settings": [
+              {
+                "Property": "Binding",
+                "Value": "Button 1"
+              }
+            ],
+            "Enable": true
+          },
+          {
+            "Path": "OpenTabletDriver.Desktop.Binding.AdaptiveBinding",
+            "Settings": [
+              {
+                "Property": "Binding",
+                "Value": "Button 2"
+              }
+            ],
+            "Enable": true
+          }
+        ],
+        "AuxButtons": [],
+        "MouseButtons": [],
+        "MouseScrollUp": null,
+        "MouseScrollDown": null,
+        "WheelBindings": [],
+        "DisablePressure": false,
+        "DisableTilt": false,
+        "EnableDragBindings": false
+      }
+    }
+  ],
+  "LockUsableAreaDisplay": true,
+  "LockUsableAreaTablet": true,
+  "Tools": []
+}

@@ -21,6 +21,10 @@
   boot.initrd.kernelModules = [ ];
   boot.kernelModules = [ "kvm-amd" "drivetemp" ];
 
+  # use open source tablet driver
+  hardware.opentabletdriver.enable = true;
+  hardware.uinput.enable = true;
+
   # ryzen igpu
   #  groups 16 17
   #  ids    1002:1638 1002:1637
@@ -33,7 +37,6 @@
     thorium-bluetooth = {
       "monitor.bluez.rules" = [
         # FIIO BTR11 volume control is quite wonky
-        # also helps with the crackling by adjusting the volume on the dac
         {
           matches = [
             {
